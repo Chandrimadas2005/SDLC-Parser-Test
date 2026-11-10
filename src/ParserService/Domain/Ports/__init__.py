@@ -4,5 +4,6 @@ from ParserService.Domain.Ports.ArtifactStore import ArtifactStore
 from ParserService.Domain.Ports.Clock import Clock
 from ParserService.Domain.Ports.JobQueue import JobQueue
 from ParserService.Domain.Ports.JobRepository import JobRepository
+from ParserService.Domain.Ports.TypeDetector import TypeDetector
 
-__all__ = ["ArtifactStore", "Clock", "JobQueue", "JobRepository"]
+__all__ = ["ArtifactStore", "Clock", "JobQueue", "JobRepository", "TypeDetector"]

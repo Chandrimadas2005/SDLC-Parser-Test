@@ -1,0 +1,7 @@
+Synthetic meeting notes for parser tests.
+They contain no real data.
+
+The second paragraph has two lines
+that belong together.
+
+Last paragraph.

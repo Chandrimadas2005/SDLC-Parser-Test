@@ -2,6 +2,7 @@
 
 from ParserService.Domain.Documents.Confidence import Confidence
 from ParserService.Domain.Documents.DetectedType import DetectedType
+from ParserService.Domain.Documents.Detection import Detection
 from ParserService.Domain.Documents.DocumentFacts import DocumentFacts
 from ParserService.Domain.Documents.DocumentStatus import DocumentStatus
 from ParserService.Domain.Documents.Element import Element
@@ -14,6 +15,7 @@ from ParserService.Domain.Documents.OutlineEntry import OutlineEntry
 from ParserService.Domain.Documents.OutlineKind import OutlineKind
 from ParserService.Domain.Documents.ParsedDocument import ParsedDocument
 from ParserService.Domain.Documents.ParseWarning import ParseWarning
+from ParserService.Domain.Documents.SourceFile import SourceFile
 from ParserService.Domain.Documents.Table import Table
 from ParserService.Domain.Documents.TableRow import TableRow
 from ParserService.Domain.Documents.WarningCode import WarningCode
@@ -21,6 +23,7 @@ from ParserService.Domain.Documents.WarningCode import WarningCode
 __all__ = [
     "Confidence",
     "DetectedType",
+    "Detection",
     "DocumentFacts",
     "DocumentStatus",
     "Element",
@@ -33,6 +36,7 @@ __all__ = [
     "OutlineKind",
     "ParseWarning",
     "ParsedDocument",
+    "SourceFile",
     "Table",
     "TableRow",
     "WarningCode",
