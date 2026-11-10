@@ -60,6 +60,7 @@ Not shipped. Used for checks, tests and local hooks.
 |---|---|---|---|
 | httpx2 | 2.16.0 | BSD-3-Clause | HTTP client behind the FastAPI test client |
 | import-linter | 2.16 | BSD-2-Clause | Layer rules (`Infrastructure -> Application -> Domain`) |
+| jsonschema | 4.26.0 | MIT | Checks every encoded `ParsedDocument` against `schemas/parsed_document.v1.json` |
 | mypy | 2.4.1 | MIT | Strict static typing (with the pydantic plugin) |
 | pip-audit | 2.10.1 | Apache-2.0 | Vulnerability scan |
 | pip-licenses | 5.5.5 | MIT | Licence policy check |
@@ -67,6 +68,16 @@ Not shipped. Used for checks, tests and local hooks.
 | pytest | 9.2.0 | MIT | Test runner |
 | pytest-cov | 7.1.0 | MIT | Coverage |
 | ruff | 0.17.4 | MIT | Lint and format (complexity 4, arguments 3) |
+| types-jsonschema | 4.26.0.20261006 | Apache-2.0 | Type stubs for jsonschema (`mypy --strict`) |
+
+Transitive development-only packages inside the allow-list:
+
+| Package | Version | Licence | Pulled in by |
+|---|---|---|---|
+| attrs | 26.1.0 | MIT | jsonschema |
+| jsonschema-specifications | 2025.9.1 | MIT | jsonschema |
+| referencing | 0.37.0 | MIT | jsonschema |
+| rpds-py | 2026.9.1 | MIT | jsonschema |
 
 Transitive development-only packages outside the shipping allow-list, never part of the
 image:
