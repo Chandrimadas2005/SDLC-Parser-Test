@@ -15,10 +15,12 @@ Shipped in the service image. Checked by CI.
 | Package | Version | Licence | Purpose |
 |---|---|---|---|
 | alembic | 1.20.1 | MIT | Schema migrations, forward and backward |
+| charset-normalizer | 3.5.2 | MIT | Encoding detection for text files |
 | fastapi | 0.162.2 | MIT | HTTP API |
 | pg8000 | 1.31.6 | BSD-3-Clause | Pure-Python PostgreSQL driver |
 | prometheus-client | 0.26.0 | Apache-2.0 | `/metrics` |
 | pydantic | 2.14.3 | MIT | Request and response models |
+| python-magic | 0.4.27 | MIT | Content-based type detection (needs the libmagic1 system package) |
 | python-multipart | 0.0.33 | Apache-2.0 | Multipart file uploads for FastAPI |
 | sqlalchemy | 2.1.8 | MIT | Core SQL toolkit for the job table |
 | structlog | 25.5.0 | MIT OR Apache-2.0 | Structured JSON logging |

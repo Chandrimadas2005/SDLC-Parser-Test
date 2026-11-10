@@ -6,10 +6,12 @@ readme = "README.md"
 requires-python = ">=3.12,<3.13"
 dependencies = [
   "alembic>=1.16,<2",
+  "charset-normalizer>=3.4,<4",
   "fastapi>=0.120,<1",
   "pg8000>=1.31,<2",
   "prometheus-client>=0.21,<1",
   "pydantic>=2.9,<3",
+  "python-magic>=0.4.27,<0.5",
   "python-multipart>=0.0.20,<1",
   "sqlalchemy>=2.0.36,<3",
   "structlog>=24.4,<26",
