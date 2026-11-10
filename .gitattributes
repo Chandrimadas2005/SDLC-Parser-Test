@@ -1,0 +1,22 @@
+# Normalise line endings so Windows and Linux contributors produce identical diffs.
+* text=auto eol=lf
+
+# Test corpus files are compared byte for byte; never touch their line endings.
+tests/corpus/** -text
+*.xlsx binary
+*.xlsm binary
+*.xls binary
+*.ods binary
+*.pdf binary
+*.docx binary
+*.doc binary
+*.pptx binary
+*.ppt binary
+*.odt binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.tif binary
+*.tiff binary
+*.zip binary
+*.msg binary

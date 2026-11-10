@@ -1,0 +1,143 @@
+[project]
+name = "parser-service"
+version = "0.1.0"
+description = "Standalone service that parses files into structured, source-located data."
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "alembic>=1.16,<2",
+  "fastapi>=0.120,<1",
+  "pg8000>=1.31,<2",
+  "prometheus-client>=0.21,<1",
+  "pydantic>=2.9,<3",
+  "python-multipart>=0.0.20,<1",
+  "sqlalchemy>=2.0.36,<3",
+  "structlog>=24.4,<26",
+  "uvicorn>=0.32,<1",
+]
+
+[project.scripts]
+parser-api = "ParserService.Infrastructure.Bootstrap.ServiceRunner:ServiceRunner.main"
+
+[dependency-groups]
+dev = [
+  "httpx2>=2.16,<3",
+  "import-linter>=2.16,<3",
+  "mypy>=2.4,<3",
+  "pip-audit>=2.10,<3",
+  "pip-licenses>=5.5,<6",
+  "pre-commit>=4.7,<5",
+  "pytest>=9.2,<10",
+  "pytest-cov>=7.1,<8",
+  "ruff>=0.17,<0.18",
+]
+
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/ParserService"]
+
+# ---------------------------------------------------------------- ruff
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+src = [".", "src"]
+
+[tool.ruff.lint]
+select = [
+  "A", "ANN", "ARG", "ASYNC", "B", "BLE", "C4", "C90", "D", "DTZ", "E", "EM", "ERA",
+  "F", "FBT", "FURB", "G", "I", "LOG", "N", "PERF", "PIE", "PL", "PT", "PTH", "Q",
+  "RET", "RSE", "RUF", "S", "SIM", "SLF", "T10", "T20", "TC", "TID", "TRY", "UP", "W",
+]
+ignore = [
+  "N999",  # PascalCase module and package names are required by the code rules
+  "D100",  # one class per file: the class docstring documents the module
+  "D105",  # magic methods need no docstring
+  "D107",  # __init__ is documented by the class docstring
+]
+
+[tool.ruff.lint.mccabe]
+max-complexity = 4
+
+[tool.ruff.lint.pylint]
+max-args = 3
+max-positional-args = 3
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.isort]
+# Explicit, so import grouping is identical on case-insensitive (Windows) and Linux filesystems.
+known-first-party = ["ParserService", "tools"]
+
+[tool.ruff.lint.flake8-tidy-imports]
+ban-relative-imports = "all"
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S101", "PLR2004", "D101", "D102", "D103"]
+
+# ---------------------------------------------------------------- mypy
+[tool.mypy]
+python_version = "3.12"
+plugins = ["pydantic.mypy"]
+strict = true
+disallow_any_explicit = true
+warn_unreachable = true
+mypy_path = "src"
+files = ["src", "tests", "tools"]
+explicit_package_bases = true
+
+# ---------------------------------------------------------------- pytest
+[tool.pytest.ini_options]
+minversion = "9.0"
+testpaths = ["tests"]
+pythonpath = ["."]
+python_files = ["Test*.py"]
+addopts = ["--strict-markers", "--strict-config", "-ra", "--import-mode=importlib"]
+filterwarnings = ["error"]
+
+[tool.coverage.run]
+branch = true
+source = ["src", "tools"]
+omit = ["*/__main__.py"]
+
+[tool.coverage.report]
+fail_under = 90
+show_missing = true
+skip_empty = true
+exclude_also = ["if TYPE_CHECKING:", "if __name__ == .__main__.:"]
+
+# ---------------------------------------------------------------- import-linter
+[tool.importlinter]
+root_packages = ["ParserService"]
+include_external_packages = true
+
+[[tool.importlinter.contracts]]
+name = "Dependencies point inward: Infrastructure -> Application -> Domain"
+type = "layers"
+layers = [
+  "ParserService.Infrastructure",
+  "ParserService.Application",
+  "ParserService.Domain",
+]
+
+[[tool.importlinter.contracts]]
+name = "Domain has no framework, database, HTTP, logging or clock imports"
+type = "forbidden"
+source_modules = ["ParserService.Domain"]
+forbidden_modules = [
+  "datetime", "logging", "time", "os", "sys", "pathlib", "subprocess", "asyncio",
+  "fastapi", "starlette", "pydantic", "uvicorn", "sqlalchemy", "alembic", "pg8000",
+  "structlog", "prometheus_client",
+]
+
+[[tool.importlinter.contracts]]
+name = "Application never imports database, HTTP or logging code"
+type = "forbidden"
+source_modules = ["ParserService.Application"]
+forbidden_modules = [
+  "fastapi", "starlette", "pydantic", "uvicorn", "sqlalchemy", "alembic", "pg8000",
+  "structlog", "prometheus_client", "logging",
+]
