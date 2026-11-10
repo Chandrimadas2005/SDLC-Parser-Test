@@ -1,1 +1,1 @@
-Café crème brûlée, naïve résumé à la carte. Synthetic text written in Latin-1 so the detector has to guess its encoding.
+Le café est prêt. Nous avons préparé une crème brûlée et un gâteau. Où est la forêt? Les élèves étudient à l'école. Synthetic French text written in Latin-1 so that the detector has to guess the encoding of this file.
