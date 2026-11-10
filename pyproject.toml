@@ -23,6 +23,7 @@ parser-api = "ParserService.Infrastructure.Bootstrap.ServiceRunner:ServiceRunner
 dev = [
   "httpx2>=2.16,<3",
   "import-linter>=2.16,<3",
+  "jsonschema>=4.23,<5",
   "mypy>=2.4,<3",
   "pip-audit>=2.10,<3",
   "pip-licenses>=5.5,<6",
@@ -30,6 +31,7 @@ dev = [
   "pytest>=9.2,<10",
   "pytest-cov>=7.1,<8",
   "ruff>=0.17,<0.18",
+  "types-jsonschema>=4.26,<5",
 ]
 
 [build-system]

@@ -1,0 +1,56 @@
+{
+  "schema_version": "1.0",
+  "status": "succeeded",
+  "document": {
+    "file_name": "sample.md",
+    "detected_type": "md",
+    "size_bytes": 42,
+    "sha256": "b3cc0475bb78a5026098858e9889acf666d31062d513d303314eca31d36e72f2",
+    "properties": {
+      "title": "Synthetic sample"
+    }
+  },
+  "warnings": [],
+  "outline": [
+    {
+      "kind": "heading",
+      "name": "Intro",
+      "level": 1,
+      "locator": {
+        "paragraph": 1,
+        "char_start": 0,
+        "char_end": 5
+      }
+    }
+  ],
+  "elements": [
+    {
+      "id": "e-000001",
+      "kind": "heading",
+      "locator": {
+        "paragraph": 1,
+        "char_start": 0,
+        "char_end": 5
+      },
+      "text": "Intro",
+      "level": 1
+    },
+    {
+      "id": "e-000002",
+      "kind": "paragraph",
+      "locator": {
+        "paragraph": 2,
+        "char_start": 7,
+        "char_end": 18
+      },
+      "text": "Hello there"
+    }
+  ],
+  "metrics": {
+    "words": 3,
+    "elements_by_kind": {
+      "heading": 1,
+      "paragraph": 1
+    }
+  }
+}

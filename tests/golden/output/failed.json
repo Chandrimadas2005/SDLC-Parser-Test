@@ -1,0 +1,24 @@
+{
+  "schema_version": "1.0",
+  "status": "failed",
+  "failure_reason": "password_protected",
+  "document": {
+    "file_name": "sample.pdf",
+    "detected_type": "pdf",
+    "size_bytes": 42,
+    "sha256": "b3cc0475bb78a5026098858e9889acf666d31062d513d303314eca31d36e72f2",
+    "properties": {
+      "title": "Synthetic sample"
+    }
+  },
+  "warnings": [
+    {
+      "code": "extension_mismatch"
+    }
+  ],
+  "outline": [],
+  "elements": [],
+  "metrics": {
+    "elements_by_kind": {}
+  }
+}
