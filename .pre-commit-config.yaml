@@ -1,0 +1,70 @@
+# Install once with:  uv run pre-commit install --hook-type pre-commit --hook-type commit-msg
+# Local hooks run the locked tool versions from uv.lock, so results match CI exactly.
+default_install_hook_types: [pre-commit, commit-msg]
+default_stages: [pre-commit]
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: no-commit-to-branch # never commit to the default branch
+        args: [--branch, main]
+      - id: check-added-large-files
+        args: [--maxkb=1024]
+      - id: check-merge-conflict
+      - id: check-toml
+      - id: check-yaml
+      - id: detect-private-key
+      - id: end-of-file-fixer
+      - id: mixed-line-ending
+        args: [--fix=lf]
+      - id: trailing-whitespace
+
+  - repo: local
+    hooks:
+      - id: conventional-commit
+        name: commit subject is a Conventional Commit of 72 characters or fewer
+        language: pygrep
+        entry: '\A(?=[^\n]{1,72}(\n|\Z))(feat|fix|chore|docs|test|ci|refactor|perf|build|revert)(\([a-z0-9-]+\))?!?: [^\n]+'
+        args: [--multiline, --negate]
+        stages: [commit-msg]
+
+      - id: ruff-check
+        name: ruff check
+        language: system
+        entry: uv run ruff check --fix
+        types: [python]
+
+      - id: ruff-format
+        name: ruff format
+        language: system
+        entry: uv run ruff format
+        types: [python]
+
+      - id: mypy
+        name: mypy --strict
+        language: system
+        entry: uv run mypy
+        pass_filenames: false
+        types: [python]
+
+      - id: lint-imports
+        name: import-linter layer rules
+        language: system
+        entry: uv run lint-imports
+        pass_filenames: false
+        types: [python]
+
+      - id: code-rules
+        name: code rules (method length, file layout, packages)
+        language: system
+        entry: uv run python -m tools.CodeRules src tools tests
+        pass_filenames: false
+        types: [python]
+
+      - id: pytest
+        name: pytest
+        language: system
+        entry: uv run pytest -q --cov
+        pass_filenames: false
+        types: [python]

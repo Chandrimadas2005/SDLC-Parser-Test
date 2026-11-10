@@ -1,0 +1,138 @@
+name: CI
+
+# Every branch push is checked, so a branch is green before its pull request is opened.
+# Pull requests additionally run the branch-name and commit-message conventions.
+on:
+  pull_request:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  conventions:
+    name: Branch and commit conventions
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          fetch-depth: 0
+      - name: Branch name is <type>/<scope>-<topic>
+        env:
+          BRANCH: ${{ github.head_ref }}
+        run: |
+          pattern='^(feature|fix|chore|docs|test|ci)/[a-z0-9]+(-[a-z0-9]+)+$'
+          if [[ ! "$BRANCH" =~ $pattern ]]; then
+            echo "::error::Branch '$BRANCH' must be <type>/<scope>-<topic>, e.g. feature/parser-xlsx-extractor"
+            exit 1
+          fi
+      - name: Commit subjects are Conventional Commits of 72 characters or fewer
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          pattern='^(feat|fix|chore|docs|test|ci|refactor|perf|build|revert)(\([a-z0-9-]+\))?!?: .+$'
+          status=0
+          while IFS= read -r subject; do
+            if [[ ${#subject} -gt 72 || ! "$subject" =~ $pattern ]]; then
+              echo "::error::Commit subject breaks the convention: $subject"
+              status=1
+            fi
+          done < <(git log --no-merges --format=%s "$BASE_SHA..$HEAD_SHA")
+          exit "$status"
+
+  quality:
+    name: Lint, types, layers, code rules, tests
+    runs-on: ubuntu-latest
+    services:
+      # Database tests run against a real PostgreSQL (brief 3.5), never mocks.
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: parser_test
+          POSTGRES_USER: parser
+          POSTGRES_PASSWORD: ci-only-password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U parser -d parser_test"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+    env:
+      PARSER_TEST_DATABASE_URL: postgresql+pg8000://parser:ci-only-password@localhost:5432/parser_test
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: astral-sh/setup-uv@v10.3.3
+        with:
+          enable-cache: true
+      - name: Install locked dependencies
+        run: uv sync --locked
+      - name: Ruff lint (complexity 4, arguments 3)
+        run: uv run ruff check --output-format=github .
+      - name: Ruff format
+        run: uv run ruff format --check .
+      - name: mypy --strict
+        run: uv run mypy
+      - name: Layer rules (import-linter)
+        run: uv run lint-imports
+      - name: Code rules (method length, file layout, packages)
+        run: uv run python -m tools.CodeRules src tools tests
+      - name: Tests with coverage (SQLite and PostgreSQL)
+        run: uv run pytest --cov --cov-report=term-missing
+
+  supply-chain:
+    name: Licenses and vulnerabilities
+    runs-on: ubuntu-latest
+    env:
+      # Only MIT, BSD, Apache-2.0, ISC and PSF licences may ship (brief, section 2.6).
+      ALLOWED_LICENSES: "MIT;BSD;Apache;ISC;PSF;Python Software Foundation"
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: astral-sh/setup-uv@v10.3.3
+        with:
+          enable-cache: true
+      - name: Install locked dependencies
+        run: uv sync --locked
+      - name: Build an environment with runtime dependencies only
+        run: |
+          uv export --locked --no-dev --no-emit-project --format requirements-txt -o runtime.txt
+          uv venv .runtime-venv
+          uv pip install --python .runtime-venv --require-hashes -r runtime.txt
+      - name: License policy for everything that ships
+        run: >-
+          uv run pip-licenses --python .runtime-venv/bin/python --partial-match
+          --allow-only "$ALLOWED_LICENSES" --format=markdown
+      - name: Vulnerability scan of every locked dependency (pip-audit)
+        run: |
+          uv export --locked --all-groups --no-emit-project --format requirements-txt -o audit.txt
+          uv run pip-audit --disable-pip --require-hashes -r audit.txt
+
+  container:
+    name: Container image builds and starts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - name: Build the image
+        run: docker build --tag parser-service:ci .
+      - name: Start with docker compose and wait for readiness
+        run: |
+          docker compose up --detach --wait --wait-timeout 120
+          curl --fail --silent http://localhost:8000/health/ready
+          curl --fail --silent http://localhost:8000/health/live
+      - name: Submit a text file and poll its status
+        run: |
+          echo "Hello, parser!" > sample.txt
+          job=$(curl --fail --silent -F "file=@sample.txt" http://localhost:8000/v1/parse-jobs | python3 -c 'import json,sys; print(json.load(sys.stdin)["job_id"])')
+          curl --fail --silent "http://localhost:8000/v1/parse-jobs/$job"
+      - name: Show logs and stop
+        if: always()
+        run: |
+          docker compose logs --no-color api | tail -50
+          docker compose down --volumes
