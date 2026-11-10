@@ -1,0 +1,547 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://parser-service.local/schemas/parsed_document.v1.json",
+  "title": "ParsedDocument",
+  "description": "Result of parsing one file (schema version 1.0). Every element carries a locator back to its place in the source file.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "status",
+    "document",
+    "warnings",
+    "outline",
+    "elements",
+    "metrics"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "status": {
+      "$ref": "#/$defs/status"
+    },
+    "failure_reason": {
+      "$ref": "#/$defs/failure_reason"
+    },
+    "document": {
+      "$ref": "#/$defs/document"
+    },
+    "warnings": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/warning"
+      }
+    },
+    "outline": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/outline_entry"
+      }
+    },
+    "elements": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/element"
+      }
+    },
+    "metrics": {
+      "$ref": "#/$defs/metrics"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "failed"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "failure_reason"
+        ]
+      },
+      "else": {
+        "not": {
+          "required": [
+            "failure_reason"
+          ]
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "partial"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "warnings": {
+            "minItems": 1
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "status": {
+      "enum": [
+        "succeeded",
+        "partial",
+        "failed"
+      ]
+    },
+    "detected_type": {
+      "enum": [
+        "xlsx",
+        "xlsm",
+        "xls",
+        "csv",
+        "tsv",
+        "pdf",
+        "docx",
+        "txt",
+        "md",
+        "pptx",
+        "html",
+        "png",
+        "jpeg",
+        "tiff",
+        "odt",
+        "ods",
+        "rtf",
+        "doc",
+        "ppt",
+        "eml",
+        "msg",
+        "zip",
+        "json",
+        "yaml",
+        "xml"
+      ]
+    },
+    "element_kind": {
+      "enum": [
+        "heading",
+        "paragraph",
+        "list_item",
+        "table",
+        "image",
+        "link",
+        "footnote",
+        "comment"
+      ]
+    },
+    "outline_kind": {
+      "enum": [
+        "heading",
+        "sheet",
+        "slide"
+      ]
+    },
+    "warning_code": {
+      "enum": [
+        "extension_mismatch",
+        "encoding_guessed",
+        "page_unreadable",
+        "sheet_unreadable",
+        "slide_unreadable",
+        "element_skipped",
+        "file_repaired",
+        "ocr_applied",
+        "ocr_low_confidence",
+        "header_row_guessed",
+        "summary_unavailable"
+      ]
+    },
+    "failure_reason": {
+      "enum": [
+        "unsupported_type",
+        "corrupted_file",
+        "password_protected",
+        "file_too_large",
+        "limit_exceeded",
+        "timeout",
+        "extractor_crash",
+        "max_attempts_exceeded",
+        "storage_error"
+      ]
+    },
+    "metric_name": {
+      "enum": [
+        "words",
+        "pages",
+        "sheets",
+        "slides",
+        "rows",
+        "columns",
+        "formulas",
+        "hidden_sheets"
+      ]
+    },
+    "document": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "file_name",
+        "detected_type",
+        "size_bytes",
+        "sha256",
+        "properties"
+      ],
+      "properties": {
+        "file_name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255
+        },
+        "detected_type": {
+          "$ref": "#/$defs/detected_type"
+        },
+        "size_bytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "page_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "sheet_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "slide_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "language": {
+          "type": "string",
+          "minLength": 1
+        },
+        "properties": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "locator": {
+      "type": "object",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "anyOf": [
+        {
+          "required": [
+            "page"
+          ]
+        },
+        {
+          "required": [
+            "sheet"
+          ]
+        },
+        {
+          "required": [
+            "slide"
+          ]
+        },
+        {
+          "required": [
+            "paragraph"
+          ]
+        }
+      ],
+      "dependentRequired": {
+        "range": [
+          "sheet"
+        ],
+        "char_start": [
+          "char_end"
+        ],
+        "char_end": [
+          "char_start"
+        ]
+      },
+      "properties": {
+        "page": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "sheet": {
+          "type": "string",
+          "minLength": 1
+        },
+        "range": {
+          "type": "string",
+          "minLength": 1
+        },
+        "slide": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "paragraph": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "char_start": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "char_end": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "warning": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "code"
+      ],
+      "properties": {
+        "code": {
+          "$ref": "#/$defs/warning_code"
+        },
+        "locator": {
+          "$ref": "#/$defs/locator"
+        }
+      }
+    },
+    "outline_entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "name",
+        "locator"
+      ],
+      "properties": {
+        "kind": {
+          "$ref": "#/$defs/outline_kind"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "level": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "locator": {
+          "$ref": "#/$defs/locator"
+        }
+      },
+      "if": {
+        "properties": {
+          "kind": {
+            "const": "heading"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "level"
+        ]
+      },
+      "else": {
+        "not": {
+          "required": [
+            "level"
+          ]
+        }
+      }
+    },
+    "table_row": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "row",
+        "cells"
+      ],
+      "properties": {
+        "row": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "cells": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "element": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind",
+        "locator"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^e-[0-9]{6,}$"
+        },
+        "kind": {
+          "$ref": "#/$defs/element_kind"
+        },
+        "locator": {
+          "$ref": "#/$defs/locator"
+        },
+        "text": {
+          "type": "string"
+        },
+        "level": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9
+        },
+        "header_row": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "header_confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "rows": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/table_row"
+          }
+        }
+      },
+      "dependentRequired": {
+        "header_row": [
+          "header_confidence"
+        ],
+        "header_confidence": [
+          "header_row"
+        ]
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "heading"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "level"
+            ]
+          },
+          "else": {
+            "not": {
+              "required": [
+                "level"
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "table"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "rows"
+            ]
+          },
+          "else": {
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "rows"
+                  ]
+                },
+                {
+                  "required": [
+                    "header_row"
+                  ]
+                },
+                {
+                  "required": [
+                    "header_confidence"
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "metrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "elements_by_kind"
+      ],
+      "properties": {
+        "words": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "pages": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "sheets": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "slides": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "rows": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "columns": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "formulas": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "hidden_sheets": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "elements_by_kind": {
+          "type": "object",
+          "propertyNames": {
+            "$ref": "#/$defs/element_kind"
+          },
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      }
+    }
+  }
+}

@@ -58,8 +58,11 @@ src/ParserService/
   Domain/          Documents, Jobs, Ports (Protocols), Errors   - no outside imports
   Application/     UseCases, Dto, Errors                        - depends on Domain only
   Infrastructure/  Extraction, Detection, Isolation, Persistence,
-                   Storage, Queue, Http, Cli, Logging, Config, Time, Bootstrap
-tests/             Domain, Application, Infrastructure, Contract, FaultInjection, Fakes, corpus
+                   Storage, Queue, Http, Cli, Logging, Config, Time, Bootstrap,
+                   Output (JSON form of a ParsedDocument)
+tests/             Domain, Application, Infrastructure, Contract, FaultInjection, Fakes,
+                   Samples, corpus, golden
+schemas/           JSON Schema of the output format (parsed_document.v1.json)
 tools/             Repository tooling (code-rule checks); not shipped
 docs/              Dependencies, Phase 0 review proposals
 ```
