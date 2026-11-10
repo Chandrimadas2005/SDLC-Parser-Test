@@ -6,6 +6,7 @@ from fastapi import FastAPI
 from ParserService.Application.UseCases.ArtifactKeys import ArtifactKeys
 from ParserService.Application.UseCases.GetParseJobStatus import GetParseJobStatus
 from ParserService.Application.UseCases.JobServices import JobServices
+from ParserService.Application.UseCases.ProcessNextJob import ProcessNextJob
 from ParserService.Application.UseCases.SubmitParseJob import SubmitParseJob
 from ParserService.Application.UseCases.SubmitPolicy import SubmitPolicy
 from ParserService.Domain.Jobs.ParserVersion import ParserVersion
@@ -13,6 +14,9 @@ from ParserService.Infrastructure.Config.Settings import Settings
 from ParserService.Infrastructure.Http.ApiDependencies import ApiDependencies
 from ParserService.Infrastructure.Http.ParserApi import ParserApi
 from ParserService.Infrastructure.Http.ReadinessCheck import ReadinessCheck
+from ParserService.Infrastructure.Isolation.IsolatedDocumentParser import IsolatedDocumentParser
+from ParserService.Infrastructure.Isolation.IsolatedParseRunner import IsolatedParseRunner
+from ParserService.Infrastructure.Isolation.WorkerLimits import WorkerLimits
 from ParserService.Infrastructure.Logging.ServiceMetrics import ServiceMetrics
 from ParserService.Infrastructure.Persistence.DatabaseEngineFactory import DatabaseEngineFactory
 from ParserService.Infrastructure.Persistence.JobRecordMapper import JobRecordMapper
@@ -66,6 +70,20 @@ class ServiceContainer:
             metrics=self.metrics,
         )
         return ParserApi(dependencies, self.parser_version.value).build()
+
+    def process_next_job(self) -> ProcessNextJob:
+        """Build the worker's use case: parse each queued file in an isolated process.
+
+        Returns:
+            The use case, wired to the isolated parser and the job ports.
+        """
+        services = JobServices(self.repository, self.store, self.queue, self.clock)
+        limits = self.settings.limits
+        runner = IsolatedParseRunner(
+            WorkerLimits(limits.job_timeout_seconds, limits.job_memory_limit_mb)
+        )
+        parser = IsolatedDocumentParser(self.settings.artifact_root, runner)
+        return ProcessNextJob(services, parser, ArtifactKeys())
 
     @classmethod
     def _parser_version(cls) -> ParserVersion:
