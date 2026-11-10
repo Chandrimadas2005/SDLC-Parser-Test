@@ -15,6 +15,7 @@ from ParserService.Domain.Documents.Metrics import Metrics
 from ParserService.Domain.Documents.OutlineEntry import OutlineEntry
 from ParserService.Domain.Documents.OutlineKind import OutlineKind
 from ParserService.Domain.Documents.ParsedDocument import ParsedDocument
+from ParserService.Domain.Documents.ParseOutcome import ParseOutcome
 from ParserService.Domain.Documents.ParseWarning import ParseWarning
 from ParserService.Domain.Documents.SourceFile import SourceFile
 from ParserService.Domain.Documents.Table import Table
@@ -36,6 +37,7 @@ __all__ = [
     "Metrics",
     "OutlineEntry",
     "OutlineKind",
+    "ParseOutcome",
     "ParseWarning",
     "ParsedDocument",
     "SourceFile",
