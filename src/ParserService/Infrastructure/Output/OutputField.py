@@ -1,0 +1,46 @@
+from enum import StrEnum
+
+
+class OutputField(StrEnum):
+    """Every field name in the JSON form of a ``ParsedDocument`` (schema v1).
+
+    The JSON Schema in ``schemas/parsed_document.v1.json`` uses the same names.
+    """
+
+    SCHEMA_VERSION = "schema_version"
+    STATUS = "status"
+    FAILURE_REASON = "failure_reason"
+    DOCUMENT = "document"
+    WARNINGS = "warnings"
+    OUTLINE = "outline"
+    ELEMENTS = "elements"
+    METRICS = "metrics"
+    FILE_NAME = "file_name"
+    DETECTED_TYPE = "detected_type"
+    SIZE_BYTES = "size_bytes"
+    SHA256 = "sha256"
+    PAGE_COUNT = "page_count"
+    SHEET_COUNT = "sheet_count"
+    SLIDE_COUNT = "slide_count"
+    LANGUAGE = "language"
+    PROPERTIES = "properties"
+    CODE = "code"
+    LOCATOR = "locator"
+    KIND = "kind"
+    NAME = "name"
+    LEVEL = "level"
+    ID = "id"
+    TEXT = "text"
+    HEADER_ROW = "header_row"
+    HEADER_CONFIDENCE = "header_confidence"
+    ROWS = "rows"
+    ROW = "row"
+    CELLS = "cells"
+    PAGE = "page"
+    SHEET = "sheet"
+    RANGE = "range"
+    SLIDE = "slide"
+    PARAGRAPH = "paragraph"
+    CHAR_START = "char_start"
+    CHAR_END = "char_end"
+    ELEMENTS_BY_KIND = "elements_by_kind"

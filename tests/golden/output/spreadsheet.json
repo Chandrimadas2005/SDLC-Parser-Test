@@ -1,0 +1,59 @@
+{
+  "schema_version": "1.0",
+  "status": "partial",
+  "document": {
+    "file_name": "sample.xlsx",
+    "detected_type": "xlsx",
+    "size_bytes": 42,
+    "sha256": "b3cc0475bb78a5026098858e9889acf666d31062d513d303314eca31d36e72f2",
+    "properties": {
+      "title": "Synthetic sample"
+    }
+  },
+  "warnings": [
+    {
+      "code": "sheet_unreadable",
+      "locator": {
+        "sheet": "Archive"
+      }
+    }
+  ],
+  "outline": [
+    {
+      "kind": "sheet",
+      "name": "Requirements",
+      "locator": {
+        "sheet": "Requirements",
+        "range": "A1:B2"
+      }
+    }
+  ],
+  "elements": [
+    {
+      "id": "e-000001",
+      "kind": "table",
+      "locator": {
+        "sheet": "Requirements",
+        "range": "A1:B2"
+      },
+      "header_row": 1,
+      "header_confidence": 0.92,
+      "rows": [
+        {
+          "row": 2,
+          "cells": {
+            "ID": "REQ-0412",
+            "Statement": "Synthetic statement"
+          }
+        }
+      ]
+    }
+  ],
+  "metrics": {
+    "rows": 1,
+    "columns": 2,
+    "elements_by_kind": {
+      "table": 1
+    }
+  }
+}
