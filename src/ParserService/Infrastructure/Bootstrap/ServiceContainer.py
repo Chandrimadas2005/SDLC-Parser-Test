@@ -4,13 +4,17 @@ from typing import Final
 from fastapi import FastAPI
 
 from ParserService.Application.UseCases.ArtifactKeys import ArtifactKeys
+from ParserService.Application.UseCases.DeleteParseJob import DeleteParseJob
+from ParserService.Application.UseCases.GetParseJobResult import GetParseJobResult
 from ParserService.Application.UseCases.GetParseJobStatus import GetParseJobStatus
+from ParserService.Application.UseCases.RetryParseJob import RetryParseJob
 from ParserService.Application.UseCases.JobServices import JobServices
 from ParserService.Application.UseCases.ProcessNextJob import ProcessNextJob
 from ParserService.Application.UseCases.SubmitParseJob import SubmitParseJob
 from ParserService.Application.UseCases.SubmitPolicy import SubmitPolicy
 from ParserService.Domain.Jobs.ParserVersion import ParserVersion
 from ParserService.Infrastructure.Config.Settings import Settings
+from ParserService.Infrastructure.Extraction.ExtractorRegistry import ExtractorRegistry
 from ParserService.Infrastructure.Http.ApiDependencies import ApiDependencies
 from ParserService.Infrastructure.Http.ParserApi import ParserApi
 from ParserService.Infrastructure.Http.ReadinessCheck import ReadinessCheck
@@ -61,9 +65,15 @@ class ServiceContainer:
         """
         services = JobServices(self.repository, self.store, self.queue, self.clock)
         policy = SubmitPolicy(self.parser_version, self.settings.limits.max_file_size_bytes)
+        keys = ArtifactKeys()
         dependencies = ApiDependencies(
-            submit_parse_job=SubmitParseJob(services, policy, ArtifactKeys()),
+            submit_parse_job=SubmitParseJob(services, policy, keys),
             get_parse_job_status=GetParseJobStatus(self.repository),
+            get_parse_job_result=GetParseJobResult(self.repository, self.store),
+            retry_parse_job=RetryParseJob(services),
+            delete_parse_job=DeleteParseJob(services, keys),
+            extractor_registry=ExtractorRegistry.default(),
+            parser_version=self.parser_version.value,
             readiness=ReadinessCheck(
                 self.engine, self.settings.artifact_root, self.settings.limits.min_free_disk_bytes
             ),

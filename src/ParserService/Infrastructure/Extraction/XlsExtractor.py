@@ -73,7 +73,7 @@ class XlsExtractor:
 
     def _value(self, cell: xlrd.sheet.Cell, datemode: int) -> object:
         if cell.ctype == self.XL_CELL_DATE:
-            return self._date(cell.value, datemode)
+            return self._date(float(cell.value), datemode)
         if cell.ctype == self.XL_CELL_BOOLEAN:
             return bool(cell.value)
         if cell.ctype in (self.XL_CELL_EMPTY, self.XL_CELL_BLANK):

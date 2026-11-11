@@ -60,7 +60,7 @@ class XlsxExtractor:
         self, path: Path, formulas_book: Workbook, values_book: Workbook
     ) -> tuple[list[tuple[str, bool, list[list[object]]]], list[ParseWarning], int]:
         sheets: list[tuple[str, bool, list[list[object]]]] = []
-        warnings = list()
+        warnings: list[ParseWarning] = []
         formulas = 0
         for index, name in enumerate(formulas_book.sheetnames, 1):
             matrix, count, warning = self._read_one_sheet(path, index, name, formulas_book, values_book)

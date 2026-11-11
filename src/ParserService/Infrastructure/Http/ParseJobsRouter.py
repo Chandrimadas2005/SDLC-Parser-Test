@@ -4,25 +4,24 @@ from typing import Annotated, Final
 import structlog
 from fastapi import APIRouter, File, Request, UploadFile
 from fastapi.concurrency import run_in_threadpool
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response
 
 from ParserService.Application.Dto.ParseJobSubmitted import ParseJobSubmitted
 from ParserService.Application.Dto.SubmitParseJobCommand import SubmitParseJobCommand
 from ParserService.Application.Errors.ApplicationErrorCode import ApplicationErrorCode
-from ParserService.Application.UseCases.GetParseJobStatus import GetParseJobStatus
-from ParserService.Application.UseCases.SubmitParseJob import SubmitParseJob
 from ParserService.Domain.Jobs.FileName import FileName
 from ParserService.Domain.Jobs.JobId import JobId
+from ParserService.Infrastructure.Http.ApiDependencies import ApiDependencies
 from ParserService.Infrastructure.Http.ApiError import ApiError
 from ParserService.Infrastructure.Http.HttpHeader import HttpHeader
 from ParserService.Infrastructure.Http.ParseJobStatusResponse import ParseJobStatusResponse
 from ParserService.Infrastructure.Http.ParseJobSubmittedResponse import ParseJobSubmittedResponse
 from ParserService.Infrastructure.Logging.LogField import LogField
-from ParserService.Infrastructure.Logging.ServiceMetrics import ServiceMetrics
+from ParserService.Infrastructure.Output.ParsedDocumentMarkdownRenderer import ParsedDocumentMarkdownRenderer
 
 
 class ParseJobsRouter:
-    """``POST /v1/parse-jobs`` and ``GET /v1/parse-jobs/{id}`` (brief, section 2.4)."""
+    """Submit, inspect, retrieve, retry and delete parse jobs through the HTTP API."""
 
     PREFIX: Final = "/v1/parse-jobs"
     RETRY_AFTER_SECONDS: Final = 30
@@ -30,26 +29,29 @@ class ParseJobsRouter:
     OUTCOME_CREATED: Final = "created"
     OUTCOME_EXISTING: Final = "existing"
 
-    def __init__(
-        self, submit: SubmitParseJob, status: GetParseJobStatus, metrics: ServiceMetrics
-    ) -> None:
-        self._submit = submit
-        self._status = status
-        self._metrics = metrics
+    def __init__(self, dependencies: ApiDependencies) -> None:
+        self._dependencies = dependencies
+        self._submit = dependencies.submit_parse_job
+        self._status = dependencies.get_parse_job_status
+        self._metrics = dependencies.metrics
+        self._markdown = ParsedDocumentMarkdownRenderer()
         self._log = structlog.get_logger(__name__)
         self.router = APIRouter(prefix=self.PREFIX)
+        self._register_routes()
+
+    def _register_routes(self) -> None:
         self.router.add_api_route(
-            "",
-            self.submit_job,
-            methods=["POST"],
-            status_code=HTTPStatus.ACCEPTED,
+            "", self.submit_job, methods=["POST"], status_code=HTTPStatus.ACCEPTED,
             response_model=ParseJobSubmittedResponse,
         )
         self.router.add_api_route(
-            "/{job_id}",
-            self.job_status,
-            methods=["GET"],
-            response_model=ParseJobStatusResponse,
+            "/{job_id}", self.job_status, methods=["GET"], response_model=ParseJobStatusResponse
+        )
+        self.router.add_api_route("/{job_id}/result", self.result_json, methods=["GET"])
+        self.router.add_api_route("/{job_id}/result.md", self.result_markdown, methods=["GET"])
+        self.router.add_api_route("/{job_id}/retry", self.retry_job, methods=["POST"])
+        self.router.add_api_route(
+            "/{job_id}", self.delete_job, methods=["DELETE"], status_code=HTTPStatus.NO_CONTENT
         )
 
     async def submit_job(
@@ -108,6 +110,48 @@ class ParseJobsRouter:
         if result.is_err:
             raise ApiError(result.unwrap_err())
         return ParseJobStatusResponse.of(result.unwrap())
+
+    async def result_json(self, job_id: str) -> Response:
+        """Return the completed ParsedDocument JSON artifact."""
+        result = await run_in_threadpool(
+            self._dependencies.get_parse_job_result.execute, self._job_id(job_id)
+        )
+        if result.is_err:
+            raise ApiError(result.unwrap_err())
+        return Response(result.unwrap(), media_type="application/json")
+
+    async def result_markdown(self, job_id: str) -> Response:
+        """Return a Markdown rendering of the completed ParsedDocument."""
+        result = await run_in_threadpool(
+            self._dependencies.get_parse_job_result.execute, self._job_id(job_id)
+        )
+        if result.is_err:
+            raise ApiError(result.unwrap_err())
+        markdown = self._markdown.render(result.unwrap())
+        return Response(markdown, media_type="text/markdown; charset=utf-8")
+
+    async def retry_job(self, request: Request, job_id: str) -> JSONResponse:
+        """Retry a failed job and return its queued state."""
+        result = await run_in_threadpool(
+            self._dependencies.retry_parse_job.execute, self._job_id(job_id)
+        )
+        if result.is_err:
+            raise self._submission_error(result.unwrap_err())
+        submitted = result.unwrap()
+        body = ParseJobSubmittedResponse.of(submitted).model_dump(mode="json")
+        location = str(request.url_for(self.job_status.__name__, job_id=submitted.job_id.value))
+        return JSONResponse(
+            body, status_code=HTTPStatus.ACCEPTED, headers={HttpHeader.LOCATION.value: location}
+        )
+
+    async def delete_job(self, job_id: str) -> Response:
+        """Delete the job and all its stored artifacts."""
+        result = await run_in_threadpool(
+            self._dependencies.delete_parse_job.execute, self._job_id(job_id)
+        )
+        if result.is_err:
+            raise ApiError(result.unwrap_err())
+        return Response(status_code=HTTPStatus.NO_CONTENT)
 
     def _file_name(self, file: UploadFile) -> FileName:
         try:

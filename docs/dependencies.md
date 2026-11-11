@@ -17,8 +17,8 @@ Shipped in the service image. Checked by CI.
 | alembic | 1.20.1 | MIT | Schema migrations, forward and backward |
 | charset-normalizer | 3.5.2 | MIT | Encoding detection for text files |
 | fastapi | 0.162.2 | MIT | HTTP API |
-| pg8000 | 1.31.6 | BSD-3-Clause | Pure-Python PostgreSQL driver |
 | openpyxl | 3.1.5 | MIT | Streaming XLSX/XLSM worksheet extraction |
+| pg8000 | 1.31.6 | BSD-3-Clause | Pure-Python PostgreSQL driver |
 | prometheus-client | 0.26.0 | Apache-2.0 | `/metrics` |
 | pydantic | 2.14.3 | MIT | Request and response models |
 | python-magic | 0.4.27 | MIT | Content-based type detection (needs the libmagic1 system package) |
@@ -33,6 +33,7 @@ Transitive runtime packages (all inside the allow-list):
 | Package | Version | Licence | Pulled in by |
 |---|---|---|---|
 | annotated-doc | 0.0.5 | MIT | fastapi |
+| et-xmlfile | 2.0.0 | MIT | openpyxl |
 | annotated-types | 0.8.0 | MIT | pydantic |
 | anyio | 4.16.0 | MIT | starlette |
 | asn1crypto | 1.5.1 | MIT | scramp |

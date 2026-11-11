@@ -12,10 +12,10 @@ from ParserService.Infrastructure.Extraction.PlainTextBlockSplitter import Plain
 from ParserService.Infrastructure.Extraction.PlainTextExtractor import PlainTextExtractor
 from ParserService.Infrastructure.Extraction.SpreadsheetTableBuilder import SpreadsheetTableBuilder
 from ParserService.Infrastructure.Extraction.TextDocumentBuilder import TextDocumentBuilder
-from ParserService.Infrastructure.Extraction.XlsExtractor import XlsExtractor
-from ParserService.Infrastructure.Extraction.XlsxExtractor import XlsxExtractor
 from ParserService.Infrastructure.Extraction.TextFileReader import TextFileReader
 from ParserService.Infrastructure.Extraction.TsvExtractor import TsvExtractor
+from ParserService.Infrastructure.Extraction.XlsExtractor import XlsExtractor
+from ParserService.Infrastructure.Extraction.XlsxExtractor import XlsxExtractor
 
 
 class ExtractorRegistry:
@@ -33,7 +33,7 @@ class ExtractorRegistry:
         """Build the registry with every extractor that exists today.
 
         Returns:
-            A registry for plain text and Markdown.
+            A registry for all currently implemented formats.
         """
         reader, builder = TextFileReader(), TextDocumentBuilder()
         spreadsheet = SpreadsheetTableBuilder()
