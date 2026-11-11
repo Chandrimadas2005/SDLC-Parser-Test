@@ -111,7 +111,8 @@ class TestParsePipeline:
 
     def test_registry_lists_supported_types_in_priority_order(self) -> None:
         assert ExtractorRegistry.default().supported_types == (
-            DetectedType.XLSX, DetectedType.XLSM, DetectedType.TXT, DetectedType.MD,
+            DetectedType.XLSX, DetectedType.XLSM, DetectedType.CSV, DetectedType.TSV,
+            DetectedType.TXT, DetectedType.MD,
         )
 
     def test_request_rejects_facts_that_disagree_with_detection(self) -> None:
