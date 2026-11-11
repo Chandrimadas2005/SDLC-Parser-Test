@@ -12,6 +12,7 @@ from ParserService.Infrastructure.Extraction.TextBlock import TextBlock
 from ParserService.Infrastructure.Extraction.TextDocumentBuilder import TextDocumentBuilder
 from ParserService.Infrastructure.Extraction.TextFileReader import TextFileReader
 from ParserService.Infrastructure.Extraction.TsvExtractor import TsvExtractor
+from ParserService.Infrastructure.Extraction.XlsExtractor import XlsExtractor
 from ParserService.Infrastructure.Extraction.XlsxExtractor import XlsxExtractor
 
 __all__ = [
@@ -27,5 +28,6 @@ __all__ = [
     "TextDocumentBuilder",
     "TextFileReader",
     "TsvExtractor",
+    "XlsExtractor",
     "XlsxExtractor",
 ]

@@ -1,0 +1,114 @@
+{
+  "schema_version": "1.1",
+  "status": "succeeded",
+  "document": {
+    "file_name": "normal.xls",
+    "detected_type": "xls",
+    "size_bytes": 6144,
+    "sha256": "74543c3c3d6fc0e835d17e6c7775314f51a5629f92142321f451c9e2bcf0124e",
+    "sheet_count": 2,
+    "properties": {}
+  },
+  "warnings": [],
+  "outline": [
+    {
+      "kind": "sheet",
+      "name": "Measurements",
+      "hidden": false,
+      "locator": {
+        "sheet": "Measurements",
+        "range": "A1:C4"
+      }
+    },
+    {
+      "kind": "sheet",
+      "name": "Archive",
+      "hidden": false,
+      "locator": {
+        "sheet": "Archive",
+        "range": "A1:A1"
+      }
+    }
+  ],
+  "elements": [
+    {
+      "id": "e-000001",
+      "kind": "table",
+      "locator": {
+        "sheet": "Measurements",
+        "range": "A1:C4"
+      },
+      "header_row": 1,
+      "header_confidence": 1.0,
+      "rows": [
+        {
+          "row": 2,
+          "cells": {
+            "Record ID": "REC-001",
+            "Reading": "4.0",
+            "Total": "4.0"
+          }
+        },
+        {
+          "row": 3,
+          "cells": {
+            "Record ID": "REC-002",
+            "Reading": "6.0",
+            "Total": ""
+          }
+        },
+        {
+          "row": 4,
+          "cells": {
+            "Record ID": "REC-002",
+            "Reading": "7.0",
+            "Total": ""
+          }
+        }
+      ],
+      "column_profiles": [
+        {
+          "name": "Record ID",
+          "guessed_type": "text",
+          "fill_rate": 1.0,
+          "unique_values": 2,
+          "looks_like_id": false
+        },
+        {
+          "name": "Reading",
+          "guessed_type": "number",
+          "fill_rate": 1.0,
+          "unique_values": 3,
+          "looks_like_id": false
+        },
+        {
+          "name": "Total",
+          "guessed_type": "number",
+          "fill_rate": 0.3333333333333333,
+          "unique_values": 1,
+          "looks_like_id": false
+        }
+      ]
+    },
+    {
+      "id": "e-000002",
+      "kind": "table",
+      "locator": {
+        "sheet": "Archive",
+        "range": "A1:A1"
+      },
+      "rows": [],
+      "column_profiles": []
+    }
+  ],
+  "metrics": {
+    "sheets": 2,
+    "rows": 3,
+    "columns": 3,
+    "formulas": 0,
+    "hidden_sheets": 0,
+    "elements_by_kind": {
+      "table": 2
+    }
+  }
+}

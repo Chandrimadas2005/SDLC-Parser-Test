@@ -12,6 +12,7 @@ from ParserService.Infrastructure.Extraction.PlainTextBlockSplitter import Plain
 from ParserService.Infrastructure.Extraction.PlainTextExtractor import PlainTextExtractor
 from ParserService.Infrastructure.Extraction.SpreadsheetTableBuilder import SpreadsheetTableBuilder
 from ParserService.Infrastructure.Extraction.TextDocumentBuilder import TextDocumentBuilder
+from ParserService.Infrastructure.Extraction.XlsExtractor import XlsExtractor
 from ParserService.Infrastructure.Extraction.XlsxExtractor import XlsxExtractor
 from ParserService.Infrastructure.Extraction.TextFileReader import TextFileReader
 from ParserService.Infrastructure.Extraction.TsvExtractor import TsvExtractor
@@ -43,6 +44,7 @@ class ExtractorRegistry:
                 DetectedType.MD: MarkdownExtractor(reader, MarkdownBlockReader(), builder),
                 DetectedType.XLSX: xlsx,
                 DetectedType.XLSM: xlsx,
+                DetectedType.XLS: XlsExtractor(spreadsheet),
                 DetectedType.CSV: CsvExtractor(spreadsheet),
                 DetectedType.TSV: TsvExtractor(spreadsheet),
             }

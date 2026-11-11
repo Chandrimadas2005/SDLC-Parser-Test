@@ -26,6 +26,7 @@ Shipped in the service image. Checked by CI.
 | sqlalchemy | 2.1.8 | MIT | Core SQL toolkit for the job table |
 | structlog | 25.5.0 | MIT OR Apache-2.0 | Structured JSON logging |
 | uvicorn | 0.54.0 | BSD-3-Clause | ASGI server |
+| xlrd | 2.0.1 | BSD-3-Clause | Legacy XLS workbook extraction |
 
 Transitive runtime packages (all inside the allow-list):
 

@@ -19,3 +19,13 @@ and a small XML metadata scan. Macros are never executed and VBA content is not 
 The output `ParsedDocument` necessarily retains extracted rows because its contract
 returns the complete structured table; the streaming guarantee applies to workbook
 loading and row ingestion, not to the final result object.
+
+## Legacy XLS open point
+
+`xlrd` reads legacy BIFF cell values, merged ranges and sheet visibility, but its
+public API does not expose formula expressions. The XLS extractor therefore retains
+cached cell values and reports zero formula expressions. This does not fully satisfy
+the brief's formula-expression requirement for XLS. A future decision is needed between
+accepting this limitation or adding a LibreOffice conversion adapter that preserves
+formula expressions before extraction. The current implementation does not guess
+formula text.
