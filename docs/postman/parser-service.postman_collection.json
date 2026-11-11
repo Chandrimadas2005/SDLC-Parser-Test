@@ -1,0 +1,220 @@
+{
+  "info": {
+    "name": "Parser Service",
+    "description": "Requests for the Parser Service API. Set `baseUrl` (default http://localhost:8000), start the API and the worker, then run the requests in order. Use synthetic files only, never real data.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health and metrics",
+      "item": [
+        {
+          "name": "Liveness",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health/live",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "health",
+                "live"
+              ]
+            },
+            "description": "The process is up."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"200 OK\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Readiness",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health/ready",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "health",
+                "ready"
+              ]
+            },
+            "description": "Database, storage and disk are ready to take jobs. 503 when not ready."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"200 OK\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Metrics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/metrics",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "metrics"
+              ]
+            },
+            "description": "Prometheus metrics: counts and timings only, never document content."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"200 OK\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Parse jobs",
+      "item": [
+        {
+          "name": "Submit a file",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/parse-jobs",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "parse-jobs"
+              ]
+            },
+            "description": "Upload a file (form field `file`). Returns 202 and a job ID. Pick any synthetic file, for example tests/corpus/md/normal/guide.md. Submitting the same file again with the same parser version returns the existing job (`already_existed: true`). The test script stores the job ID in the `jobId` collection variable.",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"202 Accepted or 200 for an existing job\", () => pm.expect(pm.response.code).to.be.oneOf([200, 202]));",
+                  "const body = pm.response.json();",
+                  "pm.test(\"has a job ID\", () => pm.expect(body.job_id).to.be.a(\"string\"));",
+                  "pm.collectionVariables.set(\"jobId\", body.job_id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Job status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/parse-jobs/{{jobId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "parse-jobs",
+                "{{jobId}}"
+              ]
+            },
+            "description": "Status of the job submitted above: queued, running, succeeded, partial or failed (with a failure reason). Run it again until the worker has finished."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"200 OK\", () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test(\"status is known\", () => pm.expect(body.status).to.be.oneOf([\"queued\", \"running\", \"succeeded\", \"partial\", \"failed\"]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Unknown job returns 404",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/parse-jobs/00000000-0000-4000-8000-000000000000",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "parse-jobs",
+                "00000000-0000-4000-8000-000000000000"
+              ]
+            },
+            "description": "Every error has a code from a fixed enum, a message and a request ID."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"404 Not Found\", () => pm.response.to.have.status(404));",
+                  "pm.test(\"error has a request ID\", () => pm.expect(pm.response.json().request_id).to.be.a(\"string\"));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8000"
+    },
+    {
+      "key": "jobId",
+      "value": ""
+    }
+  ]
+}
