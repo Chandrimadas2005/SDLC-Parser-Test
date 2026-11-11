@@ -20,6 +20,7 @@ Shipped in the service image. Checked by CI.
 | pg8000 | 1.31.6 | BSD-3-Clause | Pure-Python PostgreSQL driver |
 | prometheus-client | 0.26.0 | Apache-2.0 | `/metrics` |
 | pydantic | 2.14.3 | MIT | Request and response models |
+| pypdfium2 | 5.15.2 | Apache-2.0 / BSD-3-Clause | PDF text and outline (bundles Google's PDFium); chosen in `docs/pdf-library-comparison.md` |
 | python-magic | 0.4.27 | MIT | Content-based type detection (needs the libmagic1 system package) |
 | python-multipart | 0.0.33 | Apache-2.0 | Multipart file uploads for FastAPI |
 | sqlalchemy | 2.1.8 | MIT | Core SQL toolkit for the job table |
@@ -69,7 +70,6 @@ Not shipped. Used for checks, tests and local hooks.
 | pip-licenses | 5.5.5 | MIT | Licence policy check |
 | pre-commit | 4.7.0 | MIT | Runs the CI checks before each commit |
 | pypdf | 6.21.4 | BSD-3-Clause | PDF library comparison only |
-| pypdfium2 | 5.15.2 | Apache-2.0 / BSD-3-Clause | PDF library comparison only (bundles PDFium) |
 | pytest | 9.2.0 | MIT | Test runner |
 | pytest-cov | 7.1.0 | MIT | Coverage |
 | reportlab | 4.5.1 | BSD-3-Clause | Writes the synthetic PDFs for the comparison |
