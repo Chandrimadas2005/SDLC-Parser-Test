@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Sequence
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -42,7 +43,7 @@ class XlsExtractor:
         except (OSError, xlrd.XLRDError, ValueError):
             return Result.err(FailureReason.CORRUPTED_FILE)
         result = self._builder.build(request, sheets, 0)
-        return self._with_warnings(result, warnings, request)
+        return Result.ok(self._with_warnings(result, warnings, request))
 
     def _sheets(
         self, workbook: xlrd.book.Book
@@ -83,7 +84,9 @@ class XlsExtractor:
         epoch = datetime(1904, 1, 1) if datemode else datetime(1899, 12, 30)
         return epoch + timedelta(days=serial)
 
-    def _expand_merges(self, rows, merged_cells) -> None:
+    def _expand_merges(
+        self, rows: list[list[object]], merged_cells: Sequence[tuple[int, int, int, int]]
+    ) -> None:
         for row_start, row_end, col_start, col_end in merged_cells:
             value = rows[row_start][col_start]
             for row_index in range(row_start, row_end):
