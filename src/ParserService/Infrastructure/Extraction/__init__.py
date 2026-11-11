@@ -1,5 +1,6 @@
 """One extractor per format, the registry that picks it, and the parse pipeline."""
 
+from ParserService.Infrastructure.Extraction.CsvExtractor import CsvExtractor
 from ParserService.Infrastructure.Extraction.ExtractorRegistry import ExtractorRegistry
 from ParserService.Infrastructure.Extraction.MarkdownBlockReader import MarkdownBlockReader
 from ParserService.Infrastructure.Extraction.MarkdownExtractor import MarkdownExtractor
@@ -10,9 +11,11 @@ from ParserService.Infrastructure.Extraction.SpreadsheetTableBuilder import Spre
 from ParserService.Infrastructure.Extraction.TextBlock import TextBlock
 from ParserService.Infrastructure.Extraction.TextDocumentBuilder import TextDocumentBuilder
 from ParserService.Infrastructure.Extraction.TextFileReader import TextFileReader
+from ParserService.Infrastructure.Extraction.TsvExtractor import TsvExtractor
 from ParserService.Infrastructure.Extraction.XlsxExtractor import XlsxExtractor
 
 __all__ = [
+    "CsvExtractor",
     "ExtractorRegistry",
     "MarkdownBlockReader",
     "MarkdownExtractor",
@@ -23,5 +26,6 @@ __all__ = [
     "TextBlock",
     "TextDocumentBuilder",
     "TextFileReader",
+    "TsvExtractor",
     "XlsxExtractor",
 ]

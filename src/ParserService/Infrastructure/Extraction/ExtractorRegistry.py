@@ -5,6 +5,7 @@ from ParserService.Domain.Documents.DetectedType import DetectedType
 from ParserService.Domain.Errors.Result import Result
 from ParserService.Domain.Jobs.FailureReason import FailureReason
 from ParserService.Domain.Ports.Extractor import Extractor
+from ParserService.Infrastructure.Extraction.CsvExtractor import CsvExtractor
 from ParserService.Infrastructure.Extraction.MarkdownBlockReader import MarkdownBlockReader
 from ParserService.Infrastructure.Extraction.MarkdownExtractor import MarkdownExtractor
 from ParserService.Infrastructure.Extraction.PlainTextBlockSplitter import PlainTextBlockSplitter
@@ -13,6 +14,7 @@ from ParserService.Infrastructure.Extraction.SpreadsheetTableBuilder import Spre
 from ParserService.Infrastructure.Extraction.TextDocumentBuilder import TextDocumentBuilder
 from ParserService.Infrastructure.Extraction.XlsxExtractor import XlsxExtractor
 from ParserService.Infrastructure.Extraction.TextFileReader import TextFileReader
+from ParserService.Infrastructure.Extraction.TsvExtractor import TsvExtractor
 
 
 class ExtractorRegistry:
@@ -41,6 +43,8 @@ class ExtractorRegistry:
                 DetectedType.MD: MarkdownExtractor(reader, MarkdownBlockReader(), builder),
                 DetectedType.XLSX: xlsx,
                 DetectedType.XLSM: xlsx,
+                DetectedType.CSV: CsvExtractor(spreadsheet),
+                DetectedType.TSV: TsvExtractor(spreadsheet),
             }
         )
 
