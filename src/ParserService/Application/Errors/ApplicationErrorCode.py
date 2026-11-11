@@ -9,6 +9,9 @@ class ApplicationErrorCode(StrEnum):
     """
 
     JOB_NOT_FOUND = "job_not_found"
+    RESULT_NOT_READY = "result_not_ready"
+    RESULT_NOT_FOUND = "result_not_found"
+    RETRY_NOT_ALLOWED = "retry_not_allowed"
     FILE_TOO_LARGE = "file_too_large"
     QUEUE_FULL = "queue_full"
     STORAGE_UNAVAILABLE = "storage_unavailable"
