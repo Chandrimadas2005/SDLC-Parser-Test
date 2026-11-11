@@ -62,8 +62,13 @@ services:
       PARSER_JOB_MEMORY_LIMIT_MB: ${PARSER_JOB_MEMORY_LIMIT_MB:-1024}
     volumes:
       - artifacts:/var/lib/parser/artifacts
+    # No HTTP port: healthy while the worker process (PID 1) is running.
     healthcheck:
-      disable: true
+      test: ["CMD", "python", "-c", "import sys; sys.exit(0 if b'parser-worker' in open('/proc/1/cmdline', 'rb').read() else 1)"]
+      interval: 5s
+      timeout: 3s
+      start_period: 10s
+      retries: 3
     mem_limit: 2g
     cpus: 2.0
     pids_limit: 256
