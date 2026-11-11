@@ -27,12 +27,29 @@ To try the API without curl, import `docs/postman/parser-service.postman_collect
 into Postman. It holds every request with test scripts; set `baseUrl` if the service is not
 on `http://localhost:8000`.
 
+Result and management endpoints:
+
+```bash
+curl http://localhost:8000/v1/parse-jobs/<job_id>/result
+curl http://localhost:8000/v1/parse-jobs/<job_id>/result.md
+curl -X POST http://localhost:8000/v1/parse-jobs/<job_id>/retry
+curl -X DELETE http://localhost:8000/v1/parse-jobs/<job_id>
+curl http://localhost:8000/v1/formats
+```
+
+Spreadsheet support: XLSX, XLSM, XLS, CSV and TSV. XLS formula expressions are not
+exposed by `xlrd`; the extractor preserves available cell values and merged ranges. See
+[spreadsheet extraction notes](docs/spreadsheet-extraction.md).
+
 ## Development setup
+
+See [local development instructions](docs/LOCAL_DEVELOPMENT.md) for WSL setup, checks, and API usage.
+
 
 Requirements: [uv](https://docs.astral.sh/uv/) (it installs the pinned Python itself).
 
 ```bash
-uv sync                      # create .venv with runtime and dev dependencies
+uv sync                      # resolve added spreadsheet libraries and create .venv
 uv run pre-commit install    # run the same checks as CI before every commit
 cp .env.example .env         # optional local overrides (SQLite by default)
 uv run parser-api            # serve on http://127.0.0.1:8000 without Docker

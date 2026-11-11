@@ -15,3 +15,4 @@ class SchemaKeyword(StrEnum):
     WARNING_CODE = "warning_code"
     FAILURE_REASON = "failure_reason"
     METRIC_NAME = "metric_name"
+    COLUMN_TYPE = "column_type"

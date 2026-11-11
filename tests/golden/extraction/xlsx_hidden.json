@@ -1,0 +1,96 @@
+{
+  "schema_version": "1.1",
+  "status": "succeeded",
+  "document": {
+    "file_name": "hidden.xlsx",
+    "detected_type": "xlsx",
+    "size_bytes": 5299,
+    "sha256": "a4bf2fb6616160f38abc5dc239da5a189c444f980833ecddc882af2ba3193035",
+    "sheet_count": 2,
+    "properties": {
+      "application": "Microsoft Excel Compatible / Openpyxl 3.1.5",
+      "app_version": "3.1",
+      "creator": "openpyxl",
+      "created": "2026-11-11T08:01:09Z",
+      "modified": "2026-11-11T08:01:09Z"
+    }
+  },
+  "warnings": [],
+  "outline": [
+    {
+      "kind": "sheet",
+      "name": "HiddenData",
+      "hidden": true,
+      "locator": {
+        "sheet": "HiddenData",
+        "range": "A1:B2"
+      }
+    },
+    {
+      "kind": "sheet",
+      "name": "Visible",
+      "hidden": false,
+      "locator": {
+        "sheet": "Visible",
+        "range": "A1:A1"
+      }
+    }
+  ],
+  "elements": [
+    {
+      "id": "e-000001",
+      "kind": "table",
+      "locator": {
+        "sheet": "HiddenData",
+        "range": "A1:B2"
+      },
+      "header_row": 1,
+      "header_confidence": 1.0,
+      "rows": [
+        {
+          "row": 2,
+          "cells": {
+            "Name": "sample",
+            "Value": "1"
+          }
+        }
+      ],
+      "column_profiles": [
+        {
+          "name": "Name",
+          "guessed_type": "text",
+          "fill_rate": 1.0,
+          "unique_values": 1,
+          "looks_like_id": false
+        },
+        {
+          "name": "Value",
+          "guessed_type": "number",
+          "fill_rate": 1.0,
+          "unique_values": 1,
+          "looks_like_id": false
+        }
+      ]
+    },
+    {
+      "id": "e-000002",
+      "kind": "table",
+      "locator": {
+        "sheet": "Visible",
+        "range": "A1:A1"
+      },
+      "rows": [],
+      "column_profiles": []
+    }
+  ],
+  "metrics": {
+    "sheets": 2,
+    "rows": 1,
+    "columns": 2,
+    "formulas": 0,
+    "hidden_sheets": 1,
+    "elements_by_kind": {
+      "table": 2
+    }
+  }
+}

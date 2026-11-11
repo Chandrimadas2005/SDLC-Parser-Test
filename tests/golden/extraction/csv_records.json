@@ -1,0 +1,89 @@
+{
+  "schema_version": "1.1",
+  "status": "succeeded",
+  "document": {
+    "file_name": "records.csv",
+    "detected_type": "csv",
+    "size_bytes": 59,
+    "sha256": "f455634f2b751bb9aacf8d425fd1006de342b9100f7f6dd444382ea12445cb2b",
+    "sheet_count": 1,
+    "properties": {
+      "delimiter": ","
+    }
+  },
+  "warnings": [],
+  "outline": [
+    {
+      "kind": "sheet",
+      "name": "CSV",
+      "hidden": false,
+      "locator": {
+        "sheet": "CSV",
+        "range": "A1:C3"
+      }
+    }
+  ],
+  "elements": [
+    {
+      "id": "e-000001",
+      "kind": "table",
+      "locator": {
+        "sheet": "CSV",
+        "range": "A1:C3"
+      },
+      "header_row": 1,
+      "header_confidence": 1.0,
+      "rows": [
+        {
+          "row": 2,
+          "cells": {
+            "Record ID": "REC-001",
+            "Reading": "12",
+            "Status": "valid"
+          }
+        },
+        {
+          "row": 3,
+          "cells": {
+            "Record ID": "REC-002",
+            "Reading": "14",
+            "Status": "valid"
+          }
+        }
+      ],
+      "column_profiles": [
+        {
+          "name": "Record ID",
+          "guessed_type": "text",
+          "fill_rate": 1.0,
+          "unique_values": 2,
+          "looks_like_id": true
+        },
+        {
+          "name": "Reading",
+          "guessed_type": "number",
+          "fill_rate": 1.0,
+          "unique_values": 2,
+          "looks_like_id": false
+        },
+        {
+          "name": "Status",
+          "guessed_type": "text",
+          "fill_rate": 1.0,
+          "unique_values": 1,
+          "looks_like_id": false
+        }
+      ]
+    }
+  ],
+  "metrics": {
+    "sheets": 1,
+    "rows": 2,
+    "columns": 3,
+    "formulas": 0,
+    "hidden_sheets": 0,
+    "elements_by_kind": {
+      "table": 1
+    }
+  }
+}

@@ -1,4 +1,7 @@
 from ParserService.Domain.Documents import (
+    CellValue,
+    ColumnProfile,
+    ColumnType,
     Confidence,
     DetectedType,
     DocumentFacts,
@@ -52,18 +55,45 @@ class DocumentSamples:
 
     def spreadsheet(self) -> ParsedDocument:
         """A partial spreadsheet with one table and one unreadable sheet."""
-        row = TableRow(2, {"ID": "REQ-0412", "Statement": "Synthetic statement"})
-        table = Table(rows=(row,), header_row=1, header_confidence=Confidence(0.92))
-        locator = Locator.for_cells("Requirements", "A1:B2")
-        archive = Locator.for_cells("Archive", None)
-        elements = (Element(ElementId.at(1), ElementKind.TABLE, locator, table=table),)
+        locator = Locator.for_cells("Requirements", "A1:C2")
+        elements = (self._spreadsheet_element(locator),)
         return ParsedDocument(
             status=DocumentStatus.PARTIAL,
             facts=self.facts(DetectedType.XLSX),
             elements=elements,
-            warnings=(ParseWarning(WarningCode.SHEET_UNREADABLE, archive),),
-            outline=(OutlineEntry(OutlineKind.SHEET, "Requirements", locator),),
-            metrics=Metrics.for_elements(elements, {MetricName.ROWS: 1, MetricName.COLUMNS: 2}),
+            warnings=(
+                ParseWarning(WarningCode.SHEET_UNREADABLE, Locator.for_cells("Archive", None)),
+            ),
+            outline=(OutlineEntry(OutlineKind.SHEET, "Requirements", locator, hidden=False),),
+            metrics=Metrics.for_elements(
+                elements, {MetricName.ROWS: 1, MetricName.COLUMNS: 3, MetricName.FORMULAS: 1}
+            ),
+        )
+
+    def _spreadsheet_element(self, locator: Locator) -> Element:
+        return Element(ElementId.at(1), ElementKind.TABLE, locator, table=self._spreadsheet_table())
+
+    def _spreadsheet_table(self) -> Table:
+        row = TableRow(2, self._spreadsheet_cells())
+        return Table(
+            rows=(row,),
+            header_row=1,
+            header_confidence=Confidence(0.92),
+            column_profiles=self._spreadsheet_profiles(),
+        )
+
+    def _spreadsheet_cells(self) -> dict[str, str | CellValue]:
+        return {
+            "ID": "REQ-0412",
+            "Statement": "Synthetic statement",
+            "Total": CellValue(formula="=SUM(C2:C3)", calculated_value=12),
+        }
+
+    def _spreadsheet_profiles(self) -> tuple[ColumnProfile, ...]:
+        return (
+            ColumnProfile("ID", ColumnType.TEXT, 1.0, 1, looks_like_id=True),
+            ColumnProfile("Statement", ColumnType.TEXT, 1.0, 1, looks_like_id=False),
+            ColumnProfile("Total", ColumnType.NUMBER, 1.0, 1, looks_like_id=False),
         )
 
     def failed(self) -> ParsedDocument:

@@ -1,5 +1,7 @@
 from dataclasses import dataclass
+from typing import ClassVar
 
+from ParserService.Domain.Documents.ColumnProfile import ColumnProfile
 from ParserService.Domain.Documents.Confidence import Confidence
 from ParserService.Domain.Documents.TableRow import TableRow
 
@@ -12,9 +14,12 @@ class Table:
     (brief, section 2.2).
     """
 
+    EMPTY_COLUMN_PROFILES: ClassVar[tuple[ColumnProfile, ...]] = ()
+
     rows: tuple[TableRow, ...]
     header_row: int | None = None
     header_confidence: Confidence | None = None
+    column_profiles: tuple[ColumnProfile, ...] = EMPTY_COLUMN_PROFILES
 
     def __post_init__(self) -> None:
         if (self.header_row is None) != (self.header_confidence is None):

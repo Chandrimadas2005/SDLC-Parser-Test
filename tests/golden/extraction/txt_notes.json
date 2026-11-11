@@ -1,12 +1,14 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "1.1",
   "status": "succeeded",
   "document": {
     "file_name": "notes.txt",
     "detected_type": "txt",
     "size_bytes": 144,
     "sha256": "a1c0626dc9a9cb96b48899751539a154cb9e0d2ec3a090986710277b68204229",
-    "properties": {}
+    "properties": {
+      "encoding": "ascii"
+    }
   },
   "warnings": [],
   "outline": [],

@@ -24,7 +24,7 @@ class TestParsedDocument:
         assert self.SAMPLES.text_document().warning_count == 0
         assert self.SAMPLES.spreadsheet().warning_count == 1
         assert self.SAMPLES.failed().failure_reason is FailureReason.PASSWORD_PROTECTED
-        assert ParsedDocument.SCHEMA_VERSION == "1.0"
+        assert ParsedDocument.SCHEMA_VERSION == "1.1"
 
     def test_failure_reason_belongs_to_failed_results_only(self) -> None:
         failed = self.SAMPLES.failed()
