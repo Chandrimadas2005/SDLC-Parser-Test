@@ -29,7 +29,7 @@ from ParserService.Domain.Documents import (
 class SpreadsheetTableBuilder:
     """Build source-located spreadsheet tables and infer column profiles."""
 
-    ID_PATTERN = re.compile(r"^(?:[A-Za-z]*[-_])?[A-Za-z0-9]{4,}$")
+    ID_PATTERN = re.compile(r"^(?=.*\d)[A-Za-z0-9_-]{5,}$")
 
     def build(
         self,

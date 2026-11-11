@@ -72,7 +72,7 @@
           "guessed_type": "text",
           "fill_rate": 1.0,
           "unique_values": 2,
-          "looks_like_id": false
+          "looks_like_id": true
         },
         {
           "name": "Reading",

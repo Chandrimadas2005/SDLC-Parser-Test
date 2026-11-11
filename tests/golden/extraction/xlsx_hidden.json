@@ -55,7 +55,7 @@
           "guessed_type": "text",
           "fill_rate": 1.0,
           "unique_values": 1,
-          "looks_like_id": true
+          "looks_like_id": false
         },
         {
           "name": "Value",

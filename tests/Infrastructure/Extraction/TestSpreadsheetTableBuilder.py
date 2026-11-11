@@ -21,6 +21,7 @@ class TestSpreadsheetTableBuilder:
         profiles = document.elements[0].table.column_profiles
         assert document.elements[0].table.header_row == 1
         assert profiles[0].looks_like_id is True
+        assert profiles[2].looks_like_id is False
         assert profiles[1].guessed_type.value == "number"
         assert profiles[1].fill_rate == 0.5
         assert profiles[1].unique_values == 1
