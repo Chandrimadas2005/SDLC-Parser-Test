@@ -23,6 +23,10 @@ short-lived process with time and memory limits, so the job moves to `succeeded`
 
 Health and metrics: `/health/live`, `/health/ready`, `/metrics`.
 
+To try the API without curl, import `docs/postman/parser-service.postman_collection.json`
+into Postman. It holds every request with test scripts; set `baseUrl` if the service is not
+on `http://localhost:8000`.
+
 ## Development setup
 
 Requirements: [uv](https://docs.astral.sh/uv/) (it installs the pinned Python itself).
@@ -69,8 +73,8 @@ src/ParserService/
 tests/             Domain, Application, Infrastructure, Contract, FaultInjection, Fakes,
                    Samples, corpus, golden
 schemas/           JSON Schema of the output format (parsed_document.v1.json)
-tools/             Repository tooling (code-rule checks); not shipped
-docs/              Dependencies, Phase 0 review proposals
+tools/             Repository tooling (code rules, measurement, PDF comparison); not shipped
+docs/              Dependencies, Phase 0 review, measurements, PDF comparison, Postman collection
 ```
 
 Dependencies point inward only: `Infrastructure -> Application -> Domain`.
