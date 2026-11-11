@@ -102,15 +102,19 @@ class TestParsePipeline:
     ) -> None:
         binary = tmp_path / "blob.txt"
         binary.write_bytes(bytes(range(256)) * 4)
-        pdf = tmp_path / "doc.pdf"
-        pdf.write_bytes(b"%PDF-1.4\n")
+        rtf = tmp_path / "doc.rtf"
+        rtf.write_bytes(b"{\\rtf1\\ansi Synthetic rich text.}")
 
-        for path in (binary, pdf):
+        for path in (binary, rtf):
             result = self.PIPELINE.parse(SourceFile(str(path), FileName(path.name)))
             assert result.unwrap_err() is FailureReason.UNSUPPORTED_TYPE
 
     def test_registry_lists_supported_types_in_priority_order(self) -> None:
-        assert ExtractorRegistry.default().supported_types == (DetectedType.TXT, DetectedType.MD)
+        assert ExtractorRegistry.default().supported_types == (
+            DetectedType.PDF,
+            DetectedType.TXT,
+            DetectedType.MD,
+        )
 
     def test_request_rejects_facts_that_disagree_with_detection(self) -> None:
         facts = DocumentFacts(FileName("a.txt"), DetectedType.TXT, 1, FileHash.of(b"a"))

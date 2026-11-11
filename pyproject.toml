@@ -11,6 +11,7 @@ dependencies = [
   "pg8000>=1.31,<2",
   "prometheus-client>=0.21,<1",
   "pydantic>=2.9,<3",
+  "pypdfium2>=5.15,<6",
   "python-magic>=0.4.27,<0.5",
   "python-multipart>=0.0.20,<1",
   "sqlalchemy>=2.0.36,<3",
@@ -33,7 +34,6 @@ dev = [
   "pip-licenses>=5.5,<6",
   "pre-commit>=4.7,<5",
   "pypdf>=6,<7",
-  "pypdfium2>=4.30,<6",
   "pytest>=9.2,<10",
   "pytest-cov>=7.1,<8",
   "reportlab>=4.2,<5",
@@ -100,7 +100,7 @@ files = ["src", "tests", "tools"]
 explicit_package_bases = true
 
 [[tool.mypy.overrides]]
-# pypdfium2 ships no type information; it is used only by the PDF comparison tool.
+# pypdfium2 ships no type information; the PDF extractor wraps it in typed classes.
 module = ["pypdfium2", "pypdfium2.*"]
 ignore_missing_imports = true
 
