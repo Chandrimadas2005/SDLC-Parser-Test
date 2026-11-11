@@ -55,35 +55,41 @@ class DocumentSamples:
 
     def spreadsheet(self) -> ParsedDocument:
         """A partial spreadsheet with one table and one unreadable sheet."""
-        row = TableRow(
-            2,
-            {
-                "ID": "REQ-0412",
-                "Statement": "Synthetic statement",
-                "Total": CellValue(formula="=SUM(C2:C3)", calculated_value=12),
-            },
-        )
-        profiles = (
-            ColumnProfile("ID", ColumnType.TEXT, 1.0, 1, True),
-            ColumnProfile("Statement", ColumnType.TEXT, 1.0, 1, False),
-            ColumnProfile("Total", ColumnType.NUMBER, 1.0, 1, False),
-        )
-        table = Table(
-            rows=(row,),
-            header_row=1,
-            header_confidence=Confidence(0.92),
-            column_profiles=profiles,
-        )
         locator = Locator.for_cells("Requirements", "A1:C2")
-        archive = Locator.for_cells("Archive", None)
-        elements = (Element(ElementId.at(1), ElementKind.TABLE, locator, table=table),)
+        elements = (self._spreadsheet_element(locator),)
         return ParsedDocument(
             status=DocumentStatus.PARTIAL,
             facts=self.facts(DetectedType.XLSX),
             elements=elements,
-            warnings=(ParseWarning(WarningCode.SHEET_UNREADABLE, archive),),
+            warnings=(ParseWarning(WarningCode.SHEET_UNREADABLE, Locator.for_cells("Archive", None)),),
             outline=(OutlineEntry(OutlineKind.SHEET, "Requirements", locator, hidden=False),),
-            metrics=Metrics.for_elements(elements, {MetricName.ROWS: 1, MetricName.COLUMNS: 3, MetricName.FORMULAS: 1}),
+            metrics=Metrics.for_elements(
+                elements, {MetricName.ROWS: 1, MetricName.COLUMNS: 3, MetricName.FORMULAS: 1}
+            ),
+        )
+
+    def _spreadsheet_element(self, locator: Locator) -> Element:
+        return Element(ElementId.at(1), ElementKind.TABLE, locator, table=self._spreadsheet_table())
+
+    def _spreadsheet_table(self) -> Table:
+        row = TableRow(2, self._spreadsheet_cells())
+        return Table(
+            rows=(row,), header_row=1, header_confidence=Confidence(0.92),
+            column_profiles=self._spreadsheet_profiles(),
+        )
+
+    def _spreadsheet_cells(self) -> dict[str, str | CellValue]:
+        return {
+            "ID": "REQ-0412",
+            "Statement": "Synthetic statement",
+            "Total": CellValue(formula="=SUM(C2:C3)", calculated_value=12),
+        }
+
+    def _spreadsheet_profiles(self) -> tuple[ColumnProfile, ...]:
+        return (
+            ColumnProfile("ID", ColumnType.TEXT, 1.0, 1, True),
+            ColumnProfile("Statement", ColumnType.TEXT, 1.0, 1, False),
+            ColumnProfile("Total", ColumnType.NUMBER, 1.0, 1, False),
         )
 
     def failed(self) -> ParsedDocument:
