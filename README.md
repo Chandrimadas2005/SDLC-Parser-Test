@@ -39,6 +39,9 @@ exposed by `xlrd`; the extractor preserves available cell values and merged rang
 
 ## Development setup
 
+See [local development instructions](docs/LOCAL_DEVELOPMENT.md) for WSL setup, checks, and API usage.
+
+
 Requirements: [uv](https://docs.astral.sh/uv/) (it installs the pinned Python itself).
 
 ```bash
