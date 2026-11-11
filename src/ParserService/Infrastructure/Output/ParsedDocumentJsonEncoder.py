@@ -1,6 +1,9 @@
 import json
+from collections.abc import Mapping
 
 from ParserService.Domain.Documents import (
+    CellValue,
+    ColumnProfile,
     DocumentFacts,
     Element,
     Locator,
@@ -85,6 +88,7 @@ class ParsedDocumentJsonEncoder:
                 OutputField.KIND: entry.kind,
                 OutputField.NAME: entry.name,
                 OutputField.LEVEL: entry.level,
+                OutputField.HIDDEN: entry.hidden,
                 OutputField.LOCATOR: self._locator(entry.locator),
             }
         )
@@ -107,14 +111,42 @@ class ParsedDocumentJsonEncoder:
     def _table(self, table: Table) -> JsonObject:
         confidence = None if table.header_confidence is None else table.header_confidence.value
         rows: list[JsonValue] = [
-            {OutputField.ROW: row.row, OutputField.CELLS: dict(row.cells)} for row in table.rows
+            {OutputField.ROW: row.row, OutputField.CELLS: self._cells(row.cells)}
+            for row in table.rows
         ]
+        profiles = [self._column_profile(profile) for profile in table.column_profiles]
         return self._without_empty(
             {
                 OutputField.HEADER_ROW: table.header_row,
                 OutputField.HEADER_CONFIDENCE: confidence,
             }
-        ) | {OutputField.ROWS: rows}
+        ) | {OutputField.ROWS: rows, OutputField.COLUMN_PROFILES: profiles}
+
+    def _cells(self, cells: Mapping[str, str | CellValue]) -> JsonObject:
+        return {
+            name: self._cell(value) if isinstance(value, CellValue) else value
+            for name, value in cells.items()
+        }
+
+    def _cell(self, cell: CellValue) -> JsonValue:
+        if cell.formula is None and cell.calculated_value is None:
+            return cell.value
+        return self._without_empty(
+            {
+                OutputField.VALUE: cell.value,
+                OutputField.FORMULA: cell.formula,
+                OutputField.CALCULATED_VALUE: cell.calculated_value,
+            }
+        )
+
+    def _column_profile(self, profile: ColumnProfile) -> JsonObject:
+        return {
+            OutputField.NAME: profile.name,
+            OutputField.GUESSED_TYPE: profile.guessed_type,
+            OutputField.FILL_RATE: profile.fill_rate,
+            OutputField.UNIQUE_VALUES: profile.unique_values,
+            OutputField.LOOKS_LIKE_ID: profile.looks_like_id,
+        }
 
     def _locator(self, locator: Locator) -> JsonObject:
         return self._without_empty(

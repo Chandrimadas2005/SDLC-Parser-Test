@@ -1,4 +1,7 @@
 from ParserService.Domain.Documents import (
+    CellValue,
+    ColumnProfile,
+    ColumnType,
     Confidence,
     DetectedType,
     DocumentFacts,
@@ -52,9 +55,26 @@ class DocumentSamples:
 
     def spreadsheet(self) -> ParsedDocument:
         """A partial spreadsheet with one table and one unreadable sheet."""
-        row = TableRow(2, {"ID": "REQ-0412", "Statement": "Synthetic statement"})
-        table = Table(rows=(row,), header_row=1, header_confidence=Confidence(0.92))
-        locator = Locator.for_cells("Requirements", "A1:B2")
+        row = TableRow(
+            2,
+            {
+                "ID": "REQ-0412",
+                "Statement": "Synthetic statement",
+                "Total": CellValue(formula="=SUM(C2:C3)", calculated_value=12),
+            },
+        )
+        profiles = (
+            ColumnProfile("ID", ColumnType.TEXT, 1.0, 1, True),
+            ColumnProfile("Statement", ColumnType.TEXT, 1.0, 1, False),
+            ColumnProfile("Total", ColumnType.NUMBER, 1.0, 1, False),
+        )
+        table = Table(
+            rows=(row,),
+            header_row=1,
+            header_confidence=Confidence(0.92),
+            column_profiles=profiles,
+        )
+        locator = Locator.for_cells("Requirements", "A1:C2")
         archive = Locator.for_cells("Archive", None)
         elements = (Element(ElementId.at(1), ElementKind.TABLE, locator, table=table),)
         return ParsedDocument(
@@ -62,8 +82,8 @@ class DocumentSamples:
             facts=self.facts(DetectedType.XLSX),
             elements=elements,
             warnings=(ParseWarning(WarningCode.SHEET_UNREADABLE, archive),),
-            outline=(OutlineEntry(OutlineKind.SHEET, "Requirements", locator),),
-            metrics=Metrics.for_elements(elements, {MetricName.ROWS: 1, MetricName.COLUMNS: 2}),
+            outline=(OutlineEntry(OutlineKind.SHEET, "Requirements", locator, hidden=False),),
+            metrics=Metrics.for_elements(elements, {MetricName.ROWS: 1, MetricName.COLUMNS: 3, MetricName.FORMULAS: 1}),
         )
 
     def failed(self) -> ParsedDocument:

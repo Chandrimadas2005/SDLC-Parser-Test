@@ -7,6 +7,7 @@ import pytest
 from jsonschema import Draft202012Validator
 
 from ParserService.Domain.Documents import (
+    ColumnType,
     DetectedType,
     DocumentStatus,
     ElementKind,
@@ -38,6 +39,7 @@ class TestParsedDocumentSchema:
         SchemaKeyword.WARNING_CODE: WarningCode,
         SchemaKeyword.FAILURE_REASON: FailureReason,
         SchemaKeyword.METRIC_NAME: MetricName,
+        SchemaKeyword.COLUMN_TYPE: ColumnType,
     }
 
     def test_schema_is_a_valid_draft_2020_12_schema(self) -> None:
@@ -59,6 +61,23 @@ class TestParsedDocumentSchema:
     )
     def test_encoded_documents_are_valid(self, document: ParsedDocument) -> None:
         self.VALIDATOR.validate(self.ENCODER.encode(document))
+
+    def test_spreadsheet_fields_are_encoded(self) -> None:
+        encoded = self.ENCODER.encode(SAMPLES.spreadsheet())
+        outline = encoded[OutputField.OUTLINE]
+        elements = encoded[OutputField.ELEMENTS]
+        assert isinstance(outline, list) and isinstance(outline[0], dict)
+        assert outline[0][OutputField.HIDDEN] is False
+        assert isinstance(elements, list) and isinstance(elements[0], dict)
+        rows = elements[0][OutputField.ROWS]
+        assert isinstance(rows, list) and isinstance(rows[0], dict)
+        cells = rows[0][OutputField.CELLS]
+        assert isinstance(cells, dict)
+        total = cells["Total"]
+        assert isinstance(total, dict)
+        assert total[OutputField.FORMULA] == "=SUM(C2:C3)"
+        assert total[OutputField.CALCULATED_VALUE] == 12
+        assert self.VALIDATOR.is_valid(encoded)
 
     def test_an_element_without_a_locator_is_rejected(self) -> None:
         encoded = self.ENCODER.encode(SAMPLES.text_document())

@@ -15,10 +15,14 @@ class OutlineEntry:
     name: str
     locator: Locator
     level: int | None = None
+    hidden: bool | None = None
 
     def __post_init__(self) -> None:
         if not self.name.strip():
             message = "outline entry name must not be blank"
+            raise ValueError(message)
+        if self.hidden is not None and self.kind is not OutlineKind.SHEET:
+            message = "only sheet outline entries can carry a hidden flag"
             raise ValueError(message)
         if (self.kind is OutlineKind.HEADING) != (self.level is not None):
             message = "a heading entry needs a level, and only headings have one"
