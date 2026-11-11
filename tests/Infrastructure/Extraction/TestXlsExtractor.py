@@ -39,6 +39,10 @@ class _FakeWorkbook:
         self._sheets = sheets
         self.nsheets = len(sheets)
         self.datemode = 0
+        # Same file properties xlrd reports for tests/corpus/xls/normal/normal.xls.
+        self.user_name = "Calc"
+        self.codepage = 1200
+        self.biff_version = 80
 
     def sheet_by_index(self, index: int) -> _FakeSheet:
         return self._sheets[index]

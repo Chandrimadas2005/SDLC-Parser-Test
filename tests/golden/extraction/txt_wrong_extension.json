@@ -6,7 +6,9 @@
     "detected_type": "txt",
     "size_bytes": 47,
     "sha256": "f88a4a7c2d247e359fca39f480bff7efd8f40bc59935b2d533708ffb76f646d8",
-    "properties": {}
+    "properties": {
+      "encoding": "ascii"
+    }
   },
   "warnings": [
     {

@@ -23,13 +23,17 @@ from ParserService.Domain.Documents import (
 from ParserService.Domain.Errors.Result import Result
 from ParserService.Domain.Jobs.FailureReason import FailureReason
 from ParserService.Infrastructure.Extraction.SpreadsheetTableBuilder import SpreadsheetTableBuilder
+from ParserService.Infrastructure.Extraction.XlsxPropertyReader import XlsxPropertyReader
 
 
 class XlsxExtractor:
     """Extract XLSX and XLSM workbooks using streaming worksheet readers."""
 
-    def __init__(self, builder: SpreadsheetTableBuilder) -> None:
+    def __init__(
+        self, builder: SpreadsheetTableBuilder, properties: XlsxPropertyReader | None = None
+    ) -> None:
         self._builder = builder
+        self._properties = properties or XlsxPropertyReader()
 
     def extract(self, request: ExtractionRequest) -> Result[ParsedDocument, FailureReason]:
         """Read all worksheets, retaining readable sheets when one is damaged."""
@@ -40,6 +44,7 @@ class XlsxExtractor:
 
     def _read_workbook(self, request: ExtractionRequest) -> ParsedDocument:
         path = Path(request.source.location)
+        request = request.with_properties(self._properties.read(path))
         with path.open("rb") as formulas_file, path.open("rb") as values_file:
             formulas_book = load_workbook(formulas_file, read_only=True, data_only=False, keep_links=False)
             values_book = load_workbook(values_file, read_only=True, data_only=True, keep_links=False)

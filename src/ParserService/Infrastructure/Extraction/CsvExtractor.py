@@ -1,7 +1,13 @@
 import csv
 from pathlib import Path
+from typing import Final
 
-from ParserService.Domain.Documents import DetectedType, ExtractionRequest, ParsedDocument
+from ParserService.Domain.Documents import (
+    DetectedType,
+    ExtractionRequest,
+    ParsedDocument,
+    PropertyName,
+)
 from ParserService.Domain.Errors.Result import Result
 from ParserService.Domain.Jobs.FailureReason import FailureReason
 from ParserService.Infrastructure.Extraction.SpreadsheetTableBuilder import SpreadsheetTableBuilder
@@ -9,6 +15,8 @@ from ParserService.Infrastructure.Extraction.SpreadsheetTableBuilder import Spre
 
 class CsvExtractor:
     """Extract comma-separated values into a source-located table."""
+
+    DELIMITER: Final = ","
 
     def __init__(self, builder: SpreadsheetTableBuilder) -> None:
         self._builder = builder
@@ -19,9 +27,10 @@ class CsvExtractor:
             with Path(request.source.location).open(
                 encoding=request.detection.encoding or "utf-8", newline=""
             ) as handle:
-                matrix = [list(row) for row in csv.reader(handle, delimiter=",")]
+                matrix = [list(row) for row in csv.reader(handle, delimiter=self.DELIMITER)]
         except (OSError, UnicodeError, csv.Error):
             return Result.err(FailureReason.CORRUPTED_FILE)
+        request = request.with_properties({PropertyName.DELIMITER: self.DELIMITER})
         return Result.ok(self._builder.build(request, [(self._name(), False, matrix)], 0))
 
     def _name(self) -> str:

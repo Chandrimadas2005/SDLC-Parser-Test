@@ -6,7 +6,9 @@
     "detected_type": "md",
     "size_bytes": 178,
     "sha256": "644f9adac6f9144a272ab976125882cc289ee02d3d28f1247554d01e3086b849",
-    "properties": {}
+    "properties": {
+      "encoding": "ascii"
+    }
   },
   "warnings": [],
   "outline": [

@@ -13,7 +13,9 @@ from ParserService.Infrastructure.Extraction.TextDocumentBuilder import TextDocu
 from ParserService.Infrastructure.Extraction.TextFileReader import TextFileReader
 from ParserService.Infrastructure.Extraction.TsvExtractor import TsvExtractor
 from ParserService.Infrastructure.Extraction.XlsExtractor import XlsExtractor
+from ParserService.Infrastructure.Extraction.XlsPropertyReader import XlsPropertyReader
 from ParserService.Infrastructure.Extraction.XlsxExtractor import XlsxExtractor
+from ParserService.Infrastructure.Extraction.XlsxPropertyReader import XlsxPropertyReader
 
 __all__ = [
     "CsvExtractor",
@@ -29,5 +31,7 @@ __all__ = [
     "TextFileReader",
     "TsvExtractor",
     "XlsExtractor",
+    "XlsPropertyReader",
     "XlsxExtractor",
+    "XlsxPropertyReader",
 ]

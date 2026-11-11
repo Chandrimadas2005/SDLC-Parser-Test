@@ -14,11 +14,13 @@ from ParserService.Domain.Documents import (
     Locator,
     ParseWarning,
     ParsedDocument,
+    PropertyName,
     WarningCode,
 )
 from ParserService.Domain.Errors.Result import Result
 from ParserService.Domain.Jobs.FailureReason import FailureReason
 from ParserService.Infrastructure.Extraction.SpreadsheetTableBuilder import SpreadsheetTableBuilder
+from ParserService.Infrastructure.Extraction.XlsPropertyReader import XlsPropertyReader
 
 
 class XlsExtractor:
@@ -29,8 +31,11 @@ class XlsExtractor:
     XL_CELL_BOOLEAN = 4
     XL_CELL_BLANK = 6
 
-    def __init__(self, builder: SpreadsheetTableBuilder) -> None:
+    def __init__(
+        self, builder: SpreadsheetTableBuilder, summary: XlsPropertyReader | None = None
+    ) -> None:
         self._builder = builder
+        self._summary = summary or XlsPropertyReader()
 
     def extract(self, request: ExtractionRequest) -> Result[ParsedDocument, FailureReason]:
         """Read legacy worksheets, opening one sheet at a time."""
@@ -39,11 +44,23 @@ class XlsExtractor:
         try:
             workbook = xlrd.open_workbook(str(Path(request.source.location)), on_demand=True, formatting_info=True)
             sheets, warnings = self._sheets(workbook)
+            request = request.with_properties(self._properties(workbook))
             workbook.release_resources()
         except (OSError, xlrd.XLRDError, ValueError):
             return Result.err(FailureReason.CORRUPTED_FILE)
+        request = request.with_properties(self._summary.read(Path(request.source.location)))
         result = self._builder.build(request, sheets, 0)
         return Result.ok(self._with_warnings(result, warnings, request))
+
+    @staticmethod
+    def _properties(workbook: xlrd.book.Book) -> dict[str, str]:
+        # What xlrd itself exposes; title, author and dates come from XlsPropertyReader.
+        codepage = workbook.codepage
+        return {
+            PropertyName.LAST_MODIFIED_BY: str(workbook.user_name or "").strip(),
+            PropertyName.CODEPAGE: "" if codepage is None else str(codepage),
+            PropertyName.BIFF_VERSION: str(workbook.biff_version),
+        }
 
     def _sheets(
         self, workbook: xlrd.book.Book

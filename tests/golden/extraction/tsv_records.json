@@ -7,7 +7,9 @@
     "size_bytes": 59,
     "sha256": "178c3fce3681797503a566378737579d362f2fc4ca3079631ef8ba1936a01dd5",
     "sheet_count": 1,
-    "properties": {}
+    "properties": {
+      "delimiter": "\t"
+    }
   },
   "warnings": [],
   "outline": [

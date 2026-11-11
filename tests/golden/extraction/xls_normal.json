@@ -7,7 +7,15 @@
     "size_bytes": 6144,
     "sha256": "74543c3c3d6fc0e835d17e6c7775314f51a5629f92142321f451c9e2bcf0124e",
     "sheet_count": 2,
-    "properties": {}
+    "properties": {
+      "last_modified_by": "Calc",
+      "codepage": "1200",
+      "biff_version": "80",
+      "creator": "openpyxl",
+      "revision": "0",
+      "created": "2026-11-11T08:01:09Z",
+      "modified": "2026-11-11T08:01:09Z"
+    }
   },
   "warnings": [],
   "outline": [

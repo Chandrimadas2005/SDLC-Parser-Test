@@ -7,7 +7,13 @@
     "size_bytes": 5386,
     "sha256": "41a0d1c36d578432c1835c9220e633422429942d1467cfa861f57ec8df5f89ae",
     "sheet_count": 2,
-    "properties": {}
+    "properties": {
+      "application": "Microsoft Excel Compatible / Openpyxl 3.1.5",
+      "app_version": "3.1",
+      "creator": "openpyxl",
+      "created": "2026-11-11T08:01:09Z",
+      "modified": "2026-11-11T08:01:09Z"
+    }
   },
   "warnings": [],
   "outline": [

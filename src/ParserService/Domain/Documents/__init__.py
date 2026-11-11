@@ -20,6 +20,7 @@ from ParserService.Domain.Documents.OutlineKind import OutlineKind
 from ParserService.Domain.Documents.ParsedDocument import ParsedDocument
 from ParserService.Domain.Documents.ParseOutcome import ParseOutcome
 from ParserService.Domain.Documents.ParseWarning import ParseWarning
+from ParserService.Domain.Documents.PropertyName import PropertyName
 from ParserService.Domain.Documents.SourceFile import SourceFile
 from ParserService.Domain.Documents.Table import Table
 from ParserService.Domain.Documents.TableRow import TableRow
@@ -46,6 +47,7 @@ __all__ = [
     "ParseOutcome",
     "ParseWarning",
     "ParsedDocument",
+    "PropertyName",
     "SourceFile",
     "Table",
     "TableRow",
