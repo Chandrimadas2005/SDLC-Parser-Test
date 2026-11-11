@@ -1,0 +1,35 @@
+{
+  "schema_version": "1.0",
+  "status": "succeeded",
+  "document": {
+    "file_name": "notes.pdf",
+    "detected_type": "txt",
+    "size_bytes": 47,
+    "sha256": "f88a4a7c2d247e359fca39f480bff7efd8f40bc59935b2d533708ffb76f646d8",
+    "properties": {}
+  },
+  "warnings": [
+    {
+      "code": "extension_mismatch"
+    }
+  ],
+  "outline": [],
+  "elements": [
+    {
+      "id": "e-000001",
+      "kind": "paragraph",
+      "locator": {
+        "paragraph": 1,
+        "char_start": 0,
+        "char_end": 46
+      },
+      "text": "This is plain text saved with a PDF extension."
+    }
+  ],
+  "metrics": {
+    "words": 9,
+    "elements_by_kind": {
+      "paragraph": 1
+    }
+  }
+}

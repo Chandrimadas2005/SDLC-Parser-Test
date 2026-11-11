@@ -44,6 +44,39 @@ services:
       - /tmp:size=512m
     restart: unless-stopped
 
+  worker:
+    # Takes queued jobs and parses each file in its own short-lived process with time
+    # and memory limits (brief 2.5). Shares the artifact volume with the API.
+    build: .
+    command: ["parser-worker"]
+    depends_on:
+      api:
+        condition: service_healthy
+    environment:
+      PARSER_DATABASE_URL: postgresql+pg8000://${POSTGRES_USER:-parser}:${POSTGRES_PASSWORD:-parser-local-only}@postgres:5432/${POSTGRES_DB:-parser}
+      PARSER_ARTIFACT_ROOT: /var/lib/parser/artifacts
+      PARSER_LOG_LEVEL: ${PARSER_LOG_LEVEL:-INFO}
+      PARSER_JOB_TIMEOUT_SECONDS: ${PARSER_JOB_TIMEOUT_SECONDS:-300}
+      # Per-job limit stays below the container limit, so one bad file kills only its
+      # own process, never the worker container.
+      PARSER_JOB_MEMORY_LIMIT_MB: ${PARSER_JOB_MEMORY_LIMIT_MB:-1024}
+    volumes:
+      - artifacts:/var/lib/parser/artifacts
+    # No HTTP port: healthy while the worker process (PID 1) is running.
+    healthcheck:
+      test: ["CMD", "python", "-c", "import sys; sys.exit(0 if b'parser-worker' in open('/proc/1/cmdline', 'rb').read() else 1)"]
+      interval: 5s
+      timeout: 3s
+      start_period: 10s
+      retries: 3
+    mem_limit: 2g
+    cpus: 2.0
+    pids_limit: 256
+    read_only: true
+    tmpfs:
+      - /tmp:size=512m
+    restart: unless-stopped
+
 volumes:
   postgres-data:
   artifacts:

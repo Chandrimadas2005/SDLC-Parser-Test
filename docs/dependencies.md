@@ -15,10 +15,12 @@ Shipped in the service image. Checked by CI.
 | Package | Version | Licence | Purpose |
 |---|---|---|---|
 | alembic | 1.20.1 | MIT | Schema migrations, forward and backward |
+| charset-normalizer | 3.5.2 | MIT | Encoding detection for text files |
 | fastapi | 0.162.2 | MIT | HTTP API |
 | pg8000 | 1.31.6 | BSD-3-Clause | Pure-Python PostgreSQL driver |
 | prometheus-client | 0.26.0 | Apache-2.0 | `/metrics` |
 | pydantic | 2.14.3 | MIT | Request and response models |
+| python-magic | 0.4.27 | MIT | Content-based type detection (needs the libmagic1 system package) |
 | python-multipart | 0.0.33 | Apache-2.0 | Multipart file uploads for FastAPI |
 | sqlalchemy | 2.1.8 | MIT | Core SQL toolkit for the job table |
 | structlog | 25.5.0 | MIT OR Apache-2.0 | Structured JSON logging |
@@ -62,20 +64,28 @@ Not shipped. Used for checks, tests and local hooks.
 | import-linter | 2.16 | BSD-2-Clause | Layer rules (`Infrastructure -> Application -> Domain`) |
 | jsonschema | 4.26.0 | MIT | Checks every encoded `ParsedDocument` against `schemas/parsed_document.v1.json` |
 | mypy | 2.4.1 | MIT | Strict static typing (with the pydantic plugin) |
+| pdfplumber | 0.11.10 | MIT | PDF library comparison only (`tools/PdfComparison`) |
 | pip-audit | 2.10.1 | Apache-2.0 | Vulnerability scan |
 | pip-licenses | 5.5.5 | MIT | Licence policy check |
 | pre-commit | 4.7.0 | MIT | Runs the CI checks before each commit |
+| pypdf | 6.21.4 | BSD-3-Clause | PDF library comparison only |
+| pypdfium2 | 5.15.2 | Apache-2.0 / BSD-3-Clause | PDF library comparison only (bundles PDFium) |
 | pytest | 9.2.0 | MIT | Test runner |
 | pytest-cov | 7.1.0 | MIT | Coverage |
+| reportlab | 4.5.1 | BSD-3-Clause | Writes the synthetic PDFs for the comparison |
 | ruff | 0.17.4 | MIT | Lint and format (complexity 4, arguments 3) |
 | types-jsonschema | 4.26.0.20261006 | Apache-2.0 | Type stubs for jsonschema (`mypy --strict`) |
+| types-reportlab | 4.5.1.20260827 | Apache-2.0 | Type stubs for reportlab |
 
 Transitive development-only packages inside the allow-list:
 
 | Package | Version | Licence | Pulled in by |
 |---|---|---|---|
 | attrs | 26.1.0 | MIT | jsonschema |
+| cryptography | 50.0.2 | Apache-2.0 OR BSD-3-Clause | pdfminer.six |
 | jsonschema-specifications | 2025.9.1 | MIT | jsonschema |
+| pdfminer.six | 20260107 | MIT | pdfplumber |
+| pycparser | 3.12 | BSD-3-Clause | cffi |
 | referencing | 0.37.0 | MIT | jsonschema |
 | rpds-py | 2026.9.1 | MIT | jsonschema |
 
@@ -85,7 +95,9 @@ image:
 | Package | Version | Licence | Pulled in by |
 |---|---|---|---|
 | certifi | 2026.10.23 | MPL-2.0 | pip-audit (via requests) |
+| cffi | 2.1.1 | MIT-0 | cryptography (PDF comparison tool) |
 | pathspec | 1.1.1 | MPL-2.0 | mypy |
+| pillow | 13.0.0 | MIT-CMU | pdfplumber (PDF comparison tool); needs approval before pdfplumber could ship |
 
 ## System packages in the image
 

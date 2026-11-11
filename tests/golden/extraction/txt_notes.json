@@ -1,0 +1,51 @@
+{
+  "schema_version": "1.0",
+  "status": "succeeded",
+  "document": {
+    "file_name": "notes.txt",
+    "detected_type": "txt",
+    "size_bytes": 144,
+    "sha256": "a1c0626dc9a9cb96b48899751539a154cb9e0d2ec3a090986710277b68204229",
+    "properties": {}
+  },
+  "warnings": [],
+  "outline": [],
+  "elements": [
+    {
+      "id": "e-000001",
+      "kind": "paragraph",
+      "locator": {
+        "paragraph": 1,
+        "char_start": 0,
+        "char_end": 68
+      },
+      "text": "Synthetic meeting notes for parser tests.\nThey contain no real data."
+    },
+    {
+      "id": "e-000002",
+      "kind": "paragraph",
+      "locator": {
+        "paragraph": 2,
+        "char_start": 70,
+        "char_end": 126
+      },
+      "text": "The second paragraph has two lines\nthat belong together."
+    },
+    {
+      "id": "e-000003",
+      "kind": "paragraph",
+      "locator": {
+        "paragraph": 3,
+        "char_start": 128,
+        "char_end": 143
+      },
+      "text": "Last paragraph."
+    }
+  ],
+  "metrics": {
+    "words": 22,
+    "elements_by_kind": {
+      "paragraph": 3
+    }
+  }
+}

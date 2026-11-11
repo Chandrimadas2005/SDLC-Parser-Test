@@ -1,0 +1,147 @@
+{
+  "schema_version": "1.0",
+  "status": "succeeded",
+  "document": {
+    "file_name": "guide.md",
+    "detected_type": "md",
+    "size_bytes": 178,
+    "sha256": "644f9adac6f9144a272ab976125882cc289ee02d3d28f1247554d01e3086b849",
+    "properties": {}
+  },
+  "warnings": [],
+  "outline": [
+    {
+      "kind": "heading",
+      "name": "Synthetic guide",
+      "level": 1,
+      "locator": {
+        "paragraph": 1,
+        "char_start": 2,
+        "char_end": 17
+      }
+    },
+    {
+      "kind": "heading",
+      "name": "Steps",
+      "level": 2,
+      "locator": {
+        "paragraph": 3,
+        "char_start": 55,
+        "char_end": 60
+      }
+    },
+    {
+      "kind": "heading",
+      "name": "Notes",
+      "level": 3,
+      "locator": {
+        "paragraph": 8,
+        "char_start": 136,
+        "char_end": 141
+      }
+    }
+  ],
+  "elements": [
+    {
+      "id": "e-000001",
+      "kind": "heading",
+      "locator": {
+        "paragraph": 1,
+        "char_start": 2,
+        "char_end": 17
+      },
+      "text": "Synthetic guide",
+      "level": 1
+    },
+    {
+      "id": "e-000002",
+      "kind": "paragraph",
+      "locator": {
+        "paragraph": 2,
+        "char_start": 19,
+        "char_end": 50
+      },
+      "text": "A short introduction paragraph."
+    },
+    {
+      "id": "e-000003",
+      "kind": "heading",
+      "locator": {
+        "paragraph": 3,
+        "char_start": 55,
+        "char_end": 60
+      },
+      "text": "Steps",
+      "level": 2
+    },
+    {
+      "id": "e-000004",
+      "kind": "list_item",
+      "locator": {
+        "paragraph": 4,
+        "char_start": 64,
+        "char_end": 74
+      },
+      "text": "First item"
+    },
+    {
+      "id": "e-000005",
+      "kind": "list_item",
+      "locator": {
+        "paragraph": 5,
+        "char_start": 77,
+        "char_end": 88
+      },
+      "text": "Second item"
+    },
+    {
+      "id": "e-000006",
+      "kind": "list_item",
+      "locator": {
+        "paragraph": 6,
+        "char_start": 92,
+        "char_end": 105
+      },
+      "text": "Numbered item"
+    },
+    {
+      "id": "e-000007",
+      "kind": "paragraph",
+      "locator": {
+        "paragraph": 7,
+        "char_start": 107,
+        "char_end": 130
+      },
+      "text": "code block line"
+    },
+    {
+      "id": "e-000008",
+      "kind": "heading",
+      "locator": {
+        "paragraph": 8,
+        "char_start": 136,
+        "char_end": 141
+      },
+      "text": "Notes",
+      "level": 3
+    },
+    {
+      "id": "e-000009",
+      "kind": "paragraph",
+      "locator": {
+        "paragraph": 9,
+        "char_start": 143,
+        "char_end": 177
+      },
+      "text": "Closing paragraph with *emphasis*."
+    }
+  ],
+  "metrics": {
+    "words": 21,
+    "elements_by_kind": {
+      "heading": 3,
+      "paragraph": 3,
+      "list_item": 3
+    }
+  }
+}

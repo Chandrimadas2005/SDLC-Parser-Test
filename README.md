@@ -18,6 +18,9 @@ curl -F "file=@notes.txt" http://localhost:8000/v1/parse-jobs
 curl http://localhost:8000/v1/parse-jobs/<job_id>
 ```
 
+`docker compose up` also starts the worker, which parses each queued file in its own
+short-lived process with time and memory limits, so the job moves to `succeeded`.
+
 Health and metrics: `/health/live`, `/health/ready`, `/metrics`.
 
 ## Development setup
@@ -29,6 +32,9 @@ uv sync                      # create .venv with runtime and dev dependencies
 uv run pre-commit install    # run the same checks as CI before every commit
 cp .env.example .env         # optional local overrides (SQLite by default)
 uv run parser-api            # serve on http://127.0.0.1:8000 without Docker
+uv run parser-worker         # in a second terminal: parse queued jobs
+uv run python -m tools.Measurement tests/corpus docs/measurements.md   # parse cost per file
+uv run python -m tools.PdfComparison docs/pdf-library-comparison.md    # PDF library comparison
 ```
 
 Run every check that CI runs:

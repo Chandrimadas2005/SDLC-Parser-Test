@@ -1,0 +1,31 @@
+from enum import StrEnum
+
+
+class MimeType(StrEnum):
+    """The MIME types libmagic reports for the formats the parser knows."""
+
+    PDF = "application/pdf"
+    PNG = "image/png"
+    JPEG = "image/jpeg"
+    TIFF = "image/tiff"
+    RTF = "text/rtf"
+    HTML = "text/html"
+    XML = "text/xml"
+    APPLICATION_XML = "application/xml"
+    JSON = "application/json"
+    EMAIL = "message/rfc822"
+    ZIP = "application/zip"
+    OCTET_STREAM = "application/octet-stream"
+    DOCX = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    XLSX = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    PPTX = "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+    OLE_STORAGE = "application/x-ole-storage"
+    MS_WORD = "application/msword"
+    MS_EXCEL = "application/vnd.ms-excel"
+    MS_POWERPOINT = "application/vnd.ms-powerpoint"
+    MS_OUTLOOK = "application/vnd.ms-outlook"
+    PLAIN_TEXT = "text/plain"
+    CSV = "text/csv"
+    MARKDOWN = "text/markdown"
+    EMPTY = "application/x-empty"
+    INODE_EMPTY = "inode/x-empty"
