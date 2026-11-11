@@ -17,6 +17,8 @@ Shipped in the service image. Checked by CI.
 | alembic | 1.20.1 | MIT | Schema migrations, forward and backward |
 | charset-normalizer | 3.5.2 | MIT | Encoding detection for text files |
 | fastapi | 0.162.2 | MIT | HTTP API |
+| defusedxml | 0.7.1 | PSF-2.0 | Safe XML parsing of untrusted workbook parts (brief 2.5) |
+| openpyxl | 3.1.5 | MIT | Streaming XLSX/XLSM worksheet extraction |
 | pg8000 | 1.31.6 | BSD-3-Clause | Pure-Python PostgreSQL driver |
 | prometheus-client | 0.26.0 | Apache-2.0 | `/metrics` |
 | pydantic | 2.14.3 | MIT | Request and response models |
@@ -25,12 +27,14 @@ Shipped in the service image. Checked by CI.
 | sqlalchemy | 2.1.8 | MIT | Core SQL toolkit for the job table |
 | structlog | 25.5.0 | MIT OR Apache-2.0 | Structured JSON logging |
 | uvicorn | 0.54.0 | BSD-3-Clause | ASGI server |
+| xlrd | 2.0.1 | BSD-3-Clause | Legacy XLS workbook extraction |
 
 Transitive runtime packages (all inside the allow-list):
 
 | Package | Version | Licence | Pulled in by |
 |---|---|---|---|
 | annotated-doc | 0.0.5 | MIT | fastapi |
+| et-xmlfile | 2.0.0 | MIT | openpyxl |
 | annotated-types | 0.8.0 | MIT | pydantic |
 | anyio | 4.16.0 | MIT | starlette |
 | asn1crypto | 1.5.1 | MIT | scramp |
@@ -74,7 +78,9 @@ Not shipped. Used for checks, tests and local hooks.
 | pytest-cov | 7.1.0 | MIT | Coverage |
 | reportlab | 4.5.1 | BSD-3-Clause | Writes the synthetic PDFs for the comparison |
 | ruff | 0.17.4 | MIT | Lint and format (complexity 4, arguments 3) |
+| types-defusedxml | 0.7.0.20260504 | Apache-2.0 | Type stubs for defusedxml |
 | types-jsonschema | 4.26.0.20261006 | Apache-2.0 | Type stubs for jsonschema (`mypy --strict`) |
+| types-openpyxl | 3.1.5.20261017 | Apache-2.0 | Type stubs for openpyxl |
 | types-reportlab | 4.5.1.20260827 | Apache-2.0 | Type stubs for reportlab |
 
 Transitive development-only packages inside the allow-list:

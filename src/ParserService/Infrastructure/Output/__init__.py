@@ -1,4 +1,4 @@
-"""Output formats of a ParsedDocument: JSON (schema v1), and Markdown later."""
+"""Output formats of a ParsedDocument: JSON and Markdown."""
 
 from ParserService.Infrastructure.Output.OutputField import OutputField
 from ParserService.Infrastructure.Output.ParsedDocumentJsonEncoder import (
@@ -6,5 +6,14 @@ from ParserService.Infrastructure.Output.ParsedDocumentJsonEncoder import (
     JsonValue,
     ParsedDocumentJsonEncoder,
 )
+from ParserService.Infrastructure.Output.ParsedDocumentMarkdownRenderer import (
+    ParsedDocumentMarkdownRenderer,
+)
 
-__all__ = ["JsonObject", "JsonValue", "OutputField", "ParsedDocumentJsonEncoder"]
+__all__ = [
+    "JsonObject",
+    "JsonValue",
+    "OutputField",
+    "ParsedDocumentJsonEncoder",
+    "ParsedDocumentMarkdownRenderer",
+]

@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "1.1",
   "status": "partial",
   "document": {
     "file_name": "sample.xlsx",
@@ -22,9 +22,10 @@
     {
       "kind": "sheet",
       "name": "Requirements",
+      "hidden": false,
       "locator": {
         "sheet": "Requirements",
-        "range": "A1:B2"
+        "range": "A1:C2"
       }
     }
   ],
@@ -34,7 +35,7 @@
       "kind": "table",
       "locator": {
         "sheet": "Requirements",
-        "range": "A1:B2"
+        "range": "A1:C2"
       },
       "header_row": 1,
       "header_confidence": 0.92,
@@ -43,15 +44,43 @@
           "row": 2,
           "cells": {
             "ID": "REQ-0412",
-            "Statement": "Synthetic statement"
+            "Statement": "Synthetic statement",
+            "Total": {
+              "formula": "=SUM(C2:C3)",
+              "calculated_value": 12
+            }
           }
+        }
+      ],
+      "column_profiles": [
+        {
+          "name": "ID",
+          "guessed_type": "text",
+          "fill_rate": 1.0,
+          "unique_values": 1,
+          "looks_like_id": true
+        },
+        {
+          "name": "Statement",
+          "guessed_type": "text",
+          "fill_rate": 1.0,
+          "unique_values": 1,
+          "looks_like_id": false
+        },
+        {
+          "name": "Total",
+          "guessed_type": "number",
+          "fill_rate": 1.0,
+          "unique_values": 1,
+          "looks_like_id": false
         }
       ]
     }
   ],
   "metrics": {
     "rows": 1,
-    "columns": 2,
+    "columns": 3,
+    "formulas": 1,
     "elements_by_kind": {
       "table": 1
     }

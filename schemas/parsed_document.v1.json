@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://parser-service.local/schemas/parsed_document.v1.json",
   "title": "ParsedDocument",
-  "description": "Result of parsing one file (schema version 1.0). Every element carries a locator back to its place in the source file.",
+  "description": "Result of parsing one file (schema version 1.1). Every element carries a locator back to its place in the source file.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -16,7 +16,7 @@
   ],
   "properties": {
     "schema_version": {
-      "const": "1.0"
+      "const": "1.1"
     },
     "status": {
       "$ref": "#/$defs/status"
@@ -340,6 +340,9 @@
         },
         "locator": {
           "$ref": "#/$defs/locator"
+        },
+        "hidden": {
+          "type": "boolean"
         }
       },
       "if": {
@@ -360,7 +363,47 @@
             "level"
           ]
         }
-      }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "heading"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "level"
+            ]
+          },
+          "else": {
+            "not": {
+              "required": [
+                "level"
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "sheet"
+              }
+            }
+          },
+          "then": {},
+          "else": {
+            "not": {
+              "required": [
+                "hidden"
+              ]
+            }
+          }
+        }
+      ]
     },
     "table_row": {
       "type": "object",
@@ -377,7 +420,44 @@
         "cells": {
           "type": "object",
           "additionalProperties": {
-            "type": "string"
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "value": {
+                    "type": "string"
+                  },
+                  "formula": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "calculated_value": {
+                    "type": [
+                      "string",
+                      "number",
+                      "boolean",
+                      "null"
+                    ]
+                  }
+                },
+                "anyOf": [
+                  {
+                    "required": [
+                      "formula"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "calculated_value"
+                    ]
+                  }
+                ]
+              }
+            ]
           }
         }
       }
@@ -422,6 +502,12 @@
           "type": "array",
           "items": {
             "$ref": "#/$defs/table_row"
+          }
+        },
+        "column_profiles": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/column_profile"
           }
         }
       },
@@ -540,6 +626,48 @@
             "type": "integer",
             "minimum": 0
           }
+        }
+      }
+    },
+    "column_type": {
+      "enum": [
+        "text",
+        "number",
+        "date",
+        "boolean",
+        "empty",
+        "mixed"
+      ]
+    },
+    "column_profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "guessed_type",
+        "fill_rate",
+        "unique_values",
+        "looks_like_id"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "guessed_type": {
+          "$ref": "#/$defs/column_type"
+        },
+        "fill_rate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "unique_values": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "looks_like_id": {
+          "type": "boolean"
         }
       }
     }

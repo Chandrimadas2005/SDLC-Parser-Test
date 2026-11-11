@@ -1,6 +1,8 @@
 from collections.abc import Mapping
 from dataclasses import dataclass
 
+from ParserService.Domain.Documents.CellValue import CellValue
+
 
 @dataclass(frozen=True, slots=True)
 class TableRow:
@@ -12,7 +14,7 @@ class TableRow:
     """
 
     row: int
-    cells: Mapping[str, str]
+    cells: Mapping[str, str | CellValue]
 
     def __post_init__(self) -> None:
         if self.row < 1:

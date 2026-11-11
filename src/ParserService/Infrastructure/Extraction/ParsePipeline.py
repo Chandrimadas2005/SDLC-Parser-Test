@@ -6,6 +6,7 @@ from ParserService.Domain.Documents.Detection import Detection
 from ParserService.Domain.Documents.DocumentFacts import DocumentFacts
 from ParserService.Domain.Documents.ExtractionRequest import ExtractionRequest
 from ParserService.Domain.Documents.ParsedDocument import ParsedDocument
+from ParserService.Domain.Documents.PropertyName import PropertyName
 from ParserService.Domain.Documents.SourceFile import SourceFile
 from ParserService.Domain.Errors.Result import Result
 from ParserService.Domain.Jobs.FailureReason import FailureReason
@@ -54,4 +55,5 @@ class ParsePipeline:
                 digest.update(chunk)
         size = path.stat().st_size
         sha256 = FileHash(digest.hexdigest())
-        return DocumentFacts(source.file_name, detection.detected_type, size, sha256)
+        facts = DocumentFacts(source.file_name, detection.detected_type, size, sha256)
+        return facts.with_properties({PropertyName.ENCODING: detection.encoding or ""})

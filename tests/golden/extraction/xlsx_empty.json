@@ -1,0 +1,52 @@
+{
+  "schema_version": "1.1",
+  "status": "succeeded",
+  "document": {
+    "file_name": "empty.xlsx",
+    "detected_type": "xlsx",
+    "size_bytes": 4783,
+    "sha256": "050f7ac04ff7ce37b2defa9c48082d8dc8596173e72406ad5621f6b7a5be2997",
+    "sheet_count": 1,
+    "properties": {
+      "application": "Microsoft Excel Compatible / Openpyxl 3.1.5",
+      "app_version": "3.1",
+      "creator": "openpyxl",
+      "created": "2026-11-11T08:01:09Z",
+      "modified": "2026-11-11T08:01:09Z"
+    }
+  },
+  "warnings": [],
+  "outline": [
+    {
+      "kind": "sheet",
+      "name": "Sheet",
+      "hidden": false,
+      "locator": {
+        "sheet": "Sheet",
+        "range": "A1:A1"
+      }
+    }
+  ],
+  "elements": [
+    {
+      "id": "e-000001",
+      "kind": "table",
+      "locator": {
+        "sheet": "Sheet",
+        "range": "A1:A1"
+      },
+      "rows": [],
+      "column_profiles": []
+    }
+  ],
+  "metrics": {
+    "sheets": 1,
+    "rows": 0,
+    "columns": 0,
+    "formulas": 0,
+    "hidden_sheets": 0,
+    "elements_by_kind": {
+      "table": 1
+    }
+  }
+}

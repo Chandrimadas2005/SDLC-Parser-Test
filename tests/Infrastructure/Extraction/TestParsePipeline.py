@@ -110,7 +110,15 @@ class TestParsePipeline:
             assert result.unwrap_err() is FailureReason.UNSUPPORTED_TYPE
 
     def test_registry_lists_supported_types_in_priority_order(self) -> None:
-        assert ExtractorRegistry.default().supported_types == (DetectedType.TXT, DetectedType.MD)
+        assert ExtractorRegistry.default().supported_types == (
+            DetectedType.XLSX,
+            DetectedType.XLSM,
+            DetectedType.XLS,
+            DetectedType.CSV,
+            DetectedType.TSV,
+            DetectedType.TXT,
+            DetectedType.MD,
+        )
 
     def test_request_rejects_facts_that_disagree_with_detection(self) -> None:
         facts = DocumentFacts(FileName("a.txt"), DetectedType.TXT, 1, FileHash.of(b"a"))

@@ -1,5 +1,8 @@
 """ParsedDocument model: elements, locators, warnings, outline and metrics."""
 
+from ParserService.Domain.Documents.CellValue import CellValue
+from ParserService.Domain.Documents.ColumnProfile import ColumnProfile
+from ParserService.Domain.Documents.ColumnType import ColumnType
 from ParserService.Domain.Documents.Confidence import Confidence
 from ParserService.Domain.Documents.DetectedType import DetectedType
 from ParserService.Domain.Documents.Detection import Detection
@@ -17,12 +20,16 @@ from ParserService.Domain.Documents.OutlineKind import OutlineKind
 from ParserService.Domain.Documents.ParsedDocument import ParsedDocument
 from ParserService.Domain.Documents.ParseOutcome import ParseOutcome
 from ParserService.Domain.Documents.ParseWarning import ParseWarning
+from ParserService.Domain.Documents.PropertyName import PropertyName
 from ParserService.Domain.Documents.SourceFile import SourceFile
 from ParserService.Domain.Documents.Table import Table
 from ParserService.Domain.Documents.TableRow import TableRow
 from ParserService.Domain.Documents.WarningCode import WarningCode
 
 __all__ = [
+    "CellValue",
+    "ColumnProfile",
+    "ColumnType",
     "Confidence",
     "DetectedType",
     "Detection",
@@ -40,6 +47,7 @@ __all__ = [
     "ParseOutcome",
     "ParseWarning",
     "ParsedDocument",
+    "PropertyName",
     "SourceFile",
     "Table",
     "TableRow",
