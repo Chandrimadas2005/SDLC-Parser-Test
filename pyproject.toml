@@ -28,13 +28,18 @@ dev = [
   "import-linter>=2.16,<3",
   "jsonschema>=4.23,<5",
   "mypy>=2.4,<3",
+  "pdfplumber>=0.11,<0.12",
   "pip-audit>=2.10,<3",
   "pip-licenses>=5.5,<6",
   "pre-commit>=4.7,<5",
+  "pypdf>=6,<7",
+  "pypdfium2>=4.30,<6",
   "pytest>=9.2,<10",
   "pytest-cov>=7.1,<8",
+  "reportlab>=4.2,<5",
   "ruff>=0.17,<0.18",
   "types-jsonschema>=4.26,<5",
+  "types-reportlab>=4.2,<5",
 ]
 
 [build-system]
@@ -93,6 +98,11 @@ warn_unreachable = true
 mypy_path = "src"
 files = ["src", "tests", "tools"]
 explicit_package_bases = true
+
+[[tool.mypy.overrides]]
+# pypdfium2 ships no type information; it is used only by the PDF comparison tool.
+module = ["pypdfium2", "pypdfium2.*"]
+ignore_missing_imports = true
 
 # ---------------------------------------------------------------- pytest
 [tool.pytest.ini_options]

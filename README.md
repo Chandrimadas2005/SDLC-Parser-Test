@@ -34,6 +34,7 @@ cp .env.example .env         # optional local overrides (SQLite by default)
 uv run parser-api            # serve on http://127.0.0.1:8000 without Docker
 uv run parser-worker         # in a second terminal: parse queued jobs
 uv run python -m tools.Measurement tests/corpus docs/measurements.md   # parse cost per file
+uv run python -m tools.PdfComparison docs/pdf-library-comparison.md    # PDF library comparison
 ```
 
 Run every check that CI runs:
