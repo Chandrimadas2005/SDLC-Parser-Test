@@ -1,5 +1,6 @@
 from collections.abc import Iterator, Sequence
 from dataclasses import dataclass
+from importlib.util import find_spec
 from pathlib import Path
 import sys
 from types import ModuleType
@@ -95,6 +96,14 @@ class TestXlsExtractor:
         assert table.rows[0].cells["Total"] == "4.0"
         assert table.rows[2].cells["Record ID"] == "REC-002"
         self._golden(document, "xls_normal.json")
+
+    @pytest.mark.skipif(find_spec("xlrd") is None, reason="xlrd runtime dependency is not installed")
+    def test_real_xls_file_uses_the_xlrd_adapter(self) -> None:
+        path = self.ROOT / "normal" / "normal.xls"
+        document = XlsExtractor(SpreadsheetTableBuilder()).extract(self._request(path)).unwrap()
+        table = document.elements[0].table
+        assert table is not None
+        assert table.rows[0].cells["Record ID"] == "REC-001"
 
     def test_includes_hidden_sheet_outline(self, monkeypatch: pytest.MonkeyPatch) -> None:
         hidden = _FakeSheet("HiddenData", 1, ((_FakeCell(1, "Name"),), (_FakeCell(1, "sample"),)))
