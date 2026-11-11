@@ -15,10 +15,14 @@ repos:
       - id: check-toml
       - id: check-yaml
       - id: detect-private-key
+      # Corpus files are test inputs (some binary, some deliberately malformed): never rewrite them.
       - id: end-of-file-fixer
+        exclude: ^tests/corpus/
       - id: mixed-line-ending
         args: [--fix=lf]
+        exclude: ^tests/corpus/
       - id: trailing-whitespace
+        exclude: ^tests/corpus/
 
   - repo: local
     hooks:
