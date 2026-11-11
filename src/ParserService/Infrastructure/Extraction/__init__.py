@@ -4,6 +4,11 @@ from ParserService.Infrastructure.Extraction.ExtractorRegistry import ExtractorR
 from ParserService.Infrastructure.Extraction.MarkdownBlockReader import MarkdownBlockReader
 from ParserService.Infrastructure.Extraction.MarkdownExtractor import MarkdownExtractor
 from ParserService.Infrastructure.Extraction.ParsePipeline import ParsePipeline
+from ParserService.Infrastructure.Extraction.PdfContent import PdfContent
+from ParserService.Infrastructure.Extraction.PdfDocumentAssembler import PdfDocumentAssembler
+from ParserService.Infrastructure.Extraction.PdfExtractor import PdfExtractor
+from ParserService.Infrastructure.Extraction.PdfPageText import PdfPageText
+from ParserService.Infrastructure.Extraction.PdfReader import PdfReader
 from ParserService.Infrastructure.Extraction.PlainTextBlockSplitter import PlainTextBlockSplitter
 from ParserService.Infrastructure.Extraction.PlainTextExtractor import PlainTextExtractor
 from ParserService.Infrastructure.Extraction.TextBlock import TextBlock
@@ -15,6 +20,11 @@ __all__ = [
     "MarkdownBlockReader",
     "MarkdownExtractor",
     "ParsePipeline",
+    "PdfContent",
+    "PdfDocumentAssembler",
+    "PdfExtractor",
+    "PdfPageText",
+    "PdfReader",
     "PlainTextBlockSplitter",
     "PlainTextExtractor",
     "TextBlock",

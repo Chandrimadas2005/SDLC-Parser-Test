@@ -1,5 +1,6 @@
-"""Ready-made synthetic domain objects shared by tests. No real data."""
+"""Ready-made synthetic objects and files shared by tests. No real data."""
 
 from tests.Samples.DocumentSamples import DocumentSamples
+from tests.Samples.SamplePdfs import SamplePdfs
 
-__all__ = ["DocumentSamples"]
+__all__ = ["DocumentSamples", "SamplePdfs"]

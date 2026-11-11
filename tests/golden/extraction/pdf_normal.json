@@ -1,0 +1,67 @@
+{
+  "schema_version": "1.0",
+  "status": "partial",
+  "document": {
+    "file_name": "normal.pdf",
+    "detected_type": "pdf",
+    "size_bytes": 2627,
+    "sha256": "ad44c204596fde62e5d89cba62f990b98395e222021ef33a1083e207a46b28ce",
+    "page_count": 3,
+    "properties": {}
+  },
+  "warnings": [
+    {
+      "code": "page_unreadable",
+      "locator": {
+        "page": 3
+      }
+    }
+  ],
+  "outline": [
+    {
+      "kind": "heading",
+      "name": "Introduction",
+      "level": 1,
+      "locator": {
+        "page": 1
+      }
+    },
+    {
+      "kind": "heading",
+      "name": "Details",
+      "level": 2,
+      "locator": {
+        "page": 2
+      }
+    }
+  ],
+  "elements": [
+    {
+      "id": "e-000001",
+      "kind": "paragraph",
+      "locator": {
+        "page": 1,
+        "char_start": 0,
+        "char_end": 68
+      },
+      "text": "Introduction\nFirst paragraph, line one.\nFirst paragraph, line two."
+    },
+    {
+      "id": "e-000002",
+      "kind": "paragraph",
+      "locator": {
+        "page": 2,
+        "char_start": 0,
+        "char_end": 32
+      },
+      "text": "Details of the synthetic sample."
+    }
+  ],
+  "metrics": {
+    "words": 14,
+    "pages": 3,
+    "elements_by_kind": {
+      "paragraph": 2
+    }
+  }
+}

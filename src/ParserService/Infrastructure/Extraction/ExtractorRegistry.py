@@ -7,6 +7,9 @@ from ParserService.Domain.Jobs.FailureReason import FailureReason
 from ParserService.Domain.Ports.Extractor import Extractor
 from ParserService.Infrastructure.Extraction.MarkdownBlockReader import MarkdownBlockReader
 from ParserService.Infrastructure.Extraction.MarkdownExtractor import MarkdownExtractor
+from ParserService.Infrastructure.Extraction.PdfDocumentAssembler import PdfDocumentAssembler
+from ParserService.Infrastructure.Extraction.PdfExtractor import PdfExtractor
+from ParserService.Infrastructure.Extraction.PdfReader import PdfReader
 from ParserService.Infrastructure.Extraction.PlainTextBlockSplitter import PlainTextBlockSplitter
 from ParserService.Infrastructure.Extraction.PlainTextExtractor import PlainTextExtractor
 from ParserService.Infrastructure.Extraction.TextDocumentBuilder import TextDocumentBuilder
@@ -28,12 +31,15 @@ class ExtractorRegistry:
         """Build the registry with every extractor that exists today.
 
         Returns:
-            A registry for plain text and Markdown.
+            A registry for PDF, plain text and Markdown.
         """
         reader, builder = TextFileReader(), TextDocumentBuilder()
+        splitter = PlainTextBlockSplitter()
+        pdf = PdfExtractor(PdfReader(), PdfDocumentAssembler(splitter))
         return cls(
             {
-                DetectedType.TXT: PlainTextExtractor(reader, PlainTextBlockSplitter(), builder),
+                DetectedType.PDF: pdf,
+                DetectedType.TXT: PlainTextExtractor(reader, splitter, builder),
                 DetectedType.MD: MarkdownExtractor(reader, MarkdownBlockReader(), builder),
             }
         )
