@@ -1,25 +1,29 @@
 from __future__ import annotations
 
-from collections.abc import Sequence
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     import xlrd
+
+    from ParserService.Infrastructure.Extraction.SpreadsheetTableBuilder import (
+        SpreadsheetTableBuilder,
+    )
 
 from ParserService.Domain.Documents import (
     DocumentStatus,
     ExtractionRequest,
     Locator,
-    ParseWarning,
     ParsedDocument,
+    ParseWarning,
     PropertyName,
     WarningCode,
 )
 from ParserService.Domain.Errors.Result import Result
 from ParserService.Domain.Jobs.FailureReason import FailureReason
-from ParserService.Infrastructure.Extraction.SpreadsheetTableBuilder import SpreadsheetTableBuilder
 from ParserService.Infrastructure.Extraction.XlsPropertyReader import XlsPropertyReader
 
 
@@ -39,10 +43,12 @@ class XlsExtractor:
 
     def extract(self, request: ExtractionRequest) -> Result[ParsedDocument, FailureReason]:
         """Read legacy worksheets, opening one sheet at a time."""
-        import xlrd
+        import xlrd  # noqa: PLC0415 - loaded on use so tests can substitute a fake xlrd
 
         try:
-            workbook = xlrd.open_workbook(str(Path(request.source.location)), on_demand=True, formatting_info=True)
+            workbook = xlrd.open_workbook(
+                str(Path(request.source.location)), on_demand=True, formatting_info=True
+            )
             sheets, warnings = self._sheets(workbook)
             request = request.with_properties(self._properties(workbook))
             workbook.release_resources()
@@ -78,15 +84,20 @@ class XlsExtractor:
         self, workbook: xlrd.book.Book, index: int
     ) -> tuple[tuple[str, bool, list[list[object]]], ParseWarning | None]:
         sheet = workbook.sheet_by_index(index)
+        hidden = sheet.visibility != 0
         try:
-            rows = [[self._value(cell, workbook.datemode) for cell in row] for row in sheet.get_rows()]
+            rows = [
+                [self._value(cell, workbook.datemode) for cell in row] for row in sheet.get_rows()
+            ]
             self._expand_merges(rows, sheet.merged_cells)
-            return (sheet.name, sheet.visibility != 0, rows), None
         except (IndexError, ValueError):
-            warning = ParseWarning(WarningCode.SHEET_UNREADABLE, Locator.for_cells(sheet.name, None))
-            return (sheet.name, sheet.visibility != 0, []), warning
+            warning = ParseWarning(
+                WarningCode.SHEET_UNREADABLE, Locator.for_cells(sheet.name, None)
+            )
+            return (sheet.name, hidden, []), warning
         finally:
             workbook.unload_sheet(index)
+        return (sheet.name, hidden, rows), None
 
     def _value(self, cell: xlrd.sheet.Cell, datemode: int) -> object:
         if cell.ctype == self.XL_CELL_DATE:
@@ -98,26 +109,41 @@ class XlsExtractor:
         return cell.value
 
     def _date(self, serial: float, datemode: int) -> datetime:
-        epoch = datetime(1904, 1, 1) if datemode else datetime(1899, 12, 30)
-        return epoch + timedelta(days=serial)
+        # Excel dates have no time zone; compute in UTC and drop it again.
+        epoch = datetime(1904, 1, 1, tzinfo=UTC) if datemode else datetime(1899, 12, 30, tzinfo=UTC)
+        return (epoch + timedelta(days=serial)).replace(tzinfo=None)
 
     def _expand_merges(
         self, rows: list[list[object]], merged_cells: Sequence[tuple[int, int, int, int]]
     ) -> None:
-        for row_start, row_end, col_start, col_end in merged_cells:
-            value = rows[row_start][col_start]
-            for row_index in range(row_start, row_end):
-                while len(rows[row_index]) < col_end:
-                    rows[row_index].append(None)
-                for column_index in range(col_start, col_end):
-                    rows[row_index][column_index] = value
+        for merged in merged_cells:
+            self._fill_range(rows, merged)
+
+    @staticmethod
+    def _fill_range(rows: list[list[object]], merged: tuple[int, int, int, int]) -> None:
+        row_start, row_end, col_start, col_end = merged
+        value = rows[row_start][col_start]
+        for row in rows[row_start:row_end]:
+            row.extend([None] * (col_end - len(row)))
+            row[col_start:col_end] = [value] * (col_end - col_start)
 
     def _with_warnings(
         self, result: ParsedDocument, warnings: list[ParseWarning], request: ExtractionRequest
     ) -> ParsedDocument:
         if not warnings:
             return result
-        combined = tuple(request.detection.warnings) + tuple(warnings) + tuple(
-            warning for warning in result.warnings if warning not in request.detection.warnings
+        combined = (
+            tuple(request.detection.warnings)
+            + tuple(warnings)
+            + tuple(
+                warning for warning in result.warnings if warning not in request.detection.warnings
+            )
         )
-        return ParsedDocument(DocumentStatus.PARTIAL, result.facts, result.elements, combined, result.outline, result.metrics)
+        return ParsedDocument(
+            DocumentStatus.PARTIAL,
+            result.facts,
+            result.elements,
+            combined,
+            result.outline,
+            result.metrics,
+        )

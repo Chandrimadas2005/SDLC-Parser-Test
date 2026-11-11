@@ -6,7 +6,9 @@ from ParserService.Infrastructure.Output.ParsedDocumentJsonEncoder import (
     JsonValue,
     ParsedDocumentJsonEncoder,
 )
-from ParserService.Infrastructure.Output.ParsedDocumentMarkdownRenderer import ParsedDocumentMarkdownRenderer
+from ParserService.Infrastructure.Output.ParsedDocumentMarkdownRenderer import (
+    ParsedDocumentMarkdownRenderer,
+)
 
 __all__ = [
     "JsonObject",

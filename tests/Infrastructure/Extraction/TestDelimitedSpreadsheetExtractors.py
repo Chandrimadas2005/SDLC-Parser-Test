@@ -1,6 +1,13 @@
 from pathlib import Path
 
-from ParserService.Domain.Documents import DetectedType, Detection, DocumentFacts, ExtractionRequest, ParsedDocument, SourceFile
+from ParserService.Domain.Documents import (
+    DetectedType,
+    Detection,
+    DocumentFacts,
+    ExtractionRequest,
+    ParsedDocument,
+    SourceFile,
+)
 from ParserService.Domain.Jobs import FileHash, FileName
 from ParserService.Infrastructure.Extraction.CsvExtractor import CsvExtractor
 from ParserService.Infrastructure.Extraction.SpreadsheetTableBuilder import SpreadsheetTableBuilder
@@ -15,12 +22,20 @@ class TestDelimitedSpreadsheetExtractors:
 
     def _request(self, path: Path, detected_type: DetectedType) -> ExtractionRequest:
         name = FileName(path.name)
-        facts = DocumentFacts(name, detected_type, path.stat().st_size, FileHash.of(path.read_bytes()))
-        return ExtractionRequest(SourceFile(str(path), name), facts, Detection(detected_type, "utf-8", ()))
+        facts = DocumentFacts(
+            name, detected_type, path.stat().st_size, FileHash.of(path.read_bytes())
+        )
+        return ExtractionRequest(
+            SourceFile(str(path), name), facts, Detection(detected_type, "utf-8", ())
+        )
 
     def test_csv_extracts_header_rows_and_profiles(self) -> None:
         path = self.ROOT / "csv" / "normal" / "records.csv"
-        document = CsvExtractor(SpreadsheetTableBuilder()).extract(self._request(path, DetectedType.CSV)).unwrap()
+        document = (
+            CsvExtractor(SpreadsheetTableBuilder())
+            .extract(self._request(path, DetectedType.CSV))
+            .unwrap()
+        )
         table = document.elements[0].table
         assert table is not None
         assert table.header_row == 1
@@ -32,7 +47,11 @@ class TestDelimitedSpreadsheetExtractors:
 
     def test_tsv_uses_tab_delimiter(self) -> None:
         path = self.ROOT / "tsv" / "normal" / "records.tsv"
-        document = TsvExtractor(SpreadsheetTableBuilder()).extract(self._request(path, DetectedType.TSV)).unwrap()
+        document = (
+            TsvExtractor(SpreadsheetTableBuilder())
+            .extract(self._request(path, DetectedType.TSV))
+            .unwrap()
+        )
         table = document.elements[0].table
         assert table is not None
         assert table.rows[1].cells["Status"] == "valid"
@@ -41,7 +60,11 @@ class TestDelimitedSpreadsheetExtractors:
 
     def test_empty_csv_returns_empty_table(self) -> None:
         path = self.ROOT / "csv" / "empty" / "empty.csv"
-        document = CsvExtractor(SpreadsheetTableBuilder()).extract(self._request(path, DetectedType.CSV)).unwrap()
+        document = (
+            CsvExtractor(SpreadsheetTableBuilder())
+            .extract(self._request(path, DetectedType.CSV))
+            .unwrap()
+        )
         table = document.elements[0].table
         assert table is not None
         assert table.rows == ()

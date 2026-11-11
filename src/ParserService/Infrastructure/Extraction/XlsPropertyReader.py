@@ -5,7 +5,7 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Final
 
-from xlrd import compdoc  # type: ignore[import-untyped]
+from xlrd import compdoc
 
 from ParserService.Domain.Documents import PropertyName
 

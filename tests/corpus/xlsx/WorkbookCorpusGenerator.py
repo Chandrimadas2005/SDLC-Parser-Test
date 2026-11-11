@@ -1,7 +1,8 @@
-from pathlib import Path
 import zipfile
+from pathlib import Path
 
 from openpyxl import Workbook
+from openpyxl.worksheet.worksheet import Worksheet
 
 
 class WorkbookCorpusGenerator:
@@ -19,6 +20,7 @@ class WorkbookCorpusGenerator:
     def _normal(self, path: Path) -> None:
         workbook = Workbook()
         sheet = workbook.active
+        assert isinstance(sheet, Worksheet)
         sheet.title = "Measurements"
         sheet.append(["Record ID", "Reading", "Total"])
         sheet.append(["REC-001", 4, "=SUM(B2:B2)"])
@@ -33,6 +35,7 @@ class WorkbookCorpusGenerator:
     def _hidden(self, path: Path) -> None:
         workbook = Workbook()
         sheet = workbook.active
+        assert isinstance(sheet, Worksheet)
         sheet.title = "HiddenData"
         sheet.sheet_state = "hidden"
         sheet.append(["Name", "Value"])
@@ -51,7 +54,14 @@ class WorkbookCorpusGenerator:
         temporary = path.with_suffix(".tmp")
         with zipfile.ZipFile(path) as source, zipfile.ZipFile(temporary, "w") as target:
             for item in source.infolist():
-                content = b"<worksheet xmlns='http://schemas.openxmlformats.org/spreadsheetml/2006/main'><dimension ref='A1:C2'/><sheetData><row r='1'><c r='A1' s='999999' t='n'><v>1</v></c></row></sheetData><mergeCells><mergeCell ref='INVALID'/></mergeCells></worksheet>" if item.filename == "xl/worksheets/sheet2.xml" else source.read(item.filename)
+                content = (
+                    b"<worksheet xmlns='http://schemas.openxmlformats.org/spreadsheetml/2006/main'>"
+                    b"<dimension ref='A1:C2'/><sheetData><row r='1'>"
+                    b"<c r='A1' s='999999' t='n'><v>1</v></c></row></sheetData>"
+                    b"<mergeCells><mergeCell ref='INVALID'/></mergeCells></worksheet>"
+                    if item.filename == "xl/worksheets/sheet2.xml"
+                    else source.read(item.filename)
+                )
                 target.writestr(item, content)
         temporary.replace(path)
 

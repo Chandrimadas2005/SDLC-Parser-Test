@@ -1,7 +1,8 @@
+import re
 from collections.abc import Sequence
 from dataclasses import replace
 from datetime import date, datetime
-import re
+from typing import Final
 
 from ParserService.Domain.Documents import (
     CellValue,
@@ -30,6 +31,7 @@ class SpreadsheetTableBuilder:
     """Build source-located spreadsheet tables and infer column profiles."""
 
     ID_PATTERN = re.compile(r"^(?=.*\d)[A-Za-z0-9_-]{5,}$")
+    HEADER_THRESHOLD: Final = 0.75
 
     def build(
         self,
@@ -39,10 +41,17 @@ class SpreadsheetTableBuilder:
     ) -> ParsedDocument:
         """Create a document from rows streamed from each sheet."""
         elements, outline, warnings, rows, columns, hidden = self._build_sheets(sheets)
-        counts = self._counts(len(sheets), rows, columns, formulas, hidden)
+        counts = self._counts((len(sheets), rows, columns, formulas, hidden))
         status = self._status(warnings)
         facts = replace(request.facts, sheet_count=len(sheets))
-        return ParsedDocument(status, facts, tuple(elements), tuple(warnings), tuple(outline), Metrics.for_elements(elements, counts))
+        return ParsedDocument(
+            status,
+            facts,
+            tuple(elements),
+            tuple(warnings),
+            tuple(outline),
+            Metrics.for_elements(elements, counts),
+        )
 
     def _build_sheets(
         self, sheets: Sequence[tuple[str, bool, Sequence[Sequence[object]]]]
@@ -52,7 +61,10 @@ class SpreadsheetTableBuilder:
         warnings: list[ParseWarning] = []
         rows = columns = hidden = 0
         for name, is_hidden, matrix in sheets:
-            element, entry, guessed, row_count, column_count = self._build_sheet(name, is_hidden, matrix, len(elements) + 1)
+            sheet = (name, is_hidden, matrix)
+            element, entry, guessed, row_count, column_count = self._build_sheet(
+                sheet, len(elements) + 1
+            )
             elements.append(element)
             outline.append(entry)
             rows += row_count
@@ -63,17 +75,18 @@ class SpreadsheetTableBuilder:
         return elements, outline, warnings, rows, columns, hidden
 
     def _build_sheet(
-        self, name: str, hidden: bool, matrix: Sequence[Sequence[object]], position: int
+        self, sheet: tuple[str, bool, Sequence[Sequence[object]]], position: int
     ) -> tuple[Element, OutlineEntry, bool, int, int]:
+        name, hidden, matrix = sheet
         locator = self._locator(name, matrix)
         table, guessed, rows, columns = self._table(matrix)
         element = Element(ElementId.at(position), ElementKind.TABLE, locator, table=table)
         entry = OutlineEntry(OutlineKind.SHEET, name, locator, hidden=hidden)
         return element, entry, guessed, rows, columns
 
-    def _counts(
-        self, sheets: int, rows: int, columns: int, formulas: int, hidden: int
-    ) -> dict[MetricName, int]:
+    @staticmethod
+    def _counts(totals: tuple[int, int, int, int, int]) -> dict[MetricName, int]:
+        sheets, rows, columns, formulas, hidden = totals
         return {
             MetricName.SHEETS: sheets,
             MetricName.ROWS: rows,
@@ -83,18 +96,22 @@ class SpreadsheetTableBuilder:
         }
 
     def _status(self, warnings: Sequence[ParseWarning]) -> DocumentStatus:
-        return DocumentStatus.PARTIAL if any(
-            warning.code is WarningCode.SHEET_UNREADABLE for warning in warnings
-        ) else DocumentStatus.SUCCEEDED
+        return (
+            DocumentStatus.PARTIAL
+            if any(warning.code is WarningCode.SHEET_UNREADABLE for warning in warnings)
+            else DocumentStatus.SUCCEEDED
+        )
 
     def _table(self, matrix: Sequence[Sequence[object]]) -> tuple[Table, bool, int, int]:
         width = max((len(row) for row in matrix), default=0)
         rows = [list(row) + [None] * (width - len(row)) for row in matrix]
         header, confidence = self._header(rows[0] if rows else [])
         names = self._names(rows[0], width) if header else self._column_names(width)
-        profiles = self._profiles(rows, names, header, width)
         data = rows[1:] if header else rows
-        table_rows = tuple(self._row(index + (2 if header else 1), row, names) for index, row in enumerate(data))
+        profiles = self._profiles(data, names)
+        table_rows = tuple(
+            self._row(index + (2 if header else 1), row, names) for index, row in enumerate(data)
+        )
         table = Table(table_rows, 1 if header else None, confidence if header else None, profiles)
         return table, not header and bool(rows), len(data), width
 
@@ -105,7 +122,7 @@ class SpreadsheetTableBuilder:
         text_ratio = sum(isinstance(value, str) for value in values) / len(values)
         unique_ratio = len({str(value).strip().casefold() for value in values}) / len(values)
         confidence = text_ratio * unique_ratio
-        return confidence >= 0.75, Confidence(min(confidence, 1.0))
+        return confidence >= self.HEADER_THRESHOLD, Confidence(min(confidence, 1.0))
 
     def _names(self, row: Sequence[object], width: int) -> tuple[str, ...]:
         names: list[str] = []
@@ -140,20 +157,27 @@ class SpreadsheetTableBuilder:
         return str(value)
 
     def _profiles(
-        self, rows: Sequence[Sequence[object]], names: Sequence[str], header: bool, width: int
+        self, data: Sequence[Sequence[object]], names: Sequence[str]
     ) -> tuple[ColumnProfile, ...]:
-        data = rows[1:] if header else rows
-        return tuple(self._profile(index, names[index], data) for index in range(width))
+        return tuple(self._profile(index, name, data) for index, name in enumerate(names))
 
     def _profile(self, index: int, name: str, rows: Sequence[Sequence[object]]) -> ColumnProfile:
-        values = [self._profile_value(row[index]) for row in rows if index < len(row) and row[index] not in (None, "") and self._profile_value(row[index]) not in (None, "")]
+        values = [
+            self._profile_value(row[index])
+            for row in rows
+            if index < len(row)
+            and row[index] not in (None, "")
+            and self._profile_value(row[index]) not in (None, "")
+        ]
         kinds = {self._kind(value) for value in values}
         guessed = next(iter(kinds)) if len(kinds) == 1 else ColumnType.MIXED
         if not values:
             guessed = ColumnType.EMPTY
         unique = len({self._string(value) for value in values})
         fill = len(values) / len(rows) if rows else 0.0
-        looks_like_id = bool(values) and all(self.ID_PATTERN.match(self._string(value)) for value in values)
+        looks_like_id = bool(values) and all(
+            self.ID_PATTERN.match(self._string(value)) for value in values
+        )
         return ColumnProfile(name, guessed, fill, unique, looks_like_id)
 
     def _profile_value(self, value: object) -> object:
@@ -162,11 +186,20 @@ class SpreadsheetTableBuilder:
         return value
 
     def _kind(self, value: object) -> ColumnType:
-        if isinstance(value, bool) or str(value).strip().casefold() in {"true", "false", "yes", "no"}:
+        if isinstance(value, bool) or str(value).strip().casefold() in {
+            "true",
+            "false",
+            "yes",
+            "no",
+        }:
             return ColumnType.BOOLEAN
-        if isinstance(value, (int, float)) or re.fullmatch(r"[+-]?(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?", str(value).strip()):
+        if isinstance(value, (int, float)) or re.fullmatch(
+            r"[+-]?(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?", str(value).strip()
+        ):
             return ColumnType.NUMBER
-        if isinstance(value, (date, datetime)) or re.fullmatch(r"\d{4}-\d{2}-\d{2}", str(value).strip()):
+        if isinstance(value, (date, datetime)) or re.fullmatch(
+            r"\d{4}-\d{2}-\d{2}", str(value).strip()
+        ):
             return ColumnType.DATE
         return ColumnType.TEXT
 

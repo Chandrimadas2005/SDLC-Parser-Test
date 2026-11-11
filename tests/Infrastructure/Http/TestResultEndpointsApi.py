@@ -11,14 +11,22 @@ class TestResultEndpointsApi:
     """Result, retry, delete and format endpoints use the shared error envelope."""
 
     def _completed_job(self, harness: ApiHarness) -> tuple[str, bytes]:
-        submitted = harness.client.post(PATH, files={"file": ("a.txt", b"source", "text/plain")}).json()
+        submitted = harness.client.post(
+            PATH, files={"file": ("a.txt", b"source", "text/plain")}
+        ).json()
         job = harness.repository.get(JobId(submitted["job_id"]))
         assert job is not None
         pointer = ArtifactKeys().result_json(job.key.file_hash, job.key.parser_version)
-        content = b'{"schema_version":"1.1","status":"succeeded","document":{"file_name":"a.txt"},"warnings":[],"outline":[],"elements":[],"metrics":{}}'
+        content = (
+            b'{"schema_version":"1.1","status":"succeeded",'
+            b'"document":{"file_name":"a.txt"},'
+            b'"warnings":[],"outline":[],"elements":[],"metrics":{}}'
+        )
         harness.store.put(pointer, content)
         running = job.start(Instant(43_000))
-        completed = running.complete(JobCompletion(JobStatus.SUCCEEDED, pointer, 0), Instant(44_000))
+        completed = running.complete(
+            JobCompletion(JobStatus.SUCCEEDED, pointer, 0), Instant(44_000)
+        )
         harness.repository.update(completed)
         return submitted["job_id"], content
 
@@ -33,14 +41,18 @@ class TestResultEndpointsApi:
         assert markdown.text.startswith("# Parsed document")
 
     def test_result_not_ready_uses_error_envelope(self, harness: ApiHarness) -> None:
-        job_id = harness.client.post(PATH, files={"file": ("a.txt", b"source", "text/plain")}).json()["job_id"]
+        job_id = harness.client.post(
+            PATH, files={"file": ("a.txt", b"source", "text/plain")}
+        ).json()["job_id"]
         response = harness.client.get(f"{PATH}/{job_id}/result")
         assert response.status_code == HTTPStatus.CONFLICT
         assert response.json()["code"] == "result_not_ready"
         assert response.json()["request_id"]
 
     def test_retry_failed_job_requeues_it(self, harness: ApiHarness) -> None:
-        job_id = harness.client.post(PATH, files={"file": ("a.txt", b"source", "text/plain")}).json()["job_id"]
+        job_id = harness.client.post(
+            PATH, files={"file": ("a.txt", b"source", "text/plain")}
+        ).json()["job_id"]
         job = harness.repository.get(JobId(job_id))
         assert job is not None
         failed = job.start(Instant(43_000)).fail(FailureReason.CORRUPTED_FILE, Instant(44_000))
@@ -52,7 +64,9 @@ class TestResultEndpointsApi:
         assert harness.queue.depth() == 1
 
     def test_delete_removes_job_and_original_artifact(self, harness: ApiHarness) -> None:
-        job_id = harness.client.post(PATH, files={"file": ("a.txt", b"source", "text/plain")}).json()["job_id"]
+        job_id = harness.client.post(
+            PATH, files={"file": ("a.txt", b"source", "text/plain")}
+        ).json()["job_id"]
         job = harness.repository.get(JobId(job_id))
         assert job is not None
         assert harness.store.exists(job.file_pointer)

@@ -2,7 +2,9 @@ import zipfile
 from collections.abc import Mapping
 from pathlib import Path
 from typing import Final
-from xml.etree import ElementTree
+from xml.etree.ElementTree import Element
+
+from defusedxml import ElementTree
 
 from ParserService.Domain.Documents import PropertyName
 
@@ -66,11 +68,10 @@ class XlsxPropertyReader:
         return {field: text.strip() for field, text in pairs if field and text and text.strip()}
 
     @staticmethod
-    def _root(archive: zipfile.ZipFile, name: str) -> ElementTree.Element | None:
+    def _root(archive: zipfile.ZipFile, name: str) -> Element | None:
         if name not in archive.namelist():
             return None
         try:
-            # Same stdlib parser XlsxExtractor uses; moving to defusedxml is an open point.
-            return ElementTree.fromstring(archive.read(name))  # noqa: S314
+            return ElementTree.fromstring(archive.read(name))
         except ElementTree.ParseError:
             return None

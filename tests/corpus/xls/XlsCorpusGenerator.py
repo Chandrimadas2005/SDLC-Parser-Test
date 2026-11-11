@@ -1,7 +1,7 @@
-from pathlib import Path
 import shutil
 import subprocess
 import tempfile
+from pathlib import Path
 
 
 class XlsCorpusGenerator:
@@ -12,14 +12,25 @@ class XlsCorpusGenerator:
         self._convert(root / "xlsx" / "normal" / "normal.xlsx", root / "xls" / "normal")
         self._convert(root / "xlsx" / "hidden" / "hidden.xlsx", root / "xls" / "hidden")
         self._convert(root / "xlsx" / "empty" / "empty.xlsx", root / "xls" / "empty")
-        self._copy_wrong_extension(root / "xls" / "normal" / "normal.xls", root / "xls" / "wrong-extension")
+        self._copy_wrong_extension(
+            root / "xls" / "normal" / "normal.xls", root / "xls" / "wrong-extension"
+        )
         (root / "xls" / "corrupted" / "corrupted.xls").write_bytes(b"not an xls workbook")
 
     def _convert(self, source: Path, destination: Path) -> None:
         destination.mkdir(parents=True, exist_ok=True)
+        office = shutil.which("libreoffice") or "/usr/bin/libreoffice"
         with tempfile.TemporaryDirectory() as temporary:
-            subprocess.run(
-                ["libreoffice", "--headless", "--convert-to", "xls", "--outdir", temporary, str(source)],
+            subprocess.run(  # noqa: S603 - fixed LibreOffice command on synthetic files
+                [
+                    office,
+                    "--headless",
+                    "--convert-to",
+                    "xls",
+                    "--outdir",
+                    temporary,
+                    str(source),
+                ],
                 check=True,
                 capture_output=True,
             )

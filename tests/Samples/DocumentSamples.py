@@ -61,7 +61,9 @@ class DocumentSamples:
             status=DocumentStatus.PARTIAL,
             facts=self.facts(DetectedType.XLSX),
             elements=elements,
-            warnings=(ParseWarning(WarningCode.SHEET_UNREADABLE, Locator.for_cells("Archive", None)),),
+            warnings=(
+                ParseWarning(WarningCode.SHEET_UNREADABLE, Locator.for_cells("Archive", None)),
+            ),
             outline=(OutlineEntry(OutlineKind.SHEET, "Requirements", locator, hidden=False),),
             metrics=Metrics.for_elements(
                 elements, {MetricName.ROWS: 1, MetricName.COLUMNS: 3, MetricName.FORMULAS: 1}
@@ -74,7 +76,9 @@ class DocumentSamples:
     def _spreadsheet_table(self) -> Table:
         row = TableRow(2, self._spreadsheet_cells())
         return Table(
-            rows=(row,), header_row=1, header_confidence=Confidence(0.92),
+            rows=(row,),
+            header_row=1,
+            header_confidence=Confidence(0.92),
             column_profiles=self._spreadsheet_profiles(),
         )
 
@@ -87,9 +91,9 @@ class DocumentSamples:
 
     def _spreadsheet_profiles(self) -> tuple[ColumnProfile, ...]:
         return (
-            ColumnProfile("ID", ColumnType.TEXT, 1.0, 1, True),
-            ColumnProfile("Statement", ColumnType.TEXT, 1.0, 1, False),
-            ColumnProfile("Total", ColumnType.NUMBER, 1.0, 1, False),
+            ColumnProfile("ID", ColumnType.TEXT, 1.0, 1, looks_like_id=True),
+            ColumnProfile("Statement", ColumnType.TEXT, 1.0, 1, looks_like_id=False),
+            ColumnProfile("Total", ColumnType.NUMBER, 1.0, 1, looks_like_id=False),
         )
 
     def failed(self) -> ParsedDocument:

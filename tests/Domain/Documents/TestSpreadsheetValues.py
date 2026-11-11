@@ -9,9 +9,9 @@ class TestSpreadsheetValues:
 
     def test_column_profile_checks_fill_rate_and_unique_count(self) -> None:
         with pytest.raises(ValueError, match="fill rate"):
-            ColumnProfile("Amount", ColumnType.NUMBER, 1.1, 2, False)
+            ColumnProfile("Amount", ColumnType.NUMBER, 1.1, 2, looks_like_id=False)
         with pytest.raises(ValueError, match="unique value"):
-            ColumnProfile("Amount", ColumnType.NUMBER, 1.0, -1, False)
+            ColumnProfile("Amount", ColumnType.NUMBER, 1.0, -1, looks_like_id=False)
 
     def test_hidden_flag_is_restricted_to_sheet_outline_entries(self) -> None:
         with pytest.raises(ValueError, match="only sheet"):

@@ -17,7 +17,9 @@ from ParserService.Infrastructure.Http.HttpHeader import HttpHeader
 from ParserService.Infrastructure.Http.ParseJobStatusResponse import ParseJobStatusResponse
 from ParserService.Infrastructure.Http.ParseJobSubmittedResponse import ParseJobSubmittedResponse
 from ParserService.Infrastructure.Logging.LogField import LogField
-from ParserService.Infrastructure.Output.ParsedDocumentMarkdownRenderer import ParsedDocumentMarkdownRenderer
+from ParserService.Infrastructure.Output.ParsedDocumentMarkdownRenderer import (
+    ParsedDocumentMarkdownRenderer,
+)
 
 
 class ParseJobsRouter:
@@ -41,7 +43,10 @@ class ParseJobsRouter:
 
     def _register_routes(self) -> None:
         self.router.add_api_route(
-            "", self.submit_job, methods=["POST"], status_code=HTTPStatus.ACCEPTED,
+            "",
+            self.submit_job,
+            methods=["POST"],
+            status_code=HTTPStatus.ACCEPTED,
             response_model=ParseJobSubmittedResponse,
         )
         self.router.add_api_route(

@@ -114,7 +114,9 @@ class ParsedDocumentJsonEncoder:
             {OutputField.ROW: row.row, OutputField.CELLS: self._cells(row.cells)}
             for row in table.rows
         ]
-        profiles = [self._column_profile(profile) for profile in table.column_profiles]
+        profiles: list[JsonValue] = [
+            self._column_profile(profile) for profile in table.column_profiles
+        ]
         return self._without_empty(
             {
                 OutputField.HEADER_ROW: table.header_row,

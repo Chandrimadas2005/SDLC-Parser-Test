@@ -12,8 +12,8 @@ from ParserService.Application.UseCases import (
     DeleteParseJob,
     GetParseJobResult,
     GetParseJobStatus,
-    RetryParseJob,
     JobServices,
+    RetryParseJob,
     SubmitParseJob,
     SubmitPolicy,
 )
@@ -37,12 +37,10 @@ class ApiHarness:
     metrics: ServiceMetrics
 
 
-@pytest.fixture
-def harness(tmp_path: Path) -> Iterator[ApiHarness]:
-    repository, store, queue = InMemoryJobRepository(), InMemoryArtifactStore(), InMemoryJobQueue(5)
-    services = JobServices(repository, store, queue, FixedClock(Instant(42_000)))
+def _dependencies(services: JobServices, tmp_path: Path) -> ApiDependencies:
+    repository, store = services.repository, services.store
     engine = DatabaseEngineFactory().create(f"sqlite:///{(tmp_path / 'ready.sqlite3').as_posix()}")
-    dependencies = ApiDependencies(
+    return ApiDependencies(
         submit_parse_job=SubmitParseJob(
             services, SubmitPolicy(VERSION, MAX_FILE_SIZE), ArtifactKeys()
         ),
@@ -55,5 +53,14 @@ def harness(tmp_path: Path) -> Iterator[ApiHarness]:
         readiness=ReadinessCheck(engine, tmp_path, min_free_bytes=1),
         metrics=ServiceMetrics(),
     )
-    with TestClient(ParserApi(dependencies, VERSION.value).build(), raise_server_exceptions=False) as client:
+
+
+@pytest.fixture
+def harness(tmp_path: Path) -> Iterator[ApiHarness]:
+    repository, store, queue = InMemoryJobRepository(), InMemoryArtifactStore(), InMemoryJobQueue(5)
+    services = JobServices(repository, store, queue, FixedClock(Instant(42_000)))
+    dependencies = _dependencies(services, tmp_path)
+    with TestClient(
+        ParserApi(dependencies, VERSION.value).build(), raise_server_exceptions=False
+    ) as client:
         yield ApiHarness(client, repository, store, queue, dependencies.metrics)

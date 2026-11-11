@@ -1,13 +1,20 @@
+import sys
 from collections.abc import Iterator, Sequence
 from dataclasses import dataclass
 from importlib.util import find_spec
 from pathlib import Path
-import sys
 from types import ModuleType
 
 import pytest
 
-from ParserService.Domain.Documents import DetectedType, Detection, DocumentFacts, ExtractionRequest, ParsedDocument, SourceFile
+from ParserService.Domain.Documents import (
+    DetectedType,
+    Detection,
+    DocumentFacts,
+    ExtractionRequest,
+    ParsedDocument,
+    SourceFile,
+)
 from ParserService.Domain.Jobs import FileHash, FileName
 from ParserService.Infrastructure.Extraction.SpreadsheetTableBuilder import SpreadsheetTableBuilder
 from ParserService.Infrastructure.Extraction.XlsExtractor import XlsExtractor
@@ -20,18 +27,15 @@ class _FakeCell:
     value: object
 
 
+@dataclass(frozen=True, slots=True)
 class _FakeSheet:
-    def __init__(
-        self, name: str, visibility: int, rows: Sequence[Sequence[_FakeCell]],
-        merged_cells: Sequence[tuple[int, int, int, int]] = (),
-    ) -> None:
-        self.name = name
-        self.visibility = visibility
-        self._rows = rows
-        self.merged_cells = merged_cells
+    name: str
+    visibility: int
+    rows: Sequence[Sequence[_FakeCell]]
+    merged_cells: Sequence[tuple[int, int, int, int]] = ()
 
     def get_rows(self) -> Iterator[Sequence[_FakeCell]]:
-        return iter(self._rows)
+        return iter(self.rows)
 
 
 class _FakeWorkbook:
@@ -47,11 +51,25 @@ class _FakeWorkbook:
     def sheet_by_index(self, index: int) -> _FakeSheet:
         return self._sheets[index]
 
-    def unload_sheet(self, index: int) -> None:
+    def unload_sheet(self, _index: int) -> None:
         return None
 
     def release_resources(self) -> None:
         return None
+
+
+class _FakeOpener:
+    """Stands in for ``xlrd.open_workbook``; ``None`` simulates a corrupted file."""
+
+    def __init__(self, workbook: _FakeWorkbook | None) -> None:
+        self._workbook = workbook
+
+    def __call__(self, filename: str, **options: bool) -> _FakeWorkbook:
+        del filename, options
+        if self._workbook is None:
+            message = "synthetic corrupted workbook"
+            raise _FakeXlsError(message)
+        return self._workbook
 
 
 class _FakeXlsError(Exception):
@@ -65,21 +83,19 @@ class TestXlsExtractor:
 
     def _request(self, path: Path, name: str | None = None) -> ExtractionRequest:
         file_name = FileName(name or path.name)
-        facts = DocumentFacts(file_name, DetectedType.XLS, path.stat().st_size, FileHash.of(path.read_bytes()))
-        return ExtractionRequest(SourceFile(str(path), file_name), facts, Detection(DetectedType.XLS, None, ()))
+        facts = DocumentFacts(
+            file_name, DetectedType.XLS, path.stat().st_size, FileHash.of(path.read_bytes())
+        )
+        return ExtractionRequest(
+            SourceFile(str(path), file_name), facts, Detection(DetectedType.XLS, None, ())
+        )
 
-    def _install_xlrd(self, monkeypatch: pytest.MonkeyPatch, workbook: _FakeWorkbook | None) -> None:
+    def _install_xlrd(
+        self, monkeypatch: pytest.MonkeyPatch, workbook: _FakeWorkbook | None
+    ) -> None:
         module = ModuleType("xlrd")
-        setattr(module, "XLRDError", _FakeXlsError)
-        setattr(module, "open_workbook", self._open_workbook(workbook))
+        module.__dict__.update(XLRDError=_FakeXlsError, open_workbook=_FakeOpener(workbook))
         monkeypatch.setitem(sys.modules, "xlrd", module)
-
-    def _open_workbook(self, workbook: _FakeWorkbook | None):
-        def open_workbook(filename: str, **kwargs: object) -> _FakeWorkbook:
-            if workbook is None:
-                raise _FakeXlsError("synthetic corrupted workbook")
-            return workbook
-        return open_workbook
 
     def _normal_workbook(self) -> _FakeWorkbook:
         rows = (
@@ -88,9 +104,13 @@ class TestXlsExtractor:
             (_FakeCell(1, "REC-002"), _FakeCell(2, 6.0), _FakeCell(0, "")),
             (_FakeCell(0, ""), _FakeCell(2, 7.0), _FakeCell(0, "")),
         )
-        return _FakeWorkbook([_FakeSheet("Measurements", 0, rows, ((2, 4, 0, 1),)), _FakeSheet("Archive", 0, ())])
+        return _FakeWorkbook(
+            [_FakeSheet("Measurements", 0, rows, ((2, 4, 0, 1),)), _FakeSheet("Archive", 0, ())]
+        )
 
-    def test_reads_legacy_table_and_expands_merged_cells(self, monkeypatch: pytest.MonkeyPatch) -> None:
+    def test_reads_legacy_table_and_expands_merged_cells(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
         self._install_xlrd(monkeypatch, self._normal_workbook())
         path = self.ROOT / "normal" / "normal.xls"
         document = XlsExtractor(SpreadsheetTableBuilder()).extract(self._request(path)).unwrap()
@@ -101,7 +121,9 @@ class TestXlsExtractor:
         assert table.rows[2].cells["Record ID"] == "REC-002"
         self._golden(document, "xls_normal.json")
 
-    @pytest.mark.skipif(find_spec("xlrd") is None, reason="xlrd runtime dependency is not installed")
+    @pytest.mark.skipif(
+        find_spec("xlrd") is None, reason="xlrd runtime dependency is not installed"
+    )
     def test_real_xls_file_uses_the_xlrd_adapter(self) -> None:
         path = self.ROOT / "normal" / "normal.xls"
         document = XlsExtractor(SpreadsheetTableBuilder()).extract(self._request(path)).unwrap()

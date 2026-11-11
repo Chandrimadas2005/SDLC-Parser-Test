@@ -66,11 +66,14 @@ class TestParsedDocumentSchema:
         encoded = self.ENCODER.encode(SAMPLES.spreadsheet())
         outline = encoded[OutputField.OUTLINE]
         elements = encoded[OutputField.ELEMENTS]
-        assert isinstance(outline, list) and isinstance(outline[0], dict)
+        assert isinstance(outline, list)
+        assert isinstance(outline[0], dict)
         assert outline[0][OutputField.HIDDEN] is False
-        assert isinstance(elements, list) and isinstance(elements[0], dict)
+        assert isinstance(elements, list)
+        assert isinstance(elements[0], dict)
         rows = elements[0][OutputField.ROWS]
-        assert isinstance(rows, list) and isinstance(rows[0], dict)
+        assert isinstance(rows, list)
+        assert isinstance(rows[0], dict)
         cells = rows[0][OutputField.CELLS]
         assert isinstance(cells, dict)
         total = cells["Total"]

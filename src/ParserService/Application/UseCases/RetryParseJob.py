@@ -26,7 +26,9 @@ class RetryParseJob:
             return Result.err(ApplicationErrorCode.STORAGE_UNAVAILABLE)
         return self._enqueue(queued, job)
 
-    def _enqueue(self, queued: Job, original: Job) -> Result[ParseJobSubmitted, ApplicationErrorCode]:
+    def _enqueue(
+        self, queued: Job, original: Job
+    ) -> Result[ParseJobSubmitted, ApplicationErrorCode]:
         result = self._services.queue.enqueue(queued.id)
         if result.is_ok:
             return Result.ok(ParseJobSubmitted(queued.id, queued.status, already_existed=False))

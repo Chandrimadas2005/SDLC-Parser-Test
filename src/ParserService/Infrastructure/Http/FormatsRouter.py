@@ -11,7 +11,9 @@ class FormatsRouter:
         self._registry = registry
         self._parser_version = parser_version
         self.router = APIRouter(prefix="/v1")
-        self.router.add_api_route("/formats", self.formats, methods=["GET"], response_model=ParserFormatResponse)
+        self.router.add_api_route(
+            "/formats", self.formats, methods=["GET"], response_model=ParserFormatResponse
+        )
 
     async def formats(self) -> ParserFormatResponse:
         """Return only formats with a registered extractor."""

@@ -10,10 +10,15 @@ class ParsedDocumentMarkdownRenderer:
 
     def render(self, content: bytes) -> str:
         """Convert a JSON result artifact into Markdown sections."""
-        document = cast(dict[str, object], json.loads(content))
+        document = cast("dict[str, object]", json.loads(content))
         facts = self._mapping(document.get(OutputField.DOCUMENT))
-        lines = ["# Parsed document", "", f"**File:** {facts.get(OutputField.FILE_NAME, 'unknown')}",
-                 f"**Status:** {document.get(OutputField.STATUS, 'unknown')}", ""]
+        lines = [
+            "# Parsed document",
+            "",
+            f"**File:** {facts.get(OutputField.FILE_NAME, 'unknown')}",
+            f"**Status:** {document.get(OutputField.STATUS, 'unknown')}",
+            "",
+        ]
         self._append_outline(lines, document.get(OutputField.OUTLINE))
         self._append_warnings(lines, document.get(OutputField.WARNINGS))
         self._append_elements(lines, document.get(OutputField.ELEMENTS))
@@ -24,7 +29,9 @@ class ParsedDocumentMarkdownRenderer:
         lines.extend(["## Outline", ""])
         for entry in entries:
             item = self._mapping(entry)
-            lines.append(f"- {item.get(OutputField.KIND, 'item')}: {item.get(OutputField.NAME, '')}")
+            lines.append(
+                f"- {item.get(OutputField.KIND, 'item')}: {item.get(OutputField.NAME, '')}"
+            )
         lines.append("")
 
     def _append_warnings(self, lines: list[str], value: object) -> None:
@@ -58,7 +65,7 @@ class ParsedDocumentMarkdownRenderer:
             lines.append("- " + "; ".join(f"**{key}:** {value}" for key, value in cells.items()))
 
     def _mapping(self, value: object) -> Mapping[str, object]:
-        return cast(dict[str, object], value) if isinstance(value, dict) else {}
+        return cast("dict[str, object]", value) if isinstance(value, dict) else {}
 
     def _sequence(self, value: object) -> Sequence[object]:
-        return cast(list[object], value) if isinstance(value, list) else []
+        return cast("list[object]", value) if isinstance(value, list) else []
