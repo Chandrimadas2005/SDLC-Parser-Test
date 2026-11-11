@@ -9,7 +9,9 @@ from ParserService.Infrastructure.Extraction.MarkdownBlockReader import Markdown
 from ParserService.Infrastructure.Extraction.MarkdownExtractor import MarkdownExtractor
 from ParserService.Infrastructure.Extraction.PlainTextBlockSplitter import PlainTextBlockSplitter
 from ParserService.Infrastructure.Extraction.PlainTextExtractor import PlainTextExtractor
+from ParserService.Infrastructure.Extraction.SpreadsheetTableBuilder import SpreadsheetTableBuilder
 from ParserService.Infrastructure.Extraction.TextDocumentBuilder import TextDocumentBuilder
+from ParserService.Infrastructure.Extraction.XlsxExtractor import XlsxExtractor
 from ParserService.Infrastructure.Extraction.TextFileReader import TextFileReader
 
 
@@ -31,10 +33,14 @@ class ExtractorRegistry:
             A registry for plain text and Markdown.
         """
         reader, builder = TextFileReader(), TextDocumentBuilder()
+        spreadsheet = SpreadsheetTableBuilder()
+        xlsx = XlsxExtractor(spreadsheet)
         return cls(
             {
                 DetectedType.TXT: PlainTextExtractor(reader, PlainTextBlockSplitter(), builder),
                 DetectedType.MD: MarkdownExtractor(reader, MarkdownBlockReader(), builder),
+                DetectedType.XLSX: xlsx,
+                DetectedType.XLSM: xlsx,
             }
         )
 

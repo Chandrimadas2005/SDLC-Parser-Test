@@ -8,6 +8,7 @@ dependencies = [
   "alembic>=1.16,<2",
   "charset-normalizer>=3.4,<4",
   "fastapi>=0.120,<1",
+  "openpyxl>=3.1,<4",
   "pg8000>=1.31,<2",
   "prometheus-client>=0.21,<1",
   "pydantic>=2.9,<3",

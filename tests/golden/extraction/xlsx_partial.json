@@ -1,0 +1,123 @@
+{
+  "schema_version": "1.1",
+  "status": "partial",
+  "document": {
+    "file_name": "partial.xlsx",
+    "detected_type": "xlsx",
+    "size_bytes": 5276,
+    "sha256": "e442c580482e814e282678e1c53aac02945314b765d64ae03df204ba1a181290",
+    "sheet_count": 2,
+    "properties": {}
+  },
+  "warnings": [
+    {
+      "code": "sheet_unreadable",
+      "locator": {
+        "sheet": "Archive"
+      }
+    }
+  ],
+  "outline": [
+    {
+      "kind": "sheet",
+      "name": "Measurements",
+      "hidden": false,
+      "locator": {
+        "sheet": "Measurements",
+        "range": "A1:C4"
+      }
+    },
+    {
+      "kind": "sheet",
+      "name": "Archive",
+      "hidden": false,
+      "locator": {
+        "sheet": "Archive",
+        "range": "A1:A1"
+      }
+    }
+  ],
+  "elements": [
+    {
+      "id": "e-000001",
+      "kind": "table",
+      "locator": {
+        "sheet": "Measurements",
+        "range": "A1:C4"
+      },
+      "header_row": 1,
+      "header_confidence": 1.0,
+      "rows": [
+        {
+          "row": 2,
+          "cells": {
+            "Record ID": "REC-001",
+            "Reading": "4",
+            "Total": {
+              "formula": "=SUM(B2:B2)"
+            }
+          }
+        },
+        {
+          "row": 3,
+          "cells": {
+            "Record ID": "REC-002",
+            "Reading": "6",
+            "Total": ""
+          }
+        },
+        {
+          "row": 4,
+          "cells": {
+            "Record ID": "REC-002",
+            "Reading": "7",
+            "Total": ""
+          }
+        }
+      ],
+      "column_profiles": [
+        {
+          "name": "Record ID",
+          "guessed_type": "text",
+          "fill_rate": 1.0,
+          "unique_values": 2,
+          "looks_like_id": false
+        },
+        {
+          "name": "Reading",
+          "guessed_type": "number",
+          "fill_rate": 1.0,
+          "unique_values": 3,
+          "looks_like_id": false
+        },
+        {
+          "name": "Total",
+          "guessed_type": "empty",
+          "fill_rate": 0.0,
+          "unique_values": 0,
+          "looks_like_id": false
+        }
+      ]
+    },
+    {
+      "id": "e-000002",
+      "kind": "table",
+      "locator": {
+        "sheet": "Archive",
+        "range": "A1:A1"
+      },
+      "rows": [],
+      "column_profiles": []
+    }
+  ],
+  "metrics": {
+    "sheets": 2,
+    "rows": 3,
+    "columns": 3,
+    "formulas": 1,
+    "hidden_sheets": 0,
+    "elements_by_kind": {
+      "table": 2
+    }
+  }
+}
