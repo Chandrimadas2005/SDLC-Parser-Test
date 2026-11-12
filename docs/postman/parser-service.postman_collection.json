@@ -93,6 +93,36 @@
               }
             }
           ]
+        },
+        {
+          "name": "Supported formats",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/formats",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "formats"
+              ]
+            },
+            "description": "Formats the parser can extract today, and the parser version."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"200 OK\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"lists formats\", () => pm.expect(pm.response.json().formats).to.be.an(\"array\"));"
+                ]
+              }
+            }
+          ]
         }
       ]
     },
@@ -174,6 +204,99 @@
           ]
         },
         {
+          "name": "Job result (JSON)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/parse-jobs/{{jobId}}/result",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "parse-jobs",
+                "{{jobId}}",
+                "result"
+              ]
+            },
+            "description": "The ParsedDocument of the submitted job: elements with locators, outline, warnings and metrics. Returns 409 until the worker has finished; run Job status first."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"200 when finished, 409 while still running\", () => pm.expect(pm.response.code).to.be.oneOf([200, 409]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Job result (Markdown)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/parse-jobs/{{jobId}}/result.md",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "parse-jobs",
+                "{{jobId}}",
+                "result.md"
+              ]
+            },
+            "description": "The same result rendered as Markdown. Returns 409 until the worker has finished."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"200 when finished, 409 while still running\", () => pm.expect(pm.response.code).to.be.oneOf([200, 409]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Retry a failed job",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/parse-jobs/{{jobId}}/retry",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "parse-jobs",
+                "{{jobId}}",
+                "retry"
+              ]
+            },
+            "description": "Puts a failed job back in the queue (202). Any other job answers 409."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"202 for a failed job, 409 otherwise\", () => pm.expect(pm.response.code).to.be.oneOf([202, 409]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
           "name": "Unknown job returns 404",
           "request": {
             "method": "GET",
@@ -199,6 +322,36 @@
                 "exec": [
                   "pm.test(\"404 Not Found\", () => pm.response.to.have.status(404));",
                   "pm.test(\"error has a request ID\", () => pm.expect(pm.response.json().request_id).to.be.a(\"string\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete the job",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/parse-jobs/{{jobId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "parse-jobs",
+                "{{jobId}}"
+              ]
+            },
+            "description": "Removes the file, the result and the job record together (204). Run it last."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"204 No Content\", () => pm.response.to.have.status(204));"
                 ]
               }
             }

@@ -64,4 +64,5 @@ class TestPostmanCollection:
         unknown = [code for (_, url), code in codes.items() if url.endswith("0000")]
         known = [code for (_, url), code in codes.items() if not url.endswith("0000")]
         assert unknown == [HTTPStatus.NOT_FOUND]
-        assert set(known) == {HTTPStatus.OK}
+        # Result endpoints answer 409 until the worker has parsed the file.
+        assert set(known) <= {HTTPStatus.OK, HTTPStatus.CONFLICT}
