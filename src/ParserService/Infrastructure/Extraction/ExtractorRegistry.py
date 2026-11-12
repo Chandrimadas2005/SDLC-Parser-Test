@@ -38,22 +38,25 @@ class ExtractorRegistry:
         self._extractors = dict(extractors)
 
     @classmethod
-    def default(cls) -> Self:
+    def default(cls, max_pages: int | None = None) -> Self:
         """Build the registry with every extractor that exists today.
+
+        Args:
+            max_pages: Page limit for paged formats (PDF), or ``None`` for no limit.
 
         Returns:
             A registry for every format implemented so far. DOC, RTF, ODT and ODS are
             included only when LibreOffice is installed.
         """
-        extractors = {**cls._document_extractors(), **cls._spreadsheet_extractors()}
+        extractors = {**cls._document_extractors(max_pages), **cls._spreadsheet_extractors()}
         return cls(extractors | cls._converted(extractors, LibreOfficeConverter.available()))
 
     @staticmethod
-    def _document_extractors() -> dict[DetectedType, Extractor]:
+    def _document_extractors(max_pages: int | None) -> dict[DetectedType, Extractor]:
         reader, builder = TextFileReader(), TextDocumentBuilder()
         splitter = PlainTextBlockSplitter()
         return {
-            DetectedType.PDF: PdfExtractor(PdfReader(), PdfDocumentAssembler(splitter)),
+            DetectedType.PDF: PdfExtractor(PdfReader(max_pages), PdfDocumentAssembler(splitter)),
             DetectedType.DOCX: DocxExtractor(
                 DocxReader(DocxStyleReader()), DocxDocumentAssembler()
             ),

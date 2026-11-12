@@ -72,6 +72,22 @@ class TestPdfExtractor:
 
         assert result.unwrap_err() is FailureReason.PASSWORD_PROTECTED
 
+    def test_pdf_above_the_page_limit_is_rejected_before_reading(self, tmp_path: Path) -> None:
+        path = self.SAMPLES.normal(tmp_path / "normal.pdf")
+        limited = ParsePipeline(
+            MagicTypeDetector(TextEncodingDetector(), ZipContentInspector()),
+            ExtractorRegistry.default(max_pages=2),
+        )
+
+        over = limited.parse(SourceFile(str(path), FileName(path.name)))
+        within = ParsePipeline(
+            MagicTypeDetector(TextEncodingDetector(), ZipContentInspector()),
+            ExtractorRegistry.default(max_pages=3),
+        ).parse(SourceFile(str(path), FileName(path.name)))
+
+        assert over.unwrap_err() is FailureReason.FILE_TOO_LARGE
+        assert within.is_ok
+
     def test_truncated_pdf_fails_as_corrupted(self, tmp_path: Path) -> None:
         result = self._parse(self.SAMPLES.corrupted(tmp_path / "broken.pdf"))
 

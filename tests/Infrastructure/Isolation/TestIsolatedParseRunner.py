@@ -12,6 +12,7 @@ from ParserService.Infrastructure.Isolation import (
     ParseWorkerProcess,
     WorkerLimits,
 )
+from tests.Samples import SamplePdfs
 
 CORPUS: Final = Path(__file__).resolve().parents[2] / "corpus"
 LIMITS: Final = WorkerLimits(timeout_seconds=30, memory_mb=1024)
@@ -102,3 +103,13 @@ class TestIsolatedParseRunner:
     def test_limits_must_be_positive(self) -> None:
         with pytest.raises(ValueError, match="positive"):
             WorkerLimits(0, 1024)
+        with pytest.raises(ValueError, match="positive"):
+            WorkerLimits(30, 1024, max_pages=0)
+
+    def test_page_limit_reaches_the_worker_process(self, tmp_path: Path) -> None:
+        pdf = SamplePdfs().normal(tmp_path / "three-pages.pdf")
+        limits = WorkerLimits(timeout_seconds=30, memory_mb=1024, max_pages=2)
+
+        result = IsolatedParseRunner(limits).run(pdf, FileName("three-pages.pdf"))
+
+        assert result.unwrap_err() is FailureReason.FILE_TOO_LARGE
