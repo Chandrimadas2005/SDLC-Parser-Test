@@ -13,3 +13,4 @@ class FailureReason(StrEnum):
     EXTRACTOR_CRASH = "extractor_crash"
     MAX_ATTEMPTS_EXCEEDED = "max_attempts_exceeded"
     STORAGE_ERROR = "storage_error"
+    STORAGE_PERMANENT_ERROR = "storage_permanent_error"

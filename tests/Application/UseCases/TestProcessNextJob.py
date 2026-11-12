@@ -36,7 +36,7 @@ class TestProcessNextJob:
 
     @staticmethod
     def _run(
-        result: Result[ParseOutcome, FailureReason], *, queued: bool = True
+        result: Result[ParseOutcome, FailureReason], *, queued: bool = True, max_attempts: int = 3
     ) -> tuple[ProcessNextJob, InMemoryJobRepository, InMemoryArtifactStore]:
         repository, store, queue = (
             InMemoryJobRepository(),
@@ -46,7 +46,7 @@ class TestProcessNextJob:
         repository.add(JOB)
         if queued:
             queue.enqueue(JOB.id)
-        services = JobServices(repository, store, queue, FixedClock(Instant(1_500)))
+        services = JobServices(repository, store, queue, FixedClock(Instant(1_500)), max_attempts)
         return (
             ProcessNextJob(services, FakeDocumentParser(result), ArtifactKeys()),
             repository,
@@ -72,15 +72,34 @@ class TestProcessNextJob:
         assert job.result_pointer == ArtifactKeys().result_json(KEY.file_hash, KEY.parser_version)
         assert store.read(job.result_pointer) == OUTCOME.content
 
-    def test_failure_is_recorded_with_its_reason(self) -> None:
+    def test_transient_failure_is_automatically_requeued(self) -> None:
         use_case, repository, store = self._run(Result.err(FailureReason.TIMEOUT))
 
         use_case.execute()
 
         job = repository.jobs[JOB.id]
-        assert job.status is JobStatus.FAILED
-        assert job.failure_reason is FailureReason.TIMEOUT
+        assert job.status is JobStatus.QUEUED
+        assert job.failure_reason is None
+        assert job.attempt_count == 1
         assert store.artifacts == {}
+
+    def test_transient_failure_exhausts_attempts(self) -> None:
+        use_case, repository, _ = self._run(Result.err(FailureReason.TIMEOUT), max_attempts=1)
+
+        use_case.execute()
+
+        job = repository.jobs[JOB.id]
+        assert job.status is JobStatus.FAILED
+        assert job.failure_reason is FailureReason.MAX_ATTEMPTS_EXCEEDED
+
+    def test_permanent_failure_is_not_retried(self) -> None:
+        use_case, repository, _ = self._run(Result.err(FailureReason.CORRUPTED_FILE))
+
+        use_case.execute()
+
+        job = repository.jobs[JOB.id]
+        assert job.status is JobStatus.FAILED
+        assert job.failure_reason is FailureReason.CORRUPTED_FILE
 
     def test_an_already_running_job_is_not_started_twice(self) -> None:
         use_case, repository, _ = self._run(Result.ok(OUTCOME))

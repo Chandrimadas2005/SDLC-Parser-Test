@@ -116,6 +116,38 @@ class Job:
         self._require(JobStatus.FAILED, "requeue")
         return replace(self, status=JobStatus.QUEUED, failure_reason=None)
 
+    def mark_deleting(self) -> Self:
+        """Mark the job for idempotent artifact cleanup."""
+        return replace(self, status=JobStatus.DELETING)
+
+    def retry_manually(self) -> Self:
+        """Reset the attempt budget for an explicit caller-requested retry."""
+        self._require(JobStatus.FAILED, "retry_manually")
+        return replace(
+            self,
+            status=JobStatus.QUEUED,
+            failure_reason=None,
+            attempt_count=0,
+            started_at=None,
+            finished_at=None,
+            duration=None,
+        )
+
+    def recover(self, max_attempts: int, now: Instant) -> Self:
+        """Recover a worker-abandoned job after a process restart.
+
+        Args:
+            max_attempts: Maximum number of attempts permitted.
+            now: Recovery time used when the attempts are exhausted.
+
+        Returns:
+            A queued job, or a terminal failure when no attempts remain.
+        """
+        self._require(JobStatus.RUNNING, "recover")
+        if self.attempt_count >= max_attempts:
+            return self.fail(FailureReason.MAX_ATTEMPTS_EXCEEDED, now)
+        return replace(self, status=JobStatus.QUEUED, started_at=None)
+
     def _require(self, expected: JobStatus, transition: str) -> None:
         if self.status is not expected:
             raise InvalidJobTransitionError(self.status, transition)

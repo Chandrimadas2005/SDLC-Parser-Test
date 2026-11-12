@@ -21,7 +21,7 @@ class RetryParseJob:
             return Result.err(ApplicationErrorCode.JOB_NOT_FOUND)
         if job.status is not JobStatus.FAILED:
             return Result.err(ApplicationErrorCode.RETRY_NOT_ALLOWED)
-        queued = job.requeue()
+        queued = job.retry_manually()
         if self._services.repository.update(queued).is_err:
             return Result.err(ApplicationErrorCode.STORAGE_UNAVAILABLE)
         return self._enqueue(queued, job)

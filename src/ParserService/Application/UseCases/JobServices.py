@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 
+from ParserService.Application.UseCases.DiskGuard import DiskGuard
 from ParserService.Domain.Ports.ArtifactStore import ArtifactStore
 from ParserService.Domain.Ports.Clock import Clock
 from ParserService.Domain.Ports.JobQueue import JobQueue
@@ -14,3 +15,5 @@ class JobServices:
     store: ArtifactStore
     queue: JobQueue
     clock: Clock
+    max_attempts: int = 3
+    disk_guard: DiskGuard | None = None

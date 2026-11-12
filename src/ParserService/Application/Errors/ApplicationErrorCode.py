@@ -13,6 +13,7 @@ class ApplicationErrorCode(StrEnum):
     RESULT_NOT_FOUND = "result_not_found"
     RETRY_NOT_ALLOWED = "retry_not_allowed"
     FILE_TOO_LARGE = "file_too_large"
+    DISK_FULL = "disk_full"
     QUEUE_FULL = "queue_full"
     STORAGE_UNAVAILABLE = "storage_unavailable"
     INVALID_REQUEST = "invalid_request"

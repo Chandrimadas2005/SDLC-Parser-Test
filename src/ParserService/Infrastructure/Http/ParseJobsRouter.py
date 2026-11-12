@@ -2,7 +2,7 @@ from http import HTTPStatus
 from typing import Annotated, Final
 
 import structlog
-from fastapi import APIRouter, File, Request, UploadFile
+from fastapi import APIRouter, File, Query, Request, UploadFile
 from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import JSONResponse, Response
 
@@ -50,8 +50,14 @@ class ParseJobsRouter:
             response_model=ParseJobSubmittedResponse,
         )
         self.router.add_api_route(
+            "", self.failed_jobs, methods=["GET"], response_model=list[ParseJobStatusResponse]
+        )
+        self.router.add_api_route(
             "/{job_id}", self.job_status, methods=["GET"], response_model=ParseJobStatusResponse
         )
+        self._register_result_routes()
+
+    def _register_result_routes(self) -> None:
         self.router.add_api_route("/{job_id}/result", self.result_json, methods=["GET"])
         self.router.add_api_route("/{job_id}/result.md", self.result_markdown, methods=["GET"])
         self.router.add_api_route("/{job_id}/retry", self.retry_job, methods=["POST"])
@@ -98,6 +104,15 @@ class ParseJobsRouter:
                 LogField.STATUS: outcome,
             },
         )
+
+    async def failed_jobs(
+        self, status: str = Query(default="failed")
+    ) -> list[ParseJobStatusResponse]:
+        """List persisted failed jobs when status=failed is requested."""
+        if status != "failed":
+            raise ApiError(ApplicationErrorCode.INVALID_REQUEST)
+        views = await run_in_threadpool(self._dependencies.get_failed_parse_jobs.execute)
+        return [ParseJobStatusResponse.of(view) for view in views]
 
     async def job_status(self, job_id: str) -> ParseJobStatusResponse:
         """Report the status and failure reason of a job.

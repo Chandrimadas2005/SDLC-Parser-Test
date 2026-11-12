@@ -1,7 +1,18 @@
 from http import HTTPStatus
 
 from ParserService.Domain.Errors import JobQueueError
-from ParserService.Domain.Jobs import JobStatus
+from ParserService.Domain.Jobs import (
+    ArtifactPointer,
+    FailureReason,
+    FileHash,
+    FileName,
+    Instant,
+    Job,
+    JobId,
+    JobKey,
+    JobStatus,
+    ParserVersion,
+)
 from tests.Infrastructure.Http.conftest import MAX_FILE_SIZE, ApiHarness
 
 PATH = "/v1/parse-jobs"
@@ -50,6 +61,22 @@ class TestParseJobsApi:
         assert body["created_at"] == 42_000
         assert body["has_result"] is False
         assert body["parser_version"] == "0.1.0-test"
+
+    def test_failed_jobs_endpoint_lists_persisted_failures(self, harness: ApiHarness) -> None:
+        job = Job(
+            JobId.new(),
+            JobKey(FileHash.of(b"broken"), ParserVersion("0.1.0-test")),
+            FileName("broken.txt"),
+            ArtifactPointer("files/broken.txt"),
+            Instant(10),
+        ).fail(FailureReason.CORRUPTED_FILE, Instant(20))
+        harness.repository.add(job)
+
+        response = harness.client.get(PATH, params={"status": "failed"})
+
+        assert response.status_code == HTTPStatus.OK
+        assert response.json()[0]["job_id"] == job.id.value
+        assert response.json()[0]["failure_reason"] == FailureReason.CORRUPTED_FILE
 
     def test_unknown_job_is_404_with_the_envelope(self, harness: ApiHarness) -> None:
         response = harness.client.get(
