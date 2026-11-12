@@ -1,0 +1,173 @@
+{
+  "schema_version": "1.1",
+  "status": "succeeded",
+  "document": {
+    "file_name": "report.docx",
+    "detected_type": "docx",
+    "size_bytes": 2282,
+    "sha256": "922550e69d19181c447dc4e5cc16c4e1a745186a3f456a3ba817168307af2019",
+    "properties": {
+      "tracked_insertions": "1",
+      "tracked_deletions": "1"
+    }
+  },
+  "warnings": [],
+  "outline": [
+    {
+      "kind": "heading",
+      "name": "Synthetic report",
+      "level": 1,
+      "locator": {
+        "paragraph": 1,
+        "char_start": 0,
+        "char_end": 16
+      }
+    },
+    {
+      "kind": "heading",
+      "name": "Introduction",
+      "level": 1,
+      "locator": {
+        "paragraph": 2,
+        "char_start": 0,
+        "char_end": 12
+      }
+    },
+    {
+      "kind": "heading",
+      "name": "Details",
+      "level": 2,
+      "locator": {
+        "paragraph": 7,
+        "char_start": 0,
+        "char_end": 7
+      }
+    }
+  ],
+  "elements": [
+    {
+      "id": "e-000001",
+      "kind": "heading",
+      "locator": {
+        "paragraph": 1,
+        "char_start": 0,
+        "char_end": 16
+      },
+      "text": "Synthetic report",
+      "level": 1
+    },
+    {
+      "id": "e-000002",
+      "kind": "heading",
+      "locator": {
+        "paragraph": 2,
+        "char_start": 0,
+        "char_end": 12
+      },
+      "text": "Introduction",
+      "level": 1
+    },
+    {
+      "id": "e-000003",
+      "kind": "paragraph",
+      "locator": {
+        "paragraph": 3,
+        "char_start": 0,
+        "char_end": 23
+      },
+      "text": "Kept text and inserted."
+    },
+    {
+      "id": "e-000004",
+      "kind": "comment",
+      "locator": {
+        "paragraph": 3
+      },
+      "text": "Synthetic reviewer note"
+    },
+    {
+      "id": "e-000005",
+      "kind": "list_item",
+      "locator": {
+        "paragraph": 5,
+        "char_start": 0,
+        "char_end": 12
+      },
+      "text": "First bullet"
+    },
+    {
+      "id": "e-000006",
+      "kind": "list_item",
+      "locator": {
+        "paragraph": 6,
+        "char_start": 0,
+        "char_end": 13
+      },
+      "text": "Numbered item"
+    },
+    {
+      "id": "e-000007",
+      "kind": "heading",
+      "locator": {
+        "paragraph": 7,
+        "char_start": 0,
+        "char_end": 7
+      },
+      "text": "Details",
+      "level": 2
+    },
+    {
+      "id": "e-000008",
+      "kind": "table",
+      "locator": {
+        "paragraph": 8
+      },
+      "header_row": 1,
+      "header_confidence": 1.0,
+      "rows": [
+        {
+          "row": 2,
+          "cells": {
+            "ID": "REQ-1",
+            "Owner": "Team A"
+          }
+        }
+      ],
+      "column_profiles": []
+    },
+    {
+      "id": "e-000009",
+      "kind": "table",
+      "locator": {
+        "paragraph": 9
+      },
+      "rows": [
+        {
+          "row": 1,
+          "cells": {
+            "Column 1": "a",
+            "Column 2": "a"
+          }
+        },
+        {
+          "row": 2,
+          "cells": {
+            "Column 1": "1",
+            "Column 2": "2"
+          }
+        }
+      ],
+      "column_profiles": []
+    }
+  ],
+  "metrics": {
+    "words": 15,
+    "elements_by_kind": {
+      "heading": 3,
+      "paragraph": 1,
+      "list_item": 2,
+      "table": 2,
+      "comment": 1
+    }
+  }
+}
