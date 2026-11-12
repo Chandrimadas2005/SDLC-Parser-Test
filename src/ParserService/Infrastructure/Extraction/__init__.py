@@ -24,10 +24,19 @@ from ParserService.Infrastructure.Extraction.PdfPageText import PdfPageText
 from ParserService.Infrastructure.Extraction.PdfReader import PdfReader
 from ParserService.Infrastructure.Extraction.PlainTextBlockSplitter import PlainTextBlockSplitter
 from ParserService.Infrastructure.Extraction.PlainTextExtractor import PlainTextExtractor
+from ParserService.Infrastructure.Extraction.PptxDocumentAssembler import PptxDocumentAssembler
+from ParserService.Infrastructure.Extraction.PptxExtractor import PptxExtractor
+from ParserService.Infrastructure.Extraction.PptxPart import PptxPart
+from ParserService.Infrastructure.Extraction.PptxReader import PptxReader
+from ParserService.Infrastructure.Extraction.PptxSlide import PptxSlide
+from ParserService.Infrastructure.Extraction.PptxSlideReader import PptxSlideReader
+from ParserService.Infrastructure.Extraction.SlideBlock import SlideBlock
+from ParserService.Infrastructure.Extraction.SlideTag import SlideTag
 from ParserService.Infrastructure.Extraction.SpreadsheetTableBuilder import SpreadsheetTableBuilder
 from ParserService.Infrastructure.Extraction.TextBlock import TextBlock
 from ParserService.Infrastructure.Extraction.TextDocumentBuilder import TextDocumentBuilder
 from ParserService.Infrastructure.Extraction.TextFileReader import TextFileReader
+from ParserService.Infrastructure.Extraction.TextTableBuilder import TextTableBuilder
 from ParserService.Infrastructure.Extraction.TsvExtractor import TsvExtractor
 from ParserService.Infrastructure.Extraction.WordTag import WordTag
 from ParserService.Infrastructure.Extraction.XlsExtractor import XlsExtractor
@@ -60,10 +69,19 @@ __all__ = [
     "PdfReader",
     "PlainTextBlockSplitter",
     "PlainTextExtractor",
+    "PptxDocumentAssembler",
+    "PptxExtractor",
+    "PptxPart",
+    "PptxReader",
+    "PptxSlide",
+    "PptxSlideReader",
+    "SlideBlock",
+    "SlideTag",
     "SpreadsheetTableBuilder",
     "TextBlock",
     "TextDocumentBuilder",
     "TextFileReader",
+    "TextTableBuilder",
     "TsvExtractor",
     "WordTag",
     "XlsExtractor",

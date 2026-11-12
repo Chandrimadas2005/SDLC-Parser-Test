@@ -1,0 +1,125 @@
+{
+  "schema_version": "1.1",
+  "status": "partial",
+  "document": {
+    "file_name": "deck.pptx",
+    "detected_type": "pptx",
+    "size_bytes": 2643,
+    "sha256": "3f3d949af06fb5820f15b3773ff3794656503f701ce31be693029cde4c874f2e",
+    "slide_count": 3,
+    "properties": {}
+  },
+  "warnings": [
+    {
+      "code": "slide_unreadable",
+      "locator": {
+        "slide": 3
+      }
+    }
+  ],
+  "outline": [
+    {
+      "kind": "slide",
+      "name": "Synthetic deck",
+      "locator": {
+        "slide": 1
+      }
+    },
+    {
+      "kind": "slide",
+      "name": "Numbers",
+      "locator": {
+        "slide": 2
+      }
+    },
+    {
+      "kind": "slide",
+      "name": "Slide 3",
+      "locator": {
+        "slide": 3
+      }
+    }
+  ],
+  "elements": [
+    {
+      "id": "e-000001",
+      "kind": "heading",
+      "locator": {
+        "slide": 1
+      },
+      "text": "Synthetic deck",
+      "level": 1
+    },
+    {
+      "id": "e-000002",
+      "kind": "list_item",
+      "locator": {
+        "slide": 1
+      },
+      "text": "First point"
+    },
+    {
+      "id": "e-000003",
+      "kind": "list_item",
+      "locator": {
+        "slide": 1
+      },
+      "text": "Second point"
+    },
+    {
+      "id": "e-000004",
+      "kind": "paragraph",
+      "locator": {
+        "slide": 1
+      },
+      "text": "Free text box"
+    },
+    {
+      "id": "e-000005",
+      "kind": "heading",
+      "locator": {
+        "slide": 2
+      },
+      "text": "Numbers",
+      "level": 1
+    },
+    {
+      "id": "e-000006",
+      "kind": "table",
+      "locator": {
+        "slide": 2
+      },
+      "header_row": 1,
+      "header_confidence": 1.0,
+      "rows": [
+        {
+          "row": 2,
+          "cells": {
+            "Metric": "Pages",
+            "Value": "12"
+          }
+        }
+      ],
+      "column_profiles": []
+    },
+    {
+      "id": "e-000007",
+      "kind": "image",
+      "locator": {
+        "slide": 2
+      },
+      "text": "Synthetic chart"
+    }
+  ],
+  "metrics": {
+    "words": 12,
+    "slides": 3,
+    "elements_by_kind": {
+      "heading": 2,
+      "paragraph": 1,
+      "list_item": 2,
+      "table": 1,
+      "image": 1
+    }
+  }
+}
