@@ -19,9 +19,14 @@ from ParserService.Infrastructure.Extraction.PdfExtractor import PdfExtractor
 from ParserService.Infrastructure.Extraction.PdfReader import PdfReader
 from ParserService.Infrastructure.Extraction.PlainTextBlockSplitter import PlainTextBlockSplitter
 from ParserService.Infrastructure.Extraction.PlainTextExtractor import PlainTextExtractor
+from ParserService.Infrastructure.Extraction.PptxDocumentAssembler import PptxDocumentAssembler
+from ParserService.Infrastructure.Extraction.PptxExtractor import PptxExtractor
+from ParserService.Infrastructure.Extraction.PptxReader import PptxReader
+from ParserService.Infrastructure.Extraction.PptxSlideReader import PptxSlideReader
 from ParserService.Infrastructure.Extraction.SpreadsheetTableBuilder import SpreadsheetTableBuilder
 from ParserService.Infrastructure.Extraction.TextDocumentBuilder import TextDocumentBuilder
 from ParserService.Infrastructure.Extraction.TextFileReader import TextFileReader
+from ParserService.Infrastructure.Extraction.TextTableBuilder import TextTableBuilder
 from ParserService.Infrastructure.Extraction.TsvExtractor import TsvExtractor
 from ParserService.Infrastructure.Extraction.XlsExtractor import XlsExtractor
 from ParserService.Infrastructure.Extraction.XlsxExtractor import XlsxExtractor
@@ -45,7 +50,7 @@ class ExtractorRegistry:
             max_pages: Page limit for paged formats (PDF), or ``None`` for no limit.
 
         Returns:
-            A registry for every format implemented so far. DOC, RTF, ODT and ODS are
+            A registry for every format implemented so far. DOC, RTF, ODT, ODS and PPT are
             included only when LibreOffice is installed.
         """
         extractors = {**cls._document_extractors(max_pages), **cls._spreadsheet_extractors()}
@@ -54,11 +59,14 @@ class ExtractorRegistry:
     @staticmethod
     def _document_extractors(max_pages: int | None) -> dict[DetectedType, Extractor]:
         reader, builder = TextFileReader(), TextDocumentBuilder()
-        splitter = PlainTextBlockSplitter()
+        splitter, tables = PlainTextBlockSplitter(), TextTableBuilder()
         return {
             DetectedType.PDF: PdfExtractor(PdfReader(max_pages), PdfDocumentAssembler(splitter)),
             DetectedType.DOCX: DocxExtractor(
-                DocxReader(DocxStyleReader()), DocxDocumentAssembler()
+                DocxReader(DocxStyleReader()), DocxDocumentAssembler(tables)
+            ),
+            DetectedType.PPTX: PptxExtractor(
+                PptxReader(PptxSlideReader()), PptxDocumentAssembler(tables)
             ),
             DetectedType.TXT: PlainTextExtractor(reader, splitter, builder),
             DetectedType.MD: MarkdownExtractor(reader, MarkdownBlockReader(), builder),
@@ -87,6 +95,7 @@ class ExtractorRegistry:
             DetectedType.RTF: DetectedType.DOCX,
             DetectedType.ODT: DetectedType.DOCX,
             DetectedType.ODS: DetectedType.XLSX,
+            DetectedType.PPT: DetectedType.PPTX,
         }
         return {
             legacy: ConvertingExtractor(converter, modern, extractors[modern])

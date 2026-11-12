@@ -1,8 +1,6 @@
 import dataclasses
 from collections.abc import Iterator
-from typing import Final
 
-from ParserService.Domain.Documents.Confidence import Confidence
 from ParserService.Domain.Documents.DocumentFacts import DocumentFacts
 from ParserService.Domain.Documents.DocumentStatus import DocumentStatus
 from ParserService.Domain.Documents.Element import Element
@@ -16,11 +14,11 @@ from ParserService.Domain.Documents.OutlineEntry import OutlineEntry
 from ParserService.Domain.Documents.OutlineKind import OutlineKind
 from ParserService.Domain.Documents.ParsedDocument import ParsedDocument
 from ParserService.Domain.Documents.Table import Table
-from ParserService.Domain.Documents.TableRow import TableRow
 from ParserService.Infrastructure.Extraction.DocxContent import DocxContent
 from ParserService.Infrastructure.Extraction.DocxParagraph import DocxParagraph
 from ParserService.Infrastructure.Extraction.DocxProperty import DocxProperty
 from ParserService.Infrastructure.Extraction.DocxTable import DocxTable
+from ParserService.Infrastructure.Extraction.TextTableBuilder import TextTableBuilder
 
 type _Draft = tuple[ElementKind, Locator, str | None, int | None, Table | None]
 
@@ -33,8 +31,8 @@ class DocxDocumentAssembler:
     Tracked-change counts go into the file properties.
     """
 
-    MARKED_HEADER: Final = Confidence(1.0)
-    GUESSED_HEADER: Final = Confidence(0.7)
+    def __init__(self, tables: TextTableBuilder) -> None:
+        self._tables = tables
 
     def build(self, request: ExtractionRequest, content: DocxContent) -> ParsedDocument:
         """Build the result for a DOCX file.
@@ -64,7 +62,13 @@ class DocxDocumentAssembler:
     def _drafts(self, content: DocxContent) -> Iterator[_Draft]:
         for number, block in enumerate(content.blocks, 1):
             if isinstance(block, DocxTable):
-                yield ElementKind.TABLE, Locator(paragraph=number), None, None, self._table(block)
+                yield (
+                    ElementKind.TABLE,
+                    Locator(paragraph=number),
+                    None,
+                    None,
+                    self._tables.build(block.rows, header_marked=block.header_marked),
+                )
                 continue
             yield from self._paragraph(block, number)
             for comment_id in block.comment_ids:
@@ -81,28 +85,6 @@ class DocxDocumentAssembler:
             return
         kind = ElementKind.LIST_ITEM if block.is_list else ElementKind.PARAGRAPH
         yield kind, locator, block.text, None, None
-
-    def _table(self, block: DocxTable) -> Table:
-        first = block.rows[0] if block.rows else ()
-        names = [cell.strip() for cell in first]
-        header = block.header_marked or (all(names) and len(set(names)) == len(names))
-        keys = names if header else [f"Column {n}" for n in range(1, len(first) + 1)]
-        start = 1 if header else 0
-        rows = tuple(
-            TableRow(index + 1, self._cells(keys, row))
-            for index, row in enumerate(block.rows)
-            if index >= start
-        )
-        if not header:
-            return Table(rows)
-        confidence = self.MARKED_HEADER if block.header_marked else self.GUESSED_HEADER
-        return Table(rows, header_row=1, header_confidence=confidence)
-
-    @staticmethod
-    def _cells(keys: list[str], row: tuple[str, ...]) -> dict[str, str]:
-        width = max(len(keys), len(row))
-        names = keys + [f"Column {n}" for n in range(len(keys) + 1, width + 1)]
-        return {name: row[index] if index < len(row) else "" for index, name in enumerate(names)}
 
     @staticmethod
     def _outline(elements: tuple[Element, ...]) -> tuple[OutlineEntry, ...]:

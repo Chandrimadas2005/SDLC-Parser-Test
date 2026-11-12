@@ -113,20 +113,29 @@ class TestParsePipeline:
             result = self.PIPELINE.parse(SourceFile(str(path), FileName(path.name)))
             assert result.unwrap_err() is FailureReason.UNSUPPORTED_TYPE
 
+    NATIVE: Final = (
+        DetectedType.XLSX,
+        DetectedType.XLSM,
+        DetectedType.XLS,
+        DetectedType.CSV,
+        DetectedType.TSV,
+        DetectedType.PDF,
+        DetectedType.DOCX,
+        DetectedType.TXT,
+        DetectedType.MD,
+        DetectedType.PPTX,
+    )
+    CONVERTED: Final = (
+        DetectedType.ODT,
+        DetectedType.ODS,
+        DetectedType.RTF,
+        DetectedType.DOC,
+        DetectedType.PPT,
+    )
+
     def test_registry_lists_supported_types_in_priority_order(self) -> None:
-        native = (
-            DetectedType.XLSX,
-            DetectedType.XLSM,
-            DetectedType.XLS,
-            DetectedType.CSV,
-            DetectedType.TSV,
-            DetectedType.PDF,
-            DetectedType.DOCX,
-            DetectedType.TXT,
-            DetectedType.MD,
-        )
-        converted = (DetectedType.ODT, DetectedType.ODS, DetectedType.RTF, DetectedType.DOC)
-        expected = native + converted if LibreOfficeConverter.available() else native
+        office = LibreOfficeConverter.available() is not None
+        expected = self.NATIVE + self.CONVERTED if office else self.NATIVE
 
         assert ExtractorRegistry.default().supported_types == expected
 

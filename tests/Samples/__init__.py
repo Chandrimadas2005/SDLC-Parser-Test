@@ -3,5 +3,6 @@
 from tests.Samples.DocumentSamples import DocumentSamples
 from tests.Samples.SampleDocx import SampleDocx
 from tests.Samples.SamplePdfs import SamplePdfs
+from tests.Samples.SamplePptx import SamplePptx
 
-__all__ = ["DocumentSamples", "SampleDocx", "SamplePdfs"]
+__all__ = ["DocumentSamples", "SampleDocx", "SamplePdfs", "SamplePptx"]
