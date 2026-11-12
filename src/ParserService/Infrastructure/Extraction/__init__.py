@@ -1,6 +1,16 @@
 """One extractor per format, the registry that picks it, and the parse pipeline."""
 
 from ParserService.Infrastructure.Extraction.CsvExtractor import CsvExtractor
+from ParserService.Infrastructure.Extraction.DocxContent import DocxContent
+from ParserService.Infrastructure.Extraction.DocxDocumentAssembler import DocxDocumentAssembler
+from ParserService.Infrastructure.Extraction.DocxExtractor import DocxExtractor
+from ParserService.Infrastructure.Extraction.DocxParagraph import DocxParagraph
+from ParserService.Infrastructure.Extraction.DocxParagraphReader import DocxParagraphReader
+from ParserService.Infrastructure.Extraction.DocxPart import DocxPart
+from ParserService.Infrastructure.Extraction.DocxProperty import DocxProperty
+from ParserService.Infrastructure.Extraction.DocxReader import DocxReader
+from ParserService.Infrastructure.Extraction.DocxStyleReader import DocxStyleReader
+from ParserService.Infrastructure.Extraction.DocxTable import DocxTable
 from ParserService.Infrastructure.Extraction.ExtractorRegistry import ExtractorRegistry
 from ParserService.Infrastructure.Extraction.MarkdownBlockReader import MarkdownBlockReader
 from ParserService.Infrastructure.Extraction.MarkdownExtractor import MarkdownExtractor
@@ -17,6 +27,7 @@ from ParserService.Infrastructure.Extraction.TextBlock import TextBlock
 from ParserService.Infrastructure.Extraction.TextDocumentBuilder import TextDocumentBuilder
 from ParserService.Infrastructure.Extraction.TextFileReader import TextFileReader
 from ParserService.Infrastructure.Extraction.TsvExtractor import TsvExtractor
+from ParserService.Infrastructure.Extraction.WordTag import WordTag
 from ParserService.Infrastructure.Extraction.XlsExtractor import XlsExtractor
 from ParserService.Infrastructure.Extraction.XlsPropertyReader import XlsPropertyReader
 from ParserService.Infrastructure.Extraction.XlsxExtractor import XlsxExtractor
@@ -24,6 +35,16 @@ from ParserService.Infrastructure.Extraction.XlsxPropertyReader import XlsxPrope
 
 __all__ = [
     "CsvExtractor",
+    "DocxContent",
+    "DocxDocumentAssembler",
+    "DocxExtractor",
+    "DocxParagraph",
+    "DocxParagraphReader",
+    "DocxPart",
+    "DocxProperty",
+    "DocxReader",
+    "DocxStyleReader",
+    "DocxTable",
     "ExtractorRegistry",
     "MarkdownBlockReader",
     "MarkdownExtractor",
@@ -40,6 +61,7 @@ __all__ = [
     "TextDocumentBuilder",
     "TextFileReader",
     "TsvExtractor",
+    "WordTag",
     "XlsExtractor",
     "XlsPropertyReader",
     "XlsxExtractor",

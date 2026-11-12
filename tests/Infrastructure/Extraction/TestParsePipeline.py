@@ -117,6 +117,7 @@ class TestParsePipeline:
             DetectedType.CSV,
             DetectedType.TSV,
             DetectedType.PDF,
+            DetectedType.DOCX,
             DetectedType.TXT,
             DetectedType.MD,
         )

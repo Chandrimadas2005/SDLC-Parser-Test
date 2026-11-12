@@ -6,6 +6,10 @@ from ParserService.Domain.Errors.Result import Result
 from ParserService.Domain.Jobs.FailureReason import FailureReason
 from ParserService.Domain.Ports.Extractor import Extractor
 from ParserService.Infrastructure.Extraction.CsvExtractor import CsvExtractor
+from ParserService.Infrastructure.Extraction.DocxDocumentAssembler import DocxDocumentAssembler
+from ParserService.Infrastructure.Extraction.DocxExtractor import DocxExtractor
+from ParserService.Infrastructure.Extraction.DocxReader import DocxReader
+from ParserService.Infrastructure.Extraction.DocxStyleReader import DocxStyleReader
 from ParserService.Infrastructure.Extraction.MarkdownBlockReader import MarkdownBlockReader
 from ParserService.Infrastructure.Extraction.MarkdownExtractor import MarkdownExtractor
 from ParserService.Infrastructure.Extraction.PdfDocumentAssembler import PdfDocumentAssembler
@@ -38,23 +42,32 @@ class ExtractorRegistry:
         Returns:
             A registry for every format implemented so far.
         """
+        return cls({**cls._document_extractors(), **cls._spreadsheet_extractors()})
+
+    @staticmethod
+    def _document_extractors() -> dict[DetectedType, Extractor]:
         reader, builder = TextFileReader(), TextDocumentBuilder()
         splitter = PlainTextBlockSplitter()
-        pdf = PdfExtractor(PdfReader(), PdfDocumentAssembler(splitter))
+        return {
+            DetectedType.PDF: PdfExtractor(PdfReader(), PdfDocumentAssembler(splitter)),
+            DetectedType.DOCX: DocxExtractor(
+                DocxReader(DocxStyleReader()), DocxDocumentAssembler()
+            ),
+            DetectedType.TXT: PlainTextExtractor(reader, splitter, builder),
+            DetectedType.MD: MarkdownExtractor(reader, MarkdownBlockReader(), builder),
+        }
+
+    @staticmethod
+    def _spreadsheet_extractors() -> dict[DetectedType, Extractor]:
         spreadsheet = SpreadsheetTableBuilder()
         xlsx = XlsxExtractor(spreadsheet)
-        return cls(
-            {
-                DetectedType.PDF: pdf,
-                DetectedType.TXT: PlainTextExtractor(reader, splitter, builder),
-                DetectedType.MD: MarkdownExtractor(reader, MarkdownBlockReader(), builder),
-                DetectedType.XLSX: xlsx,
-                DetectedType.XLSM: xlsx,
-                DetectedType.XLS: XlsExtractor(spreadsheet),
-                DetectedType.CSV: CsvExtractor(spreadsheet),
-                DetectedType.TSV: TsvExtractor(spreadsheet),
-            }
-        )
+        return {
+            DetectedType.XLSX: xlsx,
+            DetectedType.XLSM: xlsx,
+            DetectedType.XLS: XlsExtractor(spreadsheet),
+            DetectedType.CSV: CsvExtractor(spreadsheet),
+            DetectedType.TSV: TsvExtractor(spreadsheet),
+        }
 
     @property
     def supported_types(self) -> tuple[DetectedType, ...]:
