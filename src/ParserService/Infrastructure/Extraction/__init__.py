@@ -1,5 +1,6 @@
 """One extractor per format, the registry that picks it, and the parse pipeline."""
 
+from ParserService.Infrastructure.Extraction.ConvertingExtractor import ConvertingExtractor
 from ParserService.Infrastructure.Extraction.CsvExtractor import CsvExtractor
 from ParserService.Infrastructure.Extraction.DocxContent import DocxContent
 from ParserService.Infrastructure.Extraction.DocxDocumentAssembler import DocxDocumentAssembler
@@ -12,6 +13,7 @@ from ParserService.Infrastructure.Extraction.DocxReader import DocxReader
 from ParserService.Infrastructure.Extraction.DocxStyleReader import DocxStyleReader
 from ParserService.Infrastructure.Extraction.DocxTable import DocxTable
 from ParserService.Infrastructure.Extraction.ExtractorRegistry import ExtractorRegistry
+from ParserService.Infrastructure.Extraction.LibreOfficeConverter import LibreOfficeConverter
 from ParserService.Infrastructure.Extraction.MarkdownBlockReader import MarkdownBlockReader
 from ParserService.Infrastructure.Extraction.MarkdownExtractor import MarkdownExtractor
 from ParserService.Infrastructure.Extraction.ParsePipeline import ParsePipeline
@@ -34,6 +36,7 @@ from ParserService.Infrastructure.Extraction.XlsxExtractor import XlsxExtractor
 from ParserService.Infrastructure.Extraction.XlsxPropertyReader import XlsxPropertyReader
 
 __all__ = [
+    "ConvertingExtractor",
     "CsvExtractor",
     "DocxContent",
     "DocxDocumentAssembler",
@@ -46,6 +49,7 @@ __all__ = [
     "DocxStyleReader",
     "DocxTable",
     "ExtractorRegistry",
+    "LibreOfficeConverter",
     "MarkdownBlockReader",
     "MarkdownExtractor",
     "ParsePipeline",

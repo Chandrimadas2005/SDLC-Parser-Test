@@ -5,11 +5,13 @@ from ParserService.Domain.Documents.DetectedType import DetectedType
 from ParserService.Domain.Errors.Result import Result
 from ParserService.Domain.Jobs.FailureReason import FailureReason
 from ParserService.Domain.Ports.Extractor import Extractor
+from ParserService.Infrastructure.Extraction.ConvertingExtractor import ConvertingExtractor
 from ParserService.Infrastructure.Extraction.CsvExtractor import CsvExtractor
 from ParserService.Infrastructure.Extraction.DocxDocumentAssembler import DocxDocumentAssembler
 from ParserService.Infrastructure.Extraction.DocxExtractor import DocxExtractor
 from ParserService.Infrastructure.Extraction.DocxReader import DocxReader
 from ParserService.Infrastructure.Extraction.DocxStyleReader import DocxStyleReader
+from ParserService.Infrastructure.Extraction.LibreOfficeConverter import LibreOfficeConverter
 from ParserService.Infrastructure.Extraction.MarkdownBlockReader import MarkdownBlockReader
 from ParserService.Infrastructure.Extraction.MarkdownExtractor import MarkdownExtractor
 from ParserService.Infrastructure.Extraction.PdfDocumentAssembler import PdfDocumentAssembler
@@ -40,9 +42,11 @@ class ExtractorRegistry:
         """Build the registry with every extractor that exists today.
 
         Returns:
-            A registry for every format implemented so far.
+            A registry for every format implemented so far. DOC, RTF, ODT and ODS are
+            included only when LibreOffice is installed.
         """
-        return cls({**cls._document_extractors(), **cls._spreadsheet_extractors()})
+        extractors = {**cls._document_extractors(), **cls._spreadsheet_extractors()}
+        return cls(extractors | cls._converted(extractors, LibreOfficeConverter.available()))
 
     @staticmethod
     def _document_extractors() -> dict[DetectedType, Extractor]:
@@ -67,6 +71,23 @@ class ExtractorRegistry:
             DetectedType.XLS: XlsExtractor(spreadsheet),
             DetectedType.CSV: CsvExtractor(spreadsheet),
             DetectedType.TSV: TsvExtractor(spreadsheet),
+        }
+
+    @staticmethod
+    def _converted(
+        extractors: dict[DetectedType, Extractor], converter: LibreOfficeConverter | None
+    ) -> dict[DetectedType, Extractor]:
+        if converter is None:
+            return {}
+        routes = {
+            DetectedType.DOC: DetectedType.DOCX,
+            DetectedType.RTF: DetectedType.DOCX,
+            DetectedType.ODT: DetectedType.DOCX,
+            DetectedType.ODS: DetectedType.XLSX,
+        }
+        return {
+            legacy: ConvertingExtractor(converter, modern, extractors[modern])
+            for legacy, modern in routes.items()
         }
 
     @property

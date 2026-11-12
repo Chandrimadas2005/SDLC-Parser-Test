@@ -11,8 +11,10 @@ RUN uv sync --locked --no-dev --no-editable
 
 FROM python:3.12-slim-bookworm AS runtime
 # libmagic is needed by python-magic for content-based type detection (Phase 0, track B).
+# Headless LibreOffice converts DOC, RTF, ODT and ODS; it always runs as its own process.
 RUN apt-get update \
     && apt-get install -y --no-install-recommends libmagic1 \
+        libreoffice-writer-nogui libreoffice-calc-nogui fonts-dejavu-core \
     && rm -rf /var/lib/apt/lists/* \
     && groupadd --system parser && useradd --system --gid parser --home /app parser
 WORKDIR /app

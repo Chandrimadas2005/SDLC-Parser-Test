@@ -19,7 +19,11 @@ from ParserService.Infrastructure.Detection import (
     TextEncodingDetector,
     ZipContentInspector,
 )
-from ParserService.Infrastructure.Extraction import ExtractorRegistry, ParsePipeline
+from ParserService.Infrastructure.Extraction import (
+    ExtractorRegistry,
+    LibreOfficeConverter,
+    ParsePipeline,
+)
 from ParserService.Infrastructure.Output import ParsedDocumentJsonEncoder
 
 TESTS: Final = Path(__file__).resolve().parents[2]
@@ -102,15 +106,15 @@ class TestParsePipeline:
     ) -> None:
         binary = tmp_path / "blob.txt"
         binary.write_bytes(bytes(range(256)) * 4)
-        rtf = tmp_path / "doc.rtf"
-        rtf.write_bytes(b"{\\rtf1\\ansi Synthetic rich text.}")
+        html = tmp_path / "page.html"
+        html.write_bytes(b"<!DOCTYPE html><html><body><p>Synthetic page</p></body></html>")
 
-        for path in (binary, rtf):
+        for path in (binary, html):
             result = self.PIPELINE.parse(SourceFile(str(path), FileName(path.name)))
             assert result.unwrap_err() is FailureReason.UNSUPPORTED_TYPE
 
     def test_registry_lists_supported_types_in_priority_order(self) -> None:
-        assert ExtractorRegistry.default().supported_types == (
+        native = (
             DetectedType.XLSX,
             DetectedType.XLSM,
             DetectedType.XLS,
@@ -121,6 +125,10 @@ class TestParsePipeline:
             DetectedType.TXT,
             DetectedType.MD,
         )
+        converted = (DetectedType.ODT, DetectedType.ODS, DetectedType.RTF, DetectedType.DOC)
+        expected = native + converted if LibreOfficeConverter.available() else native
+
+        assert ExtractorRegistry.default().supported_types == expected
 
     def test_request_rejects_facts_that_disagree_with_detection(self) -> None:
         facts = DocumentFacts(FileName("a.txt"), DetectedType.TXT, 1, FileHash.of(b"a"))
