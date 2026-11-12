@@ -23,6 +23,7 @@ from ParserService.Infrastructure.Extraction.PptxDocumentAssembler import PptxDo
 from ParserService.Infrastructure.Extraction.PptxExtractor import PptxExtractor
 from ParserService.Infrastructure.Extraction.PptxReader import PptxReader
 from ParserService.Infrastructure.Extraction.PptxSlideReader import PptxSlideReader
+from ParserService.Infrastructure.Extraction.RepairingExtractor import RepairingExtractor
 from ParserService.Infrastructure.Extraction.SpreadsheetTableBuilder import SpreadsheetTableBuilder
 from ParserService.Infrastructure.Extraction.TextDocumentBuilder import TextDocumentBuilder
 from ParserService.Infrastructure.Extraction.TextFileReader import TextFileReader
@@ -30,6 +31,7 @@ from ParserService.Infrastructure.Extraction.TextTableBuilder import TextTableBu
 from ParserService.Infrastructure.Extraction.TsvExtractor import TsvExtractor
 from ParserService.Infrastructure.Extraction.XlsExtractor import XlsExtractor
 from ParserService.Infrastructure.Extraction.XlsxExtractor import XlsxExtractor
+from ParserService.Infrastructure.Extraction.ZipSalvager import ZipSalvager
 
 
 class ExtractorRegistry:
@@ -53,7 +55,9 @@ class ExtractorRegistry:
             A registry for every format implemented so far. DOC, RTF, ODT, ODS and PPT are
             included only when LibreOffice is installed.
         """
-        extractors = {**cls._document_extractors(max_pages), **cls._spreadsheet_extractors()}
+        extractors = cls._repairing(
+            {**cls._document_extractors(max_pages), **cls._spreadsheet_extractors()}
+        )
         return cls(extractors | cls._converted(extractors, LibreOfficeConverter.available()))
 
     @staticmethod
@@ -83,6 +87,13 @@ class ExtractorRegistry:
             DetectedType.CSV: CsvExtractor(spreadsheet),
             DetectedType.TSV: TsvExtractor(spreadsheet),
         }
+
+    @staticmethod
+    def _repairing(extractors: dict[DetectedType, Extractor]) -> dict[DetectedType, Extractor]:
+        office = (DetectedType.DOCX, DetectedType.PPTX, DetectedType.XLSX, DetectedType.XLSM)
+        salvager = ZipSalvager()
+        repaired = {kind: RepairingExtractor(extractors[kind], salvager) for kind in office}
+        return extractors | repaired
 
     @staticmethod
     def _converted(

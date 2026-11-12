@@ -9,11 +9,14 @@ class ZipContentInspector:
     """Tells Office and OpenDocument files apart from plain ZIP archives.
 
     Only the archive's table of contents and the tiny OpenDocument ``mimetype``
-    entry are read. Nothing is extracted, so this is safe on untrusted archives.
+    entry are read. When the table of contents is damaged, the entry names in the
+    first megabyte still identify an Office package. Nothing is extracted, so this is
+    safe on untrusted archives.
     """
 
     MIMETYPE_ENTRY: Final = "mimetype"
     MIMETYPE_MAX_BYTES: Final = 128
+    DAMAGED_SCAN_BYTES: Final = 1024 * 1024
     MACRO_ENTRY: Final = "xl/vbaProject.bin"
     MARKERS: Final = (
         ("word/document.xml", DetectedType.DOCX),
@@ -37,8 +40,20 @@ class ZipContentInspector:
         try:
             with zipfile.ZipFile(path) as archive:
                 return self._classify(archive)
-        except (zipfile.BadZipFile, OSError):
+        except zipfile.BadZipFile:
+            return self._damaged(path)
+        except OSError:
             return None
+
+    def _damaged(self, path: Path) -> DetectedType | None:
+        # The archive's table of contents is broken, but each entry's own header still
+        # names it, so an Office package stays recognisable (and repairable later).
+        with path.open("rb") as handle:
+            head = handle.read(self.DAMAGED_SCAN_BYTES)
+        office = next((kind for marker, kind in self.MARKERS if marker.encode() in head), None)
+        if office is DetectedType.XLSX and self.MACRO_ENTRY.encode() in head:
+            return DetectedType.XLSM
+        return office
 
     def _classify(self, archive: zipfile.ZipFile) -> DetectedType:
         names = set(archive.namelist())
