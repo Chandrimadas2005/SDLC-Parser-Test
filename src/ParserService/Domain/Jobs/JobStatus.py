@@ -13,6 +13,7 @@ class JobStatus(StrEnum):
     SUCCEEDED = "succeeded"
     PARTIAL = "partial"
     FAILED = "failed"
+    DELETING = "deleting"
 
     @property
     def is_terminal(self) -> bool:

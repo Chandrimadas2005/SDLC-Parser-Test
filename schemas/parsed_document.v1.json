@@ -169,7 +169,8 @@
         "timeout",
         "extractor_crash",
         "max_attempts_exceeded",
-        "storage_error"
+        "storage_error",
+        "storage_permanent_error"
       ]
     },
     "metric_name": {

@@ -39,11 +39,20 @@ class SubmitParseJob:
         """
         if len(command.content) > self._policy.max_file_size_bytes:
             return Result.err(ApplicationErrorCode.FILE_TOO_LARGE)
+        if self._disk_is_full():
+            return Result.err(ApplicationErrorCode.DISK_FULL)
         key = JobKey(FileHash.of(command.content), self._policy.parser_version)
         existing = self._services.repository.find_by_key(key)
         if existing is not None:
             return Result.ok(ParseJobSubmitted(existing.id, existing.status, already_existed=True))
         return self._create(command, key)
+
+    def _disk_is_full(self) -> bool:
+        guard = self._services.disk_guard
+        if guard is None or guard.disk_space.has_room():
+            return False
+        guard.temporary_file_cleaner.clean()
+        return True
 
     def _create(
         self, command: SubmitParseJobCommand, key: JobKey

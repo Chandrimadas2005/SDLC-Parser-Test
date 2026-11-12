@@ -2,9 +2,11 @@ from typing import Protocol
 
 from ParserService.Domain.Errors.JobRepositoryError import JobRepositoryError
 from ParserService.Domain.Errors.Result import Result
+from ParserService.Domain.Jobs.Instant import Instant
 from ParserService.Domain.Jobs.Job import Job
 from ParserService.Domain.Jobs.JobId import JobId
 from ParserService.Domain.Jobs.JobKey import JobKey
+from ParserService.Domain.Jobs.JobStatus import JobStatus
 
 
 class JobRepository(Protocol):
@@ -57,6 +59,21 @@ class JobRepository(Protocol):
         Returns:
             The stored job, or ``NOT_FOUND`` when the record no longer exists.
         """
+        ...
+
+    def list_by_status(self, status: JobStatus) -> list[Job]:
+        """List jobs in a lifecycle state.
+
+        Args:
+            status: The lifecycle state to list.
+
+        Returns:
+            Matching jobs ordered by creation time.
+        """
+        ...
+
+    def list_created_before(self, cutoff: Instant) -> list[Job]:
+        """List jobs older than the retention cutoff, oldest first."""
         ...
 
     def delete(self, job_id: JobId) -> bool:

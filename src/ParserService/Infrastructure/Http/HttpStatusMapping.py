@@ -14,6 +14,7 @@ class HttpStatusMapping:
         ApplicationErrorCode.RESULT_NOT_READY: HTTPStatus.CONFLICT,
         ApplicationErrorCode.RETRY_NOT_ALLOWED: HTTPStatus.CONFLICT,
         ApplicationErrorCode.FILE_TOO_LARGE: HTTPStatus.REQUEST_ENTITY_TOO_LARGE,
+        ApplicationErrorCode.DISK_FULL: HTTPStatus.SERVICE_UNAVAILABLE,
         ApplicationErrorCode.QUEUE_FULL: HTTPStatus.TOO_MANY_REQUESTS,
         ApplicationErrorCode.STORAGE_UNAVAILABLE: HTTPStatus.SERVICE_UNAVAILABLE,
         ApplicationErrorCode.INVALID_REQUEST: HTTPStatus.BAD_REQUEST,
@@ -26,6 +27,9 @@ class HttpStatusMapping:
         ApplicationErrorCode.RESULT_NOT_READY: "The parse result is not ready yet.",
         ApplicationErrorCode.RETRY_NOT_ALLOWED: "Only failed parse jobs can be retried.",
         ApplicationErrorCode.FILE_TOO_LARGE: "The file exceeds the configured size limit.",
+        ApplicationErrorCode.DISK_FULL: (
+            "Uploads are disabled because the artifact disk is nearly full."
+        ),
         ApplicationErrorCode.QUEUE_FULL: "The parse queue is full; retry after the given delay.",
         ApplicationErrorCode.STORAGE_UNAVAILABLE: "Storage is temporarily unavailable.",
         ApplicationErrorCode.INVALID_REQUEST: "The request is malformed.",
