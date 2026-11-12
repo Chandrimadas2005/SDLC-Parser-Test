@@ -1,0 +1,48 @@
+{
+  "schema_version": "1.1",
+  "status": "succeeded",
+  "document": {
+    "file_name": "empty.csv",
+    "detected_type": "csv",
+    "size_bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "sheet_count": 1,
+    "properties": {
+      "delimiter": ","
+    }
+  },
+  "warnings": [],
+  "outline": [
+    {
+      "kind": "sheet",
+      "name": "CSV",
+      "hidden": false,
+      "locator": {
+        "sheet": "CSV",
+        "range": "A1:A1"
+      }
+    }
+  ],
+  "elements": [
+    {
+      "id": "e-000001",
+      "kind": "table",
+      "locator": {
+        "sheet": "CSV",
+        "range": "A1:A1"
+      },
+      "rows": [],
+      "column_profiles": []
+    }
+  ],
+  "metrics": {
+    "sheets": 1,
+    "rows": 0,
+    "columns": 0,
+    "formulas": 0,
+    "hidden_sheets": 0,
+    "elements_by_kind": {
+      "table": 1
+    }
+  }
+}

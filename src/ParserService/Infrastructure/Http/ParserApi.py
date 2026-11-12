@@ -4,6 +4,7 @@ from fastapi import FastAPI
 
 from ParserService.Infrastructure.Http.ApiDependencies import ApiDependencies
 from ParserService.Infrastructure.Http.ErrorEnvelopeHandler import ErrorEnvelopeHandler
+from ParserService.Infrastructure.Http.FormatsRouter import FormatsRouter
 from ParserService.Infrastructure.Http.HealthRouter import HealthRouter
 from ParserService.Infrastructure.Http.HttpStatusMapping import HttpStatusMapping
 from ParserService.Infrastructure.Http.MetricsRouter import MetricsRouter
@@ -29,12 +30,12 @@ class ParserApi:
         app = FastAPI(title=self.TITLE, version=self._version)
         app.add_middleware(RequestIdMiddleware)
         ErrorEnvelopeHandler(HttpStatusMapping()).install(app)
-        jobs = ParseJobsRouter(
-            self._dependencies.submit_parse_job,
-            self._dependencies.get_parse_job_status,
-            self._dependencies.metrics,
-        )
+        jobs = ParseJobsRouter(self._dependencies)
         app.include_router(jobs.router)
+        formats = FormatsRouter(
+            self._dependencies.extractor_registry, self._dependencies.parser_version
+        )
+        app.include_router(formats.router)
         app.include_router(HealthRouter(self._dependencies.readiness).router)
         app.include_router(MetricsRouter(self._dependencies.metrics).router)
         return app
