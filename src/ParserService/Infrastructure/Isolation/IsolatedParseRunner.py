@@ -52,7 +52,8 @@ class IsolatedParseRunner:
             return self._collect(folder)
 
     def _execute(self, arguments: list[str]) -> int | None:
-        limits = [str(self._limits.memory_mb), str(self._limits.timeout_seconds)]
+        pages = self._limits.max_pages or 0
+        limits = [str(self._limits.memory_mb), str(self._limits.timeout_seconds), str(pages)]
         command = [sys.executable, "-m", self.MODULE, *arguments, *limits]
         try:
             completed = subprocess.run(  # noqa: S603 - fixed command, no shell

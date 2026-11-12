@@ -33,7 +33,9 @@ class MeasurementCli:
             A ready-to-run command.
         """
         limits = Limits()
-        worker = WorkerLimits(limits.job_timeout_seconds, limits.job_memory_limit_mb)
+        worker = WorkerLimits(
+            limits.job_timeout_seconds, limits.job_memory_limit_mb, limits.max_pages
+        )
         return cls(ParseMeasurement(IsolatedParseRunner(worker)), output or sys.stdout)
 
     def run(self, arguments: Sequence[str]) -> int:

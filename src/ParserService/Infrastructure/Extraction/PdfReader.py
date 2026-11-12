@@ -17,10 +17,15 @@ class PdfReader:
 
     PDFium loads pages lazily, so a large file is never held in memory whole. A page
     that fails to load is reported as unreadable instead of failing the whole file.
+    The page count is checked before any page is read: above ``max_pages`` the file
+    is rejected with ``file_too_large`` (brief 2.5).
     Macros, scripts and embedded objects are never run: only text is read.
     """
 
     PASSWORD_ERROR: Final = 4
+
+    def __init__(self, max_pages: int | None = None) -> None:
+        self._max_pages = max_pages
 
     def read(self, path: Path) -> Result[PdfContent, FailureReason]:
         """Read every page and the outline.
@@ -29,13 +34,17 @@ class PdfReader:
             path: The PDF to read.
 
         Returns:
-            The content, ``password_protected`` for an encrypted file, or
-            ``corrupted_file`` when PDFium cannot open it.
+            The content, ``password_protected`` for an encrypted file,
+            ``corrupted_file`` when PDFium cannot open it, or ``file_too_large`` when
+            it has more pages than allowed.
         """
         try:
             document = pypdfium2.PdfDocument(path)
         except pypdfium2.PdfiumError as error:
             return Result.err(self._failure(error))
+        if self._max_pages is not None and len(document) > self._max_pages:
+            document.close()
+            return Result.err(FailureReason.FILE_TOO_LARGE)
         pages = tuple(self._page(document, index) for index in range(len(document)))
         outline = self._outline(document)
         document.close()

@@ -27,26 +27,31 @@ class ParseWorkerProcess:
     result into its output folder. It never catches unexpected errors: a crash
     simply ends the process, and the parent turns that into ``extractor_crash``.
 
-    Arguments: source path, file name, output folder, memory limit (MB), CPU limit (s).
+    Arguments: source path, file name, output folder, memory limit (MB), CPU limit (s),
+    page limit (0 for none).
     """
 
-    ARGUMENT_COUNT: Final = 5
+    ARGUMENT_COUNT: Final = 6
     BYTES_PER_MB: Final = 1024 * 1024
+
+    def __init__(self, max_pages: int | None = None) -> None:
+        self._max_pages = max_pages
 
     def run(self, arguments: Sequence[str]) -> int:
         """Parse one file under limits and write the result files.
 
         Args:
-            arguments: The five command-line arguments.
+            arguments: The six command-line arguments.
 
         Returns:
             The process exit code: 0 when the result or failure file was written.
         """
         if len(arguments) != self.ARGUMENT_COUNT:
             return 2
-        source, name, output, memory_mb, cpu_seconds = arguments
+        source, name, output, memory_mb, cpu_seconds, max_pages = arguments
         self._limit(int(memory_mb), int(cpu_seconds))
-        self.execute(SourceFile(source, FileName(name)), Path(output))
+        worker = type(self)(int(max_pages) or None)
+        worker.execute(SourceFile(source, FileName(name)), Path(output))
         return 0
 
     def execute(self, source: SourceFile, folder: Path) -> None:
@@ -57,7 +62,7 @@ class ParseWorkerProcess:
             folder: Where to write ``result.json`` and ``outcome.json``, or ``failure.txt``.
         """
         started = time.perf_counter()
-        parsed = self._pipeline().parse(source)
+        parsed = self._pipeline(self._max_pages).parse(source)
         if parsed.is_err:
             (folder / WorkerFile.FAILURE).write_text(parsed.unwrap_err().value, encoding="utf-8")
             return
@@ -69,9 +74,9 @@ class ParseWorkerProcess:
         resource.setrlimit(resource.RLIMIT_CPU, (cpu_seconds, cpu_seconds))
 
     @staticmethod
-    def _pipeline() -> ParsePipeline:
+    def _pipeline(max_pages: int | None) -> ParsePipeline:
         detector = MagicTypeDetector(TextEncodingDetector(), ZipContentInspector())
-        return ParsePipeline(detector, ExtractorRegistry.default())
+        return ParsePipeline(detector, ExtractorRegistry.default(max_pages))
 
     @staticmethod
     def _write(document: ParsedDocument, folder: Path, started: float) -> None:

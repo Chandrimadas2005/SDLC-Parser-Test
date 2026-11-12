@@ -90,7 +90,7 @@ class ServiceContainer:
         services = JobServices(self.repository, self.store, self.queue, self.clock)
         limits = self.settings.limits
         runner = IsolatedParseRunner(
-            WorkerLimits(limits.job_timeout_seconds, limits.job_memory_limit_mb)
+            WorkerLimits(limits.job_timeout_seconds, limits.job_memory_limit_mb, limits.max_pages)
         )
         parser = IsolatedDocumentParser(self.settings.artifact_root, runner)
         return ProcessNextJob(services, parser, ArtifactKeys())
