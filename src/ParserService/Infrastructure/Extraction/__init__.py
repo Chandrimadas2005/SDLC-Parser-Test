@@ -30,6 +30,7 @@ from ParserService.Infrastructure.Extraction.PptxPart import PptxPart
 from ParserService.Infrastructure.Extraction.PptxReader import PptxReader
 from ParserService.Infrastructure.Extraction.PptxSlide import PptxSlide
 from ParserService.Infrastructure.Extraction.PptxSlideReader import PptxSlideReader
+from ParserService.Infrastructure.Extraction.RepairingExtractor import RepairingExtractor
 from ParserService.Infrastructure.Extraction.SlideBlock import SlideBlock
 from ParserService.Infrastructure.Extraction.SlideTag import SlideTag
 from ParserService.Infrastructure.Extraction.SpreadsheetTableBuilder import SpreadsheetTableBuilder
@@ -43,6 +44,7 @@ from ParserService.Infrastructure.Extraction.XlsExtractor import XlsExtractor
 from ParserService.Infrastructure.Extraction.XlsPropertyReader import XlsPropertyReader
 from ParserService.Infrastructure.Extraction.XlsxExtractor import XlsxExtractor
 from ParserService.Infrastructure.Extraction.XlsxPropertyReader import XlsxPropertyReader
+from ParserService.Infrastructure.Extraction.ZipSalvager import ZipSalvager
 
 __all__ = [
     "ConvertingExtractor",
@@ -75,6 +77,7 @@ __all__ = [
     "PptxReader",
     "PptxSlide",
     "PptxSlideReader",
+    "RepairingExtractor",
     "SlideBlock",
     "SlideTag",
     "SpreadsheetTableBuilder",
@@ -88,4 +91,5 @@ __all__ = [
     "XlsPropertyReader",
     "XlsxExtractor",
     "XlsxPropertyReader",
+    "ZipSalvager",
 ]
