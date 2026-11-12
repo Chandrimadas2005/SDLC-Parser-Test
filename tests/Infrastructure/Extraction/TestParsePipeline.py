@@ -23,6 +23,7 @@ from ParserService.Infrastructure.Extraction import (
     ExtractorRegistry,
     LibreOfficeConverter,
     ParsePipeline,
+    TesseractOcr,
 )
 from ParserService.Infrastructure.Output import ParsedDocumentJsonEncoder
 
@@ -133,9 +134,12 @@ class TestParsePipeline:
         DetectedType.PPT,
     )
 
+    IMAGES: Final = (DetectedType.PNG, DetectedType.JPEG, DetectedType.TIFF)
+
     def test_registry_lists_supported_types_in_priority_order(self) -> None:
-        office = LibreOfficeConverter.available() is not None
-        expected = self.NATIVE + self.CONVERTED if office else self.NATIVE
+        office = self.CONVERTED if LibreOfficeConverter.available() else ()
+        images = self.IMAGES if TesseractOcr.available() else ()
+        expected = tuple(kind for kind in DetectedType if kind in self.NATIVE + office + images)
 
         assert ExtractorRegistry.default().supported_types == expected
 

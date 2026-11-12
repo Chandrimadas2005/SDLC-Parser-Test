@@ -11,11 +11,12 @@ RUN uv sync --locked --no-dev --no-editable
 
 FROM python:3.12-slim-bookworm AS runtime
 # libmagic is needed by python-magic for content-based type detection (Phase 0, track B).
-# Headless LibreOffice converts DOC, RTF, ODT, ODS and PPT; it always runs as its own process.
+# Headless LibreOffice converts DOC, RTF, ODT, ODS and PPT; Tesseract reads images.
+# Both always run as their own process.
 RUN apt-get update \
     && apt-get install -y --no-install-recommends libmagic1 \
         libreoffice-writer-nogui libreoffice-calc-nogui libreoffice-impress-nogui \
-        fonts-dejavu-core \
+        fonts-dejavu-core tesseract-ocr tesseract-ocr-eng \
     && rm -rf /var/lib/apt/lists/* \
     && groupadd --system parser && useradd --system --gid parser --home /app parser
 WORKDIR /app

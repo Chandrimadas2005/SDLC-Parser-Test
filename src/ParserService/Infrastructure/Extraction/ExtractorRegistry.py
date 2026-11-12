@@ -11,6 +11,7 @@ from ParserService.Infrastructure.Extraction.DocxDocumentAssembler import DocxDo
 from ParserService.Infrastructure.Extraction.DocxExtractor import DocxExtractor
 from ParserService.Infrastructure.Extraction.DocxReader import DocxReader
 from ParserService.Infrastructure.Extraction.DocxStyleReader import DocxStyleReader
+from ParserService.Infrastructure.Extraction.ImageExtractor import ImageExtractor
 from ParserService.Infrastructure.Extraction.LibreOfficeConverter import LibreOfficeConverter
 from ParserService.Infrastructure.Extraction.MarkdownBlockReader import MarkdownBlockReader
 from ParserService.Infrastructure.Extraction.MarkdownExtractor import MarkdownExtractor
@@ -25,6 +26,7 @@ from ParserService.Infrastructure.Extraction.PptxReader import PptxReader
 from ParserService.Infrastructure.Extraction.PptxSlideReader import PptxSlideReader
 from ParserService.Infrastructure.Extraction.RepairingExtractor import RepairingExtractor
 from ParserService.Infrastructure.Extraction.SpreadsheetTableBuilder import SpreadsheetTableBuilder
+from ParserService.Infrastructure.Extraction.TesseractOcr import TesseractOcr
 from ParserService.Infrastructure.Extraction.TextDocumentBuilder import TextDocumentBuilder
 from ParserService.Infrastructure.Extraction.TextFileReader import TextFileReader
 from ParserService.Infrastructure.Extraction.TextTableBuilder import TextTableBuilder
@@ -53,12 +55,14 @@ class ExtractorRegistry:
 
         Returns:
             A registry for every format implemented so far. DOC, RTF, ODT, ODS and PPT are
-            included only when LibreOffice is installed.
+            included only when LibreOffice is installed, and PNG, JPEG and TIFF only when
+            Tesseract is.
         """
         extractors = cls._repairing(
             {**cls._document_extractors(max_pages), **cls._spreadsheet_extractors()}
         )
-        return cls(extractors | cls._converted(extractors, LibreOfficeConverter.available()))
+        converted = cls._converted(extractors, LibreOfficeConverter.available())
+        return cls(extractors | converted | cls._images(TesseractOcr.available()))
 
     @staticmethod
     def _document_extractors(max_pages: int | None) -> dict[DetectedType, Extractor]:
@@ -94,6 +98,13 @@ class ExtractorRegistry:
         salvager = ZipSalvager()
         repaired = {kind: RepairingExtractor(extractors[kind], salvager) for kind in office}
         return extractors | repaired
+
+    @staticmethod
+    def _images(ocr: TesseractOcr | None) -> dict[DetectedType, Extractor]:
+        if ocr is None:
+            return {}
+        images = ImageExtractor(ocr, PlainTextBlockSplitter())
+        return {DetectedType.PNG: images, DetectedType.JPEG: images, DetectedType.TIFF: images}
 
     @staticmethod
     def _converted(

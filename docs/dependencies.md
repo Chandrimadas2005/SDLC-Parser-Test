@@ -111,4 +111,5 @@ image:
 |---|---|---|---|
 | libmagic1 | Debian bookworm | BSD-2-Clause | Content-based type detection (python-magic, track B) |
 | libreoffice-writer-nogui, libreoffice-calc-nogui, libreoffice-impress-nogui | Debian bookworm | MPL-2.0 | Converts DOC, RTF, ODT, ODS and PPT; run as a separate process |
+| tesseract-ocr, tesseract-ocr-eng | Debian bookworm | Apache-2.0 | OCR for PNG, JPEG and TIFF images; run as a separate process |
 | fonts-dejavu-core | Debian bookworm | Bitstream Vera / public domain | Fonts LibreOffice needs to lay out documents |

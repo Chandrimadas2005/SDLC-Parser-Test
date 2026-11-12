@@ -13,9 +13,11 @@ from ParserService.Infrastructure.Extraction.DocxReader import DocxReader
 from ParserService.Infrastructure.Extraction.DocxStyleReader import DocxStyleReader
 from ParserService.Infrastructure.Extraction.DocxTable import DocxTable
 from ParserService.Infrastructure.Extraction.ExtractorRegistry import ExtractorRegistry
+from ParserService.Infrastructure.Extraction.ImageExtractor import ImageExtractor
 from ParserService.Infrastructure.Extraction.LibreOfficeConverter import LibreOfficeConverter
 from ParserService.Infrastructure.Extraction.MarkdownBlockReader import MarkdownBlockReader
 from ParserService.Infrastructure.Extraction.MarkdownExtractor import MarkdownExtractor
+from ParserService.Infrastructure.Extraction.OcrText import OcrText
 from ParserService.Infrastructure.Extraction.ParsePipeline import ParsePipeline
 from ParserService.Infrastructure.Extraction.PdfContent import PdfContent
 from ParserService.Infrastructure.Extraction.PdfDocumentAssembler import PdfDocumentAssembler
@@ -34,6 +36,7 @@ from ParserService.Infrastructure.Extraction.RepairingExtractor import Repairing
 from ParserService.Infrastructure.Extraction.SlideBlock import SlideBlock
 from ParserService.Infrastructure.Extraction.SlideTag import SlideTag
 from ParserService.Infrastructure.Extraction.SpreadsheetTableBuilder import SpreadsheetTableBuilder
+from ParserService.Infrastructure.Extraction.TesseractOcr import TesseractOcr
 from ParserService.Infrastructure.Extraction.TextBlock import TextBlock
 from ParserService.Infrastructure.Extraction.TextDocumentBuilder import TextDocumentBuilder
 from ParserService.Infrastructure.Extraction.TextFileReader import TextFileReader
@@ -60,9 +63,11 @@ __all__ = [
     "DocxStyleReader",
     "DocxTable",
     "ExtractorRegistry",
+    "ImageExtractor",
     "LibreOfficeConverter",
     "MarkdownBlockReader",
     "MarkdownExtractor",
+    "OcrText",
     "ParsePipeline",
     "PdfContent",
     "PdfDocumentAssembler",
@@ -81,6 +86,7 @@ __all__ = [
     "SlideBlock",
     "SlideTag",
     "SpreadsheetTableBuilder",
+    "TesseractOcr",
     "TextBlock",
     "TextDocumentBuilder",
     "TextFileReader",
