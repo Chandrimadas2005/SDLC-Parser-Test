@@ -52,6 +52,17 @@ class TestParseJobResultEndpoints:
         services.repository.update(completed)
         assert use_case.execute(job_id).unwrap() == b'{"status":"succeeded"}'
 
+    def test_get_result_of_failed_job_reports_job_failed(self) -> None:
+        services, _, job_id = self._setup()
+        job = services.repository.get(job_id)
+        assert job is not None
+        failed = job.start(Instant(11_000)).fail(FailureReason.CORRUPTED_FILE, Instant(12_000))
+        services.repository.update(failed)
+
+        result = GetParseJobResult(services.repository, services.store).execute(job_id)
+
+        assert result.unwrap_err() is ApplicationErrorCode.JOB_FAILED
+
     def test_retry_requeues_only_failed_jobs(self) -> None:
         services, _, job_id = self._setup()
         use_case = RetryParseJob(services)

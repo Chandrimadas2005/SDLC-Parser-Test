@@ -27,6 +27,7 @@ from ParserService.Infrastructure.Extraction.Html.HtmlImageReader import HtmlIma
 from ParserService.Infrastructure.Extraction.Html.HtmlMetadataReader import HtmlMetadataReader
 from ParserService.Infrastructure.Extraction.Html.HtmlTableReader import HtmlTableReader
 from ParserService.Infrastructure.Extraction.ImageExtractor import ImageExtractor
+from ParserService.Infrastructure.Extraction.JsonExtractor import JsonExtractor
 from ParserService.Infrastructure.Extraction.LibreOfficeConverter import LibreOfficeConverter
 from ParserService.Infrastructure.Extraction.MailAssembler import MailAssembler
 from ParserService.Infrastructure.Extraction.MailExtractor import MailExtractor
@@ -52,6 +53,7 @@ from ParserService.Infrastructure.Extraction.PptxReader import PptxReader
 from ParserService.Infrastructure.Extraction.PptxSlideReader import PptxSlideReader
 from ParserService.Infrastructure.Extraction.RepairingExtractor import RepairingExtractor
 from ParserService.Infrastructure.Extraction.SpreadsheetTableBuilder import SpreadsheetTableBuilder
+from ParserService.Infrastructure.Extraction.StructuredDataBuilder import StructuredDataBuilder
 from ParserService.Infrastructure.Extraction.TesseractOcr import TesseractOcr
 from ParserService.Infrastructure.Extraction.TextDocumentBuilder import TextDocumentBuilder
 from ParserService.Infrastructure.Extraction.TextFileReader import TextFileReader
@@ -59,6 +61,8 @@ from ParserService.Infrastructure.Extraction.TextTableBuilder import TextTableBu
 from ParserService.Infrastructure.Extraction.TsvExtractor import TsvExtractor
 from ParserService.Infrastructure.Extraction.XlsExtractor import XlsExtractor
 from ParserService.Infrastructure.Extraction.XlsxExtractor import XlsxExtractor
+from ParserService.Infrastructure.Extraction.XmlExtractor import XmlExtractor
+from ParserService.Infrastructure.Extraction.YamlExtractor import YamlExtractor
 from ParserService.Infrastructure.Extraction.ZipArchiveExtractor import ZipArchiveExtractor
 from ParserService.Infrastructure.Extraction.ZipArchiveGuard import ZipArchiveGuard
 from ParserService.Infrastructure.Extraction.ZipSalvager import ZipSalvager
@@ -98,17 +102,18 @@ class ExtractorRegistry:
             be retried through conversion), and PNG, JPEG and TIFF only when Tesseract
             is. HTML and ODS are read natively.
         """
-        context = context or ExtractionContext()
+        context, limits = context or ExtractionContext(), limits or Limits()
         extractors = cls._repairing(
             {
                 **cls._document_extractors(max_pages, context.password),
                 **cls._spreadsheet_extractors(),
+                **cls._structured_extractors(limits),
             }
         )
         converted = cls._converted(extractors, LibreOfficeConverter.available())
-        native = cls._native(limits or Limits(), converted.get(DetectedType.ODS))
+        native = cls._native(limits, converted.get(DetectedType.ODS))
         images = cls._images(TesseractOcr.available())
-        containers = cls._containers(context.archive_depth, limits or Limits())
+        containers = cls._containers(context.archive_depth, limits)
         return cls(extractors | converted | native | images | containers)
 
     @classmethod
@@ -148,6 +153,15 @@ class ExtractorRegistry:
             ),
             DetectedType.TXT: PlainTextExtractor(reader, splitter, builder),
             DetectedType.MD: MarkdownExtractor(reader, MarkdownBlockReader(), builder),
+        }
+
+    @staticmethod
+    def _structured_extractors(limits: Limits) -> dict[DetectedType, Extractor]:
+        reader, builder = TextFileReader(), StructuredDataBuilder(limits)
+        return {
+            DetectedType.JSON: JsonExtractor(reader, builder),
+            DetectedType.YAML: YamlExtractor(reader, builder),
+            DetectedType.XML: XmlExtractor(reader, builder),
         }
 
     @staticmethod

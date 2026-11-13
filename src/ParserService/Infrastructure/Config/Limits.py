@@ -22,6 +22,8 @@ class Limits:
     DEFAULT_RETENTION_DAYS: ClassVar[int] = 30
     DEFAULT_MIN_FREE_DISK_BYTES: ClassVar[int] = 2 * 1024 * 1024 * 1024
     DEFAULT_MAX_BATCH_FILES: ClassVar[int] = 20
+    DEFAULT_STRUCTURED_MAX_DEPTH: ClassVar[int] = 32
+    DEFAULT_STRUCTURED_MAX_NODES: ClassVar[int] = 100_000
 
     max_file_size_bytes: int = DEFAULT_MAX_FILE_SIZE_BYTES
     max_pages: int = DEFAULT_MAX_PAGES
@@ -35,6 +37,8 @@ class Limits:
     retention_days: int = DEFAULT_RETENTION_DAYS
     min_free_disk_bytes: int = DEFAULT_MIN_FREE_DISK_BYTES
     max_batch_files: int = DEFAULT_MAX_BATCH_FILES
+    structured_max_depth: int = DEFAULT_STRUCTURED_MAX_DEPTH
+    structured_max_nodes: int = DEFAULT_STRUCTURED_MAX_NODES
 
     def __post_init__(self) -> None:
         for name in self.__slots__:

@@ -1,0 +1,1 @@
+<root><message>xml despite txt</message></root>

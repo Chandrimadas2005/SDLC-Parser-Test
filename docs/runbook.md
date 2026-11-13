@@ -46,7 +46,8 @@ All are environment variables; blank or unset means the default.
 | `PARSER_MAX_BATCH_FILES` | 20 | Files in one upload; above it `413 batch_too_large` |
 | `PARSER_MIN_FREE_DISK_BYTES` | 2 GB | Below it uploads get `503 disk_full` |
 | `PARSER_RETENTION_DAYS` | 30 | Older files, results and jobs are deleted |
-| `PARSER_ARCHIVE_MAX_DEPTH`, `_MAX_FILES`, `_MAX_EXPANDED_BYTES` | 3, 1,000, 1 GB | ZIP nesting and size (worker uses the defaults for now) |
+| `PARSER_ARCHIVE_MAX_DEPTH`, `_MAX_FILES`, `_MAX_EXPANDED_BYTES` | 3, 1,000, 1 GB | ZIP nesting and size |
+| `PARSER_STRUCTURED_MAX_DEPTH`, `PARSER_STRUCTURED_MAX_NODES` | 32, 100,000 | JSON, YAML and XML nesting depth and value count; above them `limit_exceeded` |
 
 ## Scaling
 

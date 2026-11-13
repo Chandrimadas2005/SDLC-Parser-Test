@@ -13,9 +13,11 @@ repos:
         args: [--maxkb=1024]
       - id: check-merge-conflict
       - id: check-toml
+      # Corpus files are test inputs (some binary, some deliberately malformed): never
+      # validate or rewrite them.
       - id: check-yaml
+        exclude: ^tests/corpus/
       - id: detect-private-key
-      # Corpus files are test inputs (some binary, some deliberately malformed): never rewrite them.
       - id: end-of-file-fixer
         exclude: ^tests/corpus/
       - id: mixed-line-ending

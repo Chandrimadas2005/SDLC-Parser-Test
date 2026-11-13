@@ -1,0 +1,1 @@
+<?xml version="1.0"?><root><title>Synthetic records</title><active>true</active><records><record><id>1</id><name>Ada</name></record><record><id>2</id><name>Grace</name></record></records><metadata><source>fixture</source><count>2</count></metadata><tags><tag>one</tag><tag>two</tag></tags></root>

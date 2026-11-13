@@ -61,6 +61,8 @@ class Settings:
         "retention_days": EnvironmentVariable.RETENTION_DAYS,
         "min_free_disk_bytes": EnvironmentVariable.MIN_FREE_DISK_BYTES,
         "max_batch_files": EnvironmentVariable.MAX_BATCH_FILES,
+        "structured_max_depth": EnvironmentVariable.STRUCTURED_MAX_DEPTH,
+        "structured_max_nodes": EnvironmentVariable.STRUCTURED_MAX_NODES,
     }
 
     @classmethod

@@ -56,6 +56,15 @@ class TestPostmanCollection:
         assert variables == {"baseUrl", "jobId", "batchId"}
         assert all(url.startswith(BASE_URL) for _, url in self._requests())
 
+    def test_every_api_operation_has_openapi_summary_and_description(self, tmp_path: Path) -> None:
+        with self._client(tmp_path) as client:
+            paths = client.get("/openapi.json").json()["paths"]
+
+        for operations in paths.values():
+            for operation in operations.values():
+                assert operation.get("summary")
+                assert operation.get("description")
+
     def test_every_request_answers_as_the_collection_expects(self, tmp_path: Path) -> None:
         with self._client(tmp_path) as client:
             submitted = client.post("/v1/parse-jobs", files={"file": ("a.txt", b"Synthetic.\n")})

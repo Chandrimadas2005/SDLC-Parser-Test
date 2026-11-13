@@ -19,6 +19,7 @@ dependencies = [
   "pypdfium2>=5.15,<6",
   "python-magic>=0.4.27,<0.5",
   "python-multipart>=0.0.20,<1",
+  "pyyaml>=6.0,<7",
   "sqlalchemy>=2.0.36,<3",
   "structlog>=24.4,<26",
   "uvicorn>=0.32,<1",
@@ -110,7 +111,7 @@ explicit_package_bases = true
 
 [[tool.mypy.overrides]]
 # pypdfium2 and xlrd ship no type information; the extractors wrap them in typed classes.
-module = ["pypdfium2", "pypdfium2.*", "xlrd", "xlrd.*", "olefile", "olefile.*"]
+module = ["pypdfium2", "pypdfium2.*", "xlrd", "xlrd.*", "olefile", "olefile.*", "yaml"]
 ignore_missing_imports = true
 
 # ---------------------------------------------------------------- pytest

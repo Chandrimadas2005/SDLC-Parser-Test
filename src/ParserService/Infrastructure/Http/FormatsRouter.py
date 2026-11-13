@@ -12,7 +12,12 @@ class FormatsRouter:
         self._parser_version = parser_version
         self.router = APIRouter(prefix="/v1")
         self.router.add_api_route(
-            "/formats", self.formats, methods=["GET"], response_model=ParserFormatResponse
+            "/formats",
+            self.formats,
+            methods=["GET"],
+            response_model=ParserFormatResponse,
+            summary="List supported formats",
+            description="Returns registered file formats and parser version.",
         )
 
     async def formats(self) -> ParserFormatResponse:

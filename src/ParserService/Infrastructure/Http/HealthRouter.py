@@ -20,8 +20,20 @@ class HealthRouter:
     def __init__(self, readiness: ReadinessCheck) -> None:
         self._readiness = readiness
         self.router = APIRouter(prefix=self.PREFIX)
-        self.router.add_api_route("/live", self.live, methods=["GET"])
-        self.router.add_api_route("/ready", self.ready, methods=["GET"])
+        self.router.add_api_route(
+            "/live",
+            self.live,
+            methods=["GET"],
+            summary="Liveness check",
+            description="Returns 200 when the API process is serving requests.",
+        )
+        self.router.add_api_route(
+            "/ready",
+            self.ready,
+            methods=["GET"],
+            summary="Readiness check",
+            description="Returns 200 when dependencies and disk are ready, otherwise 503.",
+        )
 
     async def live(self) -> JSONResponse:
         """Answer as soon as the process serves requests.

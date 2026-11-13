@@ -1,0 +1,10 @@
+{
+  "title": "Synthetic records",
+  "active": true,
+  "records": [
+    {"id": 1, "name": "Ada"},
+    {"id": 2, "name": "Grace"}
+  ],
+  "metadata": {"source": "fixture", "count": 2},
+  "tags": ["one", "two"]
+}

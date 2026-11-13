@@ -146,15 +146,23 @@ then deleted. A file that already failed as `password_protected` is parsed again
 it is uploaded with a password. PDFs are supported; encrypted Office files still fail
 as `password_protected` (open point).
 
+## JSON, YAML and XML
+
+Each top-level key becomes a heading; nested values become paragraphs named by their
+path (`metadata.count: 2`), and lists of objects with the same keys become tables. XML
+attributes appear as `@name` and mixed text as `#text`. Hostile XML (DTD entities,
+external references) and input deeper or larger than `PARSER_STRUCTURED_MAX_DEPTH` /
+`PARSER_STRUCTURED_MAX_NODES` fail with `limit_exceeded`. Details:
+[docs/structured-data-extraction.md](docs/structured-data-extraction.md).
+
 ## Archives and e-mails
 
 ZIP archives, EML and MSG e-mails are containers: every file inside (archive entries,
 the message body, attachments) is parsed like an upload and appears under its own
 level-1 heading, in order. Archive limits are checked from the table of contents
 before anything is decompressed (at most 1,000 files, 1 GB expanded and 3 levels of
-nesting); above them the file fails with `limit_exceeded`. The isolated worker uses
-these defaults for now; passing the `PARSER_ARCHIVE_*` settings into it is an open
-point. Entry names are never used as paths, so
+nesting); above them the file fails with `limit_exceeded`. The `PARSER_ARCHIVE_*`
+settings change these limits, in the API process and in the isolated worker. Entry names are never used as paths, so
 "zip slip" names are harmless. A part that cannot be parsed adds `element_skipped`
 and makes the result `partial`. E-mail headers (subject, from, to, date) go into the
 file properties.

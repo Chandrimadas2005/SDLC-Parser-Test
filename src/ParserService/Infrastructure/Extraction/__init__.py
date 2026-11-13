@@ -21,6 +21,7 @@ from ParserService.Infrastructure.Extraction.ExtractionContext import Extraction
 from ParserService.Infrastructure.Extraction.ExtractorRegistry import ExtractorRegistry
 from ParserService.Infrastructure.Extraction.HtmlText import HtmlText
 from ParserService.Infrastructure.Extraction.ImageExtractor import ImageExtractor
+from ParserService.Infrastructure.Extraction.JsonExtractor import JsonExtractor
 from ParserService.Infrastructure.Extraction.LibreOfficeConverter import LibreOfficeConverter
 from ParserService.Infrastructure.Extraction.MailAssembler import MailAssembler
 from ParserService.Infrastructure.Extraction.MailContent import MailContent
@@ -51,6 +52,8 @@ from ParserService.Infrastructure.Extraction.RepairingExtractor import Repairing
 from ParserService.Infrastructure.Extraction.SlideBlock import SlideBlock
 from ParserService.Infrastructure.Extraction.SlideTag import SlideTag
 from ParserService.Infrastructure.Extraction.SpreadsheetTableBuilder import SpreadsheetTableBuilder
+from ParserService.Infrastructure.Extraction.StructuredDataBuilder import StructuredDataBuilder
+from ParserService.Infrastructure.Extraction.StructuredField import StructuredField
 from ParserService.Infrastructure.Extraction.TesseractOcr import TesseractOcr
 from ParserService.Infrastructure.Extraction.TextBlock import TextBlock
 from ParserService.Infrastructure.Extraction.TextDocumentBuilder import TextDocumentBuilder
@@ -62,6 +65,8 @@ from ParserService.Infrastructure.Extraction.XlsExtractor import XlsExtractor
 from ParserService.Infrastructure.Extraction.XlsPropertyReader import XlsPropertyReader
 from ParserService.Infrastructure.Extraction.XlsxExtractor import XlsxExtractor
 from ParserService.Infrastructure.Extraction.XlsxPropertyReader import XlsxPropertyReader
+from ParserService.Infrastructure.Extraction.XmlExtractor import XmlExtractor
+from ParserService.Infrastructure.Extraction.YamlExtractor import YamlExtractor
 from ParserService.Infrastructure.Extraction.ZipArchiveExtractor import ZipArchiveExtractor
 from ParserService.Infrastructure.Extraction.ZipArchiveGuard import ZipArchiveGuard
 from ParserService.Infrastructure.Extraction.ZipSalvager import ZipSalvager
@@ -88,6 +93,7 @@ __all__ = [
     "ExtractorRegistry",
     "HtmlText",
     "ImageExtractor",
+    "JsonExtractor",
     "LibreOfficeConverter",
     "MailAssembler",
     "MailContent",
@@ -118,6 +124,8 @@ __all__ = [
     "SlideBlock",
     "SlideTag",
     "SpreadsheetTableBuilder",
+    "StructuredDataBuilder",
+    "StructuredField",
     "TesseractOcr",
     "TextBlock",
     "TextDocumentBuilder",
@@ -129,6 +137,8 @@ __all__ = [
     "XlsPropertyReader",
     "XlsxExtractor",
     "XlsxPropertyReader",
+    "XmlExtractor",
+    "YamlExtractor",
     "ZipArchiveExtractor",
     "ZipArchiveGuard",
     "ZipSalvager",
