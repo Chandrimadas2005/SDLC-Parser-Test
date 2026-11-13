@@ -2,7 +2,7 @@ from http import HTTPStatus
 from typing import Annotated, Final
 
 import structlog
-from fastapi import APIRouter, File, Request, UploadFile
+from fastapi import APIRouter, File, Query, Request, UploadFile
 from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import JSONResponse, Response
 
@@ -13,6 +13,7 @@ from ParserService.Domain.Jobs.FileName import FileName
 from ParserService.Domain.Jobs.JobId import JobId
 from ParserService.Infrastructure.Http.ApiDependencies import ApiDependencies
 from ParserService.Infrastructure.Http.ApiError import ApiError
+from ParserService.Infrastructure.Http.BatchResponse import BatchResponse
 from ParserService.Infrastructure.Http.HttpHeader import HttpHeader
 from ParserService.Infrastructure.Http.ParseJobStatusResponse import ParseJobStatusResponse
 from ParserService.Infrastructure.Http.ParseJobSubmittedResponse import ParseJobSubmittedResponse
@@ -37,6 +38,7 @@ class ParseJobsRouter:
         self._status = dependencies.get_parse_job_status
         self._metrics = dependencies.metrics
         self._markdown = ParsedDocumentMarkdownRenderer()
+        self._batches = BatchResponse()
         self._log = structlog.get_logger(__name__)
         self.router = APIRouter(prefix=self.PREFIX)
         self._register_routes()
@@ -50,8 +52,14 @@ class ParseJobsRouter:
             response_model=ParseJobSubmittedResponse,
         )
         self.router.add_api_route(
+            "", self.failed_jobs, methods=["GET"], response_model=list[ParseJobStatusResponse]
+        )
+        self.router.add_api_route(
             "/{job_id}", self.job_status, methods=["GET"], response_model=ParseJobStatusResponse
         )
+        self._register_result_routes()
+
+    def _register_result_routes(self) -> None:
         self.router.add_api_route("/{job_id}/result", self.result_json, methods=["GET"])
         self.router.add_api_route("/{job_id}/result.md", self.result_markdown, methods=["GET"])
         self.router.add_api_route("/{job_id}/retry", self.retry_job, methods=["POST"])
@@ -60,22 +68,28 @@ class ParseJobsRouter:
         )
 
     async def submit_job(
-        self, request: Request, file: Annotated[UploadFile, File()]
+        self, request: Request, file: Annotated[list[UploadFile], File()]
     ) -> JSONResponse:
-        """Accept a file and answer ``202`` with the job to poll.
+        """Accept one or more files and answer ``202``.
+
+        One file gives a job to poll. Several files in the same ``file`` field give a
+        batch: one job per file, parsed in parallel, with a combined result at
+        ``/v1/parse-batches/{batch_id}/result``.
 
         Args:
             request: The incoming request, used to build the ``Location`` header.
-            file: The uploaded file (multipart field ``file``).
+            file: The uploaded file or files (multipart field ``file``).
 
         Returns:
             The submission response.
 
         Raises:
-            ApiError: ``FILE_TOO_LARGE``, ``QUEUE_FULL``, ``STORAGE_UNAVAILABLE`` or
-                ``INVALID_REQUEST``.
+            ApiError: ``FILE_TOO_LARGE``, ``BATCH_TOO_LARGE``, ``QUEUE_FULL``,
+                ``STORAGE_UNAVAILABLE`` or ``INVALID_REQUEST``.
         """
-        command = SubmitParseJobCommand(self._file_name(file), await file.read())
+        if len(file) > 1:
+            return await self._submit_batch(request, file)
+        command = SubmitParseJobCommand(self._file_name(file[0]), await file[0].read())
         result = await run_in_threadpool(self._submit.execute, command)
         if result.is_err:
             self._metrics.record_submission(result.unwrap_err().value)
@@ -84,6 +98,17 @@ class ParseJobsRouter:
         self._record(submitted, len(command.content))
         location = str(request.url_for(self.job_status.__name__, job_id=submitted.job_id.value))
         body = ParseJobSubmittedResponse.of(submitted).model_dump(mode="json")
+        headers = {HttpHeader.LOCATION.value: location}
+        return JSONResponse(body, status_code=HTTPStatus.ACCEPTED, headers=headers)
+
+    async def _submit_batch(self, request: Request, files: list[UploadFile]) -> JSONResponse:
+        commands = [SubmitParseJobCommand(self._file_name(f), await f.read()) for f in files]
+        result = await run_in_threadpool(self._dependencies.submit_parse_batch.execute, commands)
+        if result.is_err:
+            raise self._submission_error(result.unwrap_err())
+        batch = result.unwrap()
+        location = f"{request.base_url}v1/parse-batches/{batch.batch_id.value}"
+        body = self._batches.submitted(batch)
         headers = {HttpHeader.LOCATION.value: location}
         return JSONResponse(body, status_code=HTTPStatus.ACCEPTED, headers=headers)
 
@@ -98,6 +123,15 @@ class ParseJobsRouter:
                 LogField.STATUS: outcome,
             },
         )
+
+    async def failed_jobs(
+        self, status: str = Query(default="failed")
+    ) -> list[ParseJobStatusResponse]:
+        """List persisted failed jobs when status=failed is requested."""
+        if status != "failed":
+            raise ApiError(ApplicationErrorCode.INVALID_REQUEST)
+        views = await run_in_threadpool(self._dependencies.get_failed_parse_jobs.execute)
+        return [ParseJobStatusResponse.of(view) for view in views]
 
     async def job_status(self, job_id: str) -> ParseJobStatusResponse:
         """Report the status and failure reason of a job.

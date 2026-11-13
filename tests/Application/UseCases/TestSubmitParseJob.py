@@ -4,6 +4,7 @@ from ParserService.Application.Dto import SubmitParseJobCommand
 from ParserService.Application.Errors import ApplicationErrorCode
 from ParserService.Application.UseCases import (
     ArtifactKeys,
+    DiskGuard,
     JobServices,
     SubmitParseJob,
     SubmitPolicy,
@@ -45,6 +46,19 @@ class _Harness:
         return cls(repository, store, queue, use_case)
 
 
+class _DiskFull:
+    def has_room(self) -> bool:
+        return False
+
+
+class _Cleaner:
+    def __init__(self) -> None:
+        self.cleaned = False
+
+    def clean(self) -> None:
+        self.cleaned = True
+
+
 class TestSubmitParseJob:
     """Submission stores the file, records the job, queues it, and is safe to repeat."""
 
@@ -84,6 +98,26 @@ class TestSubmitParseJob:
         result = harness.use_case.execute(COMMAND)
 
         assert result.unwrap_err() is ApplicationErrorCode.FILE_TOO_LARGE
+        assert harness.repository.jobs == {}
+        assert harness.store.artifacts == {}
+
+    def test_low_disk_refuses_upload_and_cleans_temporary_files(self) -> None:
+        harness = _Harness.build()
+        cleaner = _Cleaner()
+        services = JobServices(
+            harness.repository,
+            harness.store,
+            harness.queue,
+            FixedClock(Instant(5_000)),
+            3,
+            DiskGuard(_DiskFull(), cleaner),
+        )
+        use_case = SubmitParseJob(services, SubmitPolicy(VERSION, 1_000), ArtifactKeys())
+
+        result = use_case.execute(COMMAND)
+
+        assert result.unwrap_err() is ApplicationErrorCode.DISK_FULL
+        assert cleaner.cleaned
         assert harness.repository.jobs == {}
         assert harness.store.artifacts == {}
 

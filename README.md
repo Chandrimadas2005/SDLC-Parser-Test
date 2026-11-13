@@ -101,3 +101,23 @@ Dependencies point inward only: `Infrastructure -> Application -> Domain`.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for the code rules, branch naming, commit format
 and the review process. Nothing is merged to the default branch without lead review.
+
+## Worker concurrency
+
+One worker process parses several files at the same time, each in its own isolated
+process. `PARSER_WORKER_CONCURRENCY` sets how many; when it is blank the worker uses
+(available memory - 512 MB) / `PARSER_JOB_MEMORY_LIMIT_MB`, between 1 and 64, so
+concurrent jobs never ask for more memory than the container has. Jobs beyond that
+wait in the queue and start by themselves when a slot frees up. For more throughput,
+run more worker containers: the queue hands each job to exactly one of them.
+
+## Several files in one upload
+
+Send two or more files in the same `file` field of `POST /v1/parse-jobs`. Each file
+becomes an ordinary job (so the duplicate rule and size limit apply per file) and the
+worker slots parse them in parallel. The answer is `202` with a `batch_id`;
+`GET /v1/parse-batches/{batch_id}` shows every file's status, and
+`GET /v1/parse-batches/{batch_id}/result` returns one combined JSON with each file's
+parsed document or failure reason (`409` until every file has finished). One file in
+a request behaves exactly as before. `PARSER_MAX_BATCH_FILES` (default 20) caps the
+files per request.

@@ -60,6 +60,8 @@ services:
       # Per-job limit stays below the container limit, so one bad file kills only its
       # own process, never the worker container.
       PARSER_JOB_MEMORY_LIMIT_MB: ${PARSER_JOB_MEMORY_LIMIT_MB:-1024}
+      # Jobs parsed at once; blank means derived from the container memory (see README).
+      PARSER_WORKER_CONCURRENCY: ${PARSER_WORKER_CONCURRENCY:-}
     volumes:
       - artifacts:/var/lib/parser/artifacts
     # No HTTP port: healthy while the worker process (PID 1) is running.

@@ -20,7 +20,8 @@ from ParserService.Infrastructure.Persistence import (
     JobRecordMapper,
     PostgresJobRepository,
 )
-from ParserService.Infrastructure.Queue import PostgresJobQueue
+from ParserService.Infrastructure.Queue import PostgresJobQueue, QueuePolicy
+from ParserService.Infrastructure.Resilience.BackoffExecutor import BackoffExecutor
 from tests.Fakes import FixedClock
 
 
@@ -42,7 +43,9 @@ class TestPostgresJobQueue:
         first, second = self._job(1), self._job(2)
         repository.add(second)
         repository.add(first)
-        queue = PostgresJobQueue(engine, FixedClock(Instant(5_000)), capacity=10)
+        queue = PostgresJobQueue(
+            engine, FixedClock(Instant(5_000)), QueuePolicy(10, BackoffExecutor())
+        )
 
         assert queue.depth() == 2
         assert queue.claim() == first.id
@@ -58,7 +61,7 @@ class TestPostgresJobQueue:
 
     def test_enqueue_accepts_until_the_capacity_is_exceeded(self, engine: Engine) -> None:
         repository = PostgresJobRepository(engine, JobRecordMapper())
-        queue = PostgresJobQueue(engine, FixedClock(Instant(1)), capacity=2)
+        queue = PostgresJobQueue(engine, FixedClock(Instant(1)), QueuePolicy(2, BackoffExecutor()))
         results = []
         for job in (self._job(index) for index in range(3)):
             repository.add(job)
@@ -71,7 +74,9 @@ class TestPostgresJobQueue:
         repository = PostgresJobRepository(engine, JobRecordMapper())
         job = self._job(7)
         repository.add(job)
-        queue = PostgresJobQueue(engine, FixedClock(Instant(2_000)), capacity=10)
+        queue = PostgresJobQueue(
+            engine, FixedClock(Instant(2_000)), QueuePolicy(10, BackoffExecutor())
+        )
         queue.claim()
         running = repository.get(job.id)
         assert running is not None
@@ -84,6 +89,6 @@ class TestPostgresJobQueue:
 
     def test_unreachable_database_is_reported(self, tmp_path: Path) -> None:
         engine = DatabaseEngineFactory().create(f"sqlite:///{tmp_path.as_posix()}")
-        queue = PostgresJobQueue(engine, FixedClock(Instant(1)), capacity=1)
+        queue = PostgresJobQueue(engine, FixedClock(Instant(1)), QueuePolicy(1, BackoffExecutor()))
 
         assert queue.enqueue(JobId.new()).unwrap_err() is JobQueueError.QUEUE_UNAVAILABLE

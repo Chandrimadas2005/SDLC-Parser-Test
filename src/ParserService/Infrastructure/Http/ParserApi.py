@@ -8,6 +8,7 @@ from ParserService.Infrastructure.Http.FormatsRouter import FormatsRouter
 from ParserService.Infrastructure.Http.HealthRouter import HealthRouter
 from ParserService.Infrastructure.Http.HttpStatusMapping import HttpStatusMapping
 from ParserService.Infrastructure.Http.MetricsRouter import MetricsRouter
+from ParserService.Infrastructure.Http.ParseBatchesRouter import ParseBatchesRouter
 from ParserService.Infrastructure.Http.ParseJobsRouter import ParseJobsRouter
 from ParserService.Infrastructure.Http.RequestIdMiddleware import RequestIdMiddleware
 
@@ -32,6 +33,7 @@ class ParserApi:
         ErrorEnvelopeHandler(HttpStatusMapping()).install(app)
         jobs = ParseJobsRouter(self._dependencies)
         app.include_router(jobs.router)
+        app.include_router(ParseBatchesRouter(self._dependencies).router)
         formats = FormatsRouter(
             self._dependencies.extractor_registry, self._dependencies.parser_version
         )

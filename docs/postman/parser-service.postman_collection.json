@@ -358,6 +358,126 @@
           ]
         }
       ]
+    },
+    {
+      "name": "Parse batches",
+      "item": [
+        {
+          "name": "Submit several files",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/parse-jobs",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "parse-jobs"
+              ]
+            },
+            "description": "Upload two or more files at once: add a file to every `file` row (one per row; add rows for more). Returns 202 with a batch ID and one job per file. Workers parse the files in parallel. The test script stores the batch ID in the `batchId` collection variable.",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": []
+                },
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": []
+                },
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"202 Accepted\", () => pm.response.to.have.status(202));",
+                  "const body = pm.response.json();",
+                  "pm.test(\"has a batch ID\", () => pm.expect(body.batch_id).to.be.a(\"string\"));",
+                  "pm.test(\"one entry per file\", () => pm.expect(body.files).to.be.an(\"array\"));",
+                  "pm.collectionVariables.set(\"batchId\", body.batch_id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Batch status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/parse-batches/{{batchId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "parse-batches",
+                "{{batchId}}"
+              ]
+            },
+            "description": "Overall status (running, succeeded, partial or failed) and every file's job status."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"200 OK\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"lists every file\", () => pm.expect(pm.response.json().files).to.be.an(\"array\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Batch result (combined)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/parse-batches/{{batchId}}/result",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "parse-batches",
+                "{{batchId}}",
+                "result"
+              ]
+            },
+            "description": "One combined JSON: for every file its parsed document (`result`) or its `failure_reason`. Returns 409 until every file has finished; run Batch status first."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"200 when every file has finished, 409 before\", () => pm.expect(pm.response.code).to.be.oneOf([200, 409]));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
     }
   ],
   "variable": [
@@ -367,6 +487,10 @@
     },
     {
       "key": "jobId",
+      "value": ""
+    },
+    {
+      "key": "batchId",
       "value": ""
     }
   ]

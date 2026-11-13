@@ -1,3 +1,5 @@
+from typing import ClassVar, Literal
+
 from sqlalchemy import func, select, update
 from sqlalchemy.engine import Connection, Engine
 from sqlalchemy.exc import OperationalError
@@ -10,63 +12,64 @@ from ParserService.Domain.Jobs.JobStatus import JobStatus
 from ParserService.Domain.Ports.Clock import Clock
 from ParserService.Infrastructure.Persistence.JobRecordMapper import JobRecordMapper
 from ParserService.Infrastructure.Persistence.JobTable import JobTable
+from ParserService.Infrastructure.Queue.QueuePolicy import QueuePolicy
 
 
 class PostgresJobQueue:
-    """JobQueue on the jobs table itself: queued rows are the queue (Phase 0 proposal).
+    """Durable queue backed by job rows; safe when several worker slots claim at once.
 
-    ``claim`` selects the oldest queued row with ``FOR UPDATE SKIP LOCKED``, so several
-    workers never take the same job, and starts the job in the same transaction. A
-    restart loses nothing: unfinished jobs are still rows and return to the queue.
+    PostgreSQL skips rows another claimer has locked (FOR UPDATE SKIP LOCKED). On top
+    of that the claim only succeeds if the row is still queued when it is updated, so
+    two claimers can never start the same job, on SQLite (local runs) as well; the
+    loser simply tries the next job.
     """
 
-    def __init__(self, engine: Engine, clock: Clock, capacity: int) -> None:
+    CLAIM_ATTEMPTS: ClassVar[int] = 20
+
+    def __init__(self, engine: Engine, clock: Clock, policy: QueuePolicy) -> None:
         self._engine = engine
         self._clock = clock
-        self._capacity = capacity
+        self._policy = policy
         self._mapper = JobRecordMapper()
         self._table = JobTable.table
 
     def enqueue(self, job_id: JobId) -> Result[JobId, JobQueueError]:
-        """Accept a job whose record is already queued, unless the queue is full.
-
-        Args:
-            job_id: The job whose record was just inserted with status ``queued``.
-
-        Returns:
-            The job identifier, or ``QUEUE_FULL`` / ``QUEUE_UNAVAILABLE``.
-        """
+        """Accept an already-persisted queued job unless the queue is full."""
         try:
-            depth = self.depth()
-        except OperationalError:
+            depth = self._policy.backoff.execute(self.depth)
+        except (OSError, OperationalError):
             return Result.err(JobQueueError.QUEUE_UNAVAILABLE)
-        if depth > self._capacity:
+        if depth > self._policy.capacity:
             return Result.err(JobQueueError.QUEUE_FULL)
         return Result.ok(job_id)
 
     def claim(self) -> JobId | None:
-        """Atomically take the oldest queued job and mark it running.
+        """Atomically take the oldest queued job and mark it running."""
+        for _ in range(self.CLAIM_ATTEMPTS):
+            claimed = self._policy.backoff.execute(self._claim)
+            if claimed is not False:
+                return claimed
+        return None
 
-        Returns:
-            The claimed job identifier, or ``None`` when nothing is queued.
-        """
+    def depth(self) -> int:
+        """Count queued job rows."""
+        statement = select(func.count()).where(self._table.c.status == JobStatus.QUEUED.value)
+        with self._engine.connect() as connection:
+            return int(connection.execute(statement).scalar_one())
+
+    def _claim(self) -> JobId | Literal[False] | None:
+        # False means another claimer won this row: the caller tries the next one.
         with self._engine.begin() as connection:
             row = connection.execute(self._next_queued()).mappings().first()
             if row is None:
                 return None
             job = self._mapper.from_row(row).start(self._clock.now())
-            self._store(connection, job.id, self._mapper.to_row(job))
-            return job.id
-
-    def depth(self) -> int:
-        """Count queued jobs.
-
-        Returns:
-            The number of rows with status ``queued``.
-        """
-        statement = select(func.count()).where(self._table.c.status == JobStatus.QUEUED.value)
-        with self._engine.connect() as connection:
-            return int(connection.execute(statement).scalar_one())
+            still_queued = (self._table.c.id == job.id.value) & (
+                self._table.c.status == JobStatus.QUEUED.value
+            )
+            update_row = update(self._table).where(still_queued).values(self._mapper.to_row(job))
+            won = connection.execute(update_row).rowcount == 1
+            return job.id if won else False
 
     def _next_queued(self) -> Executable:
         return (

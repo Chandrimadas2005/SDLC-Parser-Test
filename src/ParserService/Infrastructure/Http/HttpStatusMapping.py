@@ -10,10 +10,13 @@ class HttpStatusMapping:
 
     STATUSES: ClassVar[Mapping[ApplicationErrorCode, HTTPStatus]] = {
         ApplicationErrorCode.JOB_NOT_FOUND: HTTPStatus.NOT_FOUND,
+        ApplicationErrorCode.BATCH_NOT_FOUND: HTTPStatus.NOT_FOUND,
+        ApplicationErrorCode.BATCH_TOO_LARGE: HTTPStatus.REQUEST_ENTITY_TOO_LARGE,
         ApplicationErrorCode.RESULT_NOT_FOUND: HTTPStatus.NOT_FOUND,
         ApplicationErrorCode.RESULT_NOT_READY: HTTPStatus.CONFLICT,
         ApplicationErrorCode.RETRY_NOT_ALLOWED: HTTPStatus.CONFLICT,
         ApplicationErrorCode.FILE_TOO_LARGE: HTTPStatus.REQUEST_ENTITY_TOO_LARGE,
+        ApplicationErrorCode.DISK_FULL: HTTPStatus.SERVICE_UNAVAILABLE,
         ApplicationErrorCode.QUEUE_FULL: HTTPStatus.TOO_MANY_REQUESTS,
         ApplicationErrorCode.STORAGE_UNAVAILABLE: HTTPStatus.SERVICE_UNAVAILABLE,
         ApplicationErrorCode.INVALID_REQUEST: HTTPStatus.BAD_REQUEST,
@@ -22,10 +25,15 @@ class HttpStatusMapping:
     }
     MESSAGES: ClassVar[Mapping[ApplicationErrorCode, str]] = {
         ApplicationErrorCode.JOB_NOT_FOUND: "No parse job has this identifier.",
+        ApplicationErrorCode.BATCH_NOT_FOUND: "No batch has this identifier.",
+        ApplicationErrorCode.BATCH_TOO_LARGE: "Too many files in one upload.",
         ApplicationErrorCode.RESULT_NOT_FOUND: "The stored parse result is missing.",
         ApplicationErrorCode.RESULT_NOT_READY: "The parse result is not ready yet.",
         ApplicationErrorCode.RETRY_NOT_ALLOWED: "Only failed parse jobs can be retried.",
         ApplicationErrorCode.FILE_TOO_LARGE: "The file exceeds the configured size limit.",
+        ApplicationErrorCode.DISK_FULL: (
+            "Uploads are disabled because the artifact disk is nearly full."
+        ),
         ApplicationErrorCode.QUEUE_FULL: "The parse queue is full; retry after the given delay.",
         ApplicationErrorCode.STORAGE_UNAVAILABLE: "Storage is temporarily unavailable.",
         ApplicationErrorCode.INVALID_REQUEST: "The request is malformed.",

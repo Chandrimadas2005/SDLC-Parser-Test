@@ -1,5 +1,5 @@
 from ParserService.Domain.Errors import JobRepositoryError, Result
-from ParserService.Domain.Jobs import Job, JobId, JobKey
+from ParserService.Domain.Jobs import Instant, Job, JobId, JobKey, JobStatus
 
 
 class InMemoryJobRepository:
@@ -40,6 +40,14 @@ class InMemoryJobRepository:
             return Result.err(JobRepositoryError.NOT_FOUND)
         self.jobs[job.id] = job
         return Result.ok(job)
+
+    def list_by_status(self, status: JobStatus) -> list[Job]:
+        """List jobs in the requested state."""
+        return [job for job in self.jobs.values() if job.status is status]
+
+    def list_created_before(self, cutoff: Instant) -> list[Job]:
+        """List jobs older than the retention cutoff."""
+        return [job for job in self.jobs.values() if job.created_at < cutoff]
 
     def delete(self, job_id: JobId) -> bool:
         """Remove a job; ``True`` when one existed."""
