@@ -304,6 +304,42 @@
           ]
         },
         {
+          "name": "List failed jobs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/parse-jobs?status=failed",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "parse-jobs"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "failed"
+                }
+              ]
+            },
+            "description": "Lists persisted failed jobs and their failure reasons."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"200 OK\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"response is an array\", () => pm.expect(pm.response.json()).to.be.an(\"array\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
           "name": "Unknown job returns 404",
           "request": {
             "method": "GET",
@@ -402,6 +438,13 @@
                   "key": "file",
                   "type": "file",
                   "src": []
+                },
+                {
+                  "key": "password",
+                  "value": "",
+                  "type": "text",
+                  "disabled": true,
+                  "description": "Optional shared password for encrypted PDF files in this batch."
                 }
               ]
             }

@@ -15,7 +15,13 @@ class MetricsRouter:
     def __init__(self, metrics: ServiceMetrics) -> None:
         self._metrics = metrics
         self.router = APIRouter()
-        self.router.add_api_route(self.PATH, self.metrics, methods=["GET"])
+        self.router.add_api_route(
+            self.PATH,
+            self.metrics,
+            methods=["GET"],
+            summary="Prometheus metrics",
+            description="Returns service counters in Prometheus exposition format.",
+        )
 
     async def metrics(self) -> Response:
         """Render the registry.

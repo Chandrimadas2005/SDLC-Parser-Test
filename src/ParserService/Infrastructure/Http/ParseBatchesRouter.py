@@ -16,8 +16,20 @@ class ParseBatchesRouter:
         self._batches = dependencies.get_parse_batch
         self._responses = BatchResponse()
         self.router = APIRouter(prefix="/v1/parse-batches", tags=["parse batches"])
-        self.router.add_api_route("/{batch_id}", self.batch_status, methods=["GET"])
-        self.router.add_api_route("/{batch_id}/result", self.batch_result, methods=["GET"])
+        self.router.add_api_route(
+            "/{batch_id}",
+            self.batch_status,
+            methods=["GET"],
+            summary="Get batch status",
+            description="Returns the overall batch state and the status of every uploaded file.",
+        )
+        self.router.add_api_route(
+            "/{batch_id}/result",
+            self.batch_result,
+            methods=["GET"],
+            summary="Get combined batch result",
+            description="Each parsed document or failure reason; 409 until every file finishes.",
+        )
 
     async def batch_status(self, batch_id: str) -> JSONResponse:
         """Every file's job status and the batch's overall status.

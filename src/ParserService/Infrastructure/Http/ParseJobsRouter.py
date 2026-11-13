@@ -44,27 +44,77 @@ class ParseJobsRouter:
         self._register_routes()
 
     def _register_routes(self) -> None:
+        self._register_submission_route()
+        self._register_job_query_routes()
+        self._register_result_routes()
+
+    def _register_submission_route(self) -> None:
         self.router.add_api_route(
             "",
             self.submit_job,
             methods=["POST"],
             status_code=HTTPStatus.ACCEPTED,
             response_model=ParseJobSubmittedResponse,
+            summary="Submit one file or a multi-file batch",
+            description=(
+                "Multipart form with one or more `file` fields and optional `password`; "
+                "returns a job or batch identifier."
+            ),
+        )
+
+    def _register_job_query_routes(self) -> None:
+        self.router.add_api_route(
+            "",
+            self.failed_jobs,
+            methods=["GET"],
+            response_model=list[ParseJobStatusResponse],
+            summary="List failed parse jobs",
+            description="Returns persisted failed jobs; status must be `failed`.",
         )
         self.router.add_api_route(
-            "", self.failed_jobs, methods=["GET"], response_model=list[ParseJobStatusResponse]
+            "/{job_id}",
+            self.job_status,
+            methods=["GET"],
+            response_model=ParseJobStatusResponse,
+            summary="Get parse job status",
+            description="Returns lifecycle status, failure reason, attempts and timestamps.",
         )
-        self.router.add_api_route(
-            "/{job_id}", self.job_status, methods=["GET"], response_model=ParseJobStatusResponse
-        )
-        self._register_result_routes()
 
     def _register_result_routes(self) -> None:
-        self.router.add_api_route("/{job_id}/result", self.result_json, methods=["GET"])
-        self.router.add_api_route("/{job_id}/result.md", self.result_markdown, methods=["GET"])
-        self.router.add_api_route("/{job_id}/retry", self.retry_job, methods=["POST"])
+        self._register_result_get_routes()
+        self._register_job_action_routes()
+
+    def _register_result_get_routes(self) -> None:
         self.router.add_api_route(
-            "/{job_id}", self.delete_job, methods=["DELETE"], status_code=HTTPStatus.NO_CONTENT
+            "/{job_id}/result",
+            self.result_json,
+            methods=["GET"],
+            summary="Get JSON result",
+            description="Returns the ParsedDocument JSON; 409 while processing.",
+        )
+        self.router.add_api_route(
+            "/{job_id}/result.md",
+            self.result_markdown,
+            methods=["GET"],
+            summary="Get Markdown result",
+            description="Returns the Markdown rendering; 409 while processing.",
+        )
+
+    def _register_job_action_routes(self) -> None:
+        self.router.add_api_route(
+            "/{job_id}/retry",
+            self.retry_job,
+            methods=["POST"],
+            summary="Retry a failed job",
+            description="Requeues a failed job and returns 202; other states return 409.",
+        )
+        self.router.add_api_route(
+            "/{job_id}",
+            self.delete_job,
+            methods=["DELETE"],
+            status_code=HTTPStatus.NO_CONTENT,
+            summary="Delete a parse job",
+            description="Deletes the original file, parsed results and job record.",
         )
 
     async def submit_job(
