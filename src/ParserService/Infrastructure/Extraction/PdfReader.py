@@ -20,15 +20,23 @@ class PdfReader:
     that fails to load is reported as unreadable instead of failing the whole file.
     The page count is checked before any page is read: above ``max_pages`` the file
     is rejected with ``file_too_large`` (brief 2.5).
-    Pages without a text layer (scans) are read with OCR when it is available.
+    Pages without a text layer (scans) are read with OCR when it is available. An
+    encrypted file opens with the caller's password; without it, or with a wrong one,
+    it fails as ``password_protected``.
     Macros, scripts and embedded objects are never run: only text is read.
     """
 
     PASSWORD_ERROR: Final = 4
 
-    def __init__(self, max_pages: int | None = None, ocr: PdfPageOcr | None = None) -> None:
+    def __init__(
+        self,
+        max_pages: int | None = None,
+        ocr: PdfPageOcr | None = None,
+        password: str | None = None,
+    ) -> None:
         self._max_pages = max_pages
         self._ocr = ocr
+        self._password = password
 
     def read(self, path: Path) -> Result[PdfContent, FailureReason]:
         """Read every page and the outline.
@@ -42,7 +50,7 @@ class PdfReader:
             it has more pages than allowed.
         """
         try:
-            document = pypdfium2.PdfDocument(path)
+            document = pypdfium2.PdfDocument(path, password=self._password)
         except pypdfium2.PdfiumError as error:
             return Result.err(self._failure(error))
         if self._max_pages is not None and len(document) > self._max_pages:

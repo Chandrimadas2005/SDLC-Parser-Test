@@ -152,6 +152,13 @@
                   "key": "file",
                   "type": "file",
                   "src": []
+                },
+                {
+                  "key": "password",
+                  "type": "text",
+                  "value": "",
+                  "disabled": true,
+                  "description": "Optional: password for an encrypted file. Tick the row to send it."
                 }
               ]
             }

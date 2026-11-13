@@ -137,3 +137,11 @@ worker slots parse them in parallel. The answer is `202` with a `batch_id`;
 parsed document or failure reason (`409` until every file has finished). One file in
 a request behaves exactly as before. `PARSER_MAX_BATCH_FILES` (default 20) caps the
 files per request.
+
+## Password-protected files
+
+Send the password in the optional `password` form field of `POST /v1/parse-jobs`. It
+is kept next to the stored file only until the worker has used it, never logged, and
+then deleted. A file that already failed as `password_protected` is parsed again when
+it is uploaded with a password. PDFs are supported; encrypted Office files still fail
+as `password_protected` (open point).

@@ -6,6 +6,7 @@ from ParserService.Domain.Jobs.ArtifactPointer import ArtifactPointer
 from ParserService.Domain.Jobs.FailureReason import FailureReason
 from ParserService.Domain.Jobs.FileName import FileName
 from ParserService.Infrastructure.Isolation.IsolatedParseRunner import IsolatedParseRunner
+from ParserService.Infrastructure.Isolation.WorkerFile import WorkerFile
 
 
 class IsolatedDocumentParser:
@@ -31,7 +32,10 @@ class IsolatedDocumentParser:
         Returns:
             The outcome, or why the file could not be parsed.
         """
-        ran = self._runner.run(self._artifact_root / file_pointer.key, file_name)
+        source = self._artifact_root / file_pointer.key
+        ran = self._runner.run(source, file_name)
+        # A password is only kept until the worker has used it.
+        (source.parent / WorkerFile.UNLOCK).unlink(missing_ok=True)
         if ran.is_err:
             return Result.err(ran.unwrap_err())
         return Result.ok(ran.unwrap().outcome)

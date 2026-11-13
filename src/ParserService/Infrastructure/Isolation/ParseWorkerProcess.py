@@ -62,7 +62,8 @@ class ParseWorkerProcess:
             folder: Where to write ``result.json`` and ``outcome.json``, or ``failure.txt``.
         """
         started = time.perf_counter()
-        parsed = self._pipeline(self._max_pages).parse(source)
+        password = self._password(Path(source.location))
+        parsed = self._pipeline(self._max_pages, password).parse(source)
         if parsed.is_err:
             (folder / WorkerFile.FAILURE).write_text(parsed.unwrap_err().value, encoding="utf-8")
             return
@@ -74,9 +75,15 @@ class ParseWorkerProcess:
         resource.setrlimit(resource.RLIMIT_CPU, (cpu_seconds, cpu_seconds))
 
     @staticmethod
-    def _pipeline(max_pages: int | None) -> ParsePipeline:
+    def _password(source: Path) -> str | None:
+        secret = source.parent / WorkerFile.UNLOCK
+        return secret.read_text(encoding="utf-8") if secret.is_file() else None
+
+    @staticmethod
+    def _pipeline(max_pages: int | None, password: str | None) -> ParsePipeline:
         detector = MagicTypeDetector(TextEncodingDetector(), ZipContentInspector())
-        return ParsePipeline(detector, ExtractorRegistry.default(max_pages))
+        registry = ExtractorRegistry.default(max_pages, password=password)
+        return ParsePipeline(detector, registry)
 
     @staticmethod
     def _write(document: ParsedDocument, folder: Path, started: float) -> None:

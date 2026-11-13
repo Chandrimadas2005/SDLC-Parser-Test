@@ -16,6 +16,7 @@ class ArtifactKeys:
     FILES_PREFIX: Final = "files"
     RESULTS_PREFIX: Final = "results"
     ORIGINAL_STEM: Final = "original"
+    UNLOCK_NAME: Final = "unlock"
     FAN_OUT: Final = 2
 
     def original_file(self, file_hash: FileHash, file_name: FileName) -> ArtifactPointer:
@@ -30,6 +31,20 @@ class ArtifactKeys:
         """
         stem = f"{self.ORIGINAL_STEM}{file_name.extension}"
         return ArtifactPointer(f"{self.FILES_PREFIX}/{self._shard(file_hash)}/{stem}")
+
+    def password(self, file_hash: FileHash) -> ArtifactPointer:
+        """Where a caller's password for the file waits until the worker has used it.
+
+        It sits next to the original file, so the isolated worker finds it without
+        it ever passing through a command line, and it is removed after parsing.
+
+        Args:
+            file_hash: Digest of the uploaded bytes.
+
+        Returns:
+            The pointer of the password file.
+        """
+        return ArtifactPointer(f"{self.FILES_PREFIX}/{self._shard(file_hash)}/{self.UNLOCK_NAME}")
 
     def result_json(self, file_hash: FileHash, version: ParserVersion) -> ArtifactPointer:
         """Where the JSON ``ParsedDocument`` for a file and parser version lives.

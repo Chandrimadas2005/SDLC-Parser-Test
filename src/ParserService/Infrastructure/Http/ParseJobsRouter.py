@@ -2,7 +2,7 @@ from http import HTTPStatus
 from typing import Annotated, Final
 
 import structlog
-from fastapi import APIRouter, File, Query, Request, UploadFile
+from fastapi import APIRouter, File, Form, Query, Request, UploadFile
 from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import JSONResponse, Response
 
@@ -68,7 +68,10 @@ class ParseJobsRouter:
         )
 
     async def submit_job(
-        self, request: Request, file: Annotated[list[UploadFile], File()]
+        self,
+        request: Request,
+        file: Annotated[list[UploadFile], File()],
+        password: Annotated[str | None, Form()] = None,
     ) -> JSONResponse:
         """Accept one or more files and answer ``202``.
 
@@ -79,6 +82,10 @@ class ParseJobsRouter:
         Args:
             request: The incoming request, used to build the ``Location`` header.
             file: The uploaded file or files (multipart field ``file``).
+            password: Optional password for encrypted files (multipart field
+                ``password``). It is never logged, and is removed after parsing. Sent
+                for a file that already failed as ``password_protected``, the file is
+                parsed again with it.
 
         Returns:
             The submission response.
@@ -88,8 +95,8 @@ class ParseJobsRouter:
                 ``STORAGE_UNAVAILABLE`` or ``INVALID_REQUEST``.
         """
         if len(file) > 1:
-            return await self._submit_batch(request, file)
-        command = SubmitParseJobCommand(self._file_name(file[0]), await file[0].read())
+            return await self._submit_batch(request, file, password)
+        command = SubmitParseJobCommand(self._file_name(file[0]), await file[0].read(), password)
         result = await run_in_threadpool(self._submit.execute, command)
         if result.is_err:
             self._metrics.record_submission(result.unwrap_err().value)
@@ -101,8 +108,12 @@ class ParseJobsRouter:
         headers = {HttpHeader.LOCATION.value: location}
         return JSONResponse(body, status_code=HTTPStatus.ACCEPTED, headers=headers)
 
-    async def _submit_batch(self, request: Request, files: list[UploadFile]) -> JSONResponse:
-        commands = [SubmitParseJobCommand(self._file_name(f), await f.read()) for f in files]
+    async def _submit_batch(
+        self, request: Request, files: list[UploadFile], password: str | None
+    ) -> JSONResponse:
+        commands = [
+            SubmitParseJobCommand(self._file_name(f), await f.read(), password) for f in files
+        ]
         result = await run_in_threadpool(self._dependencies.submit_parse_batch.execute, commands)
         if result.is_err:
             raise self._submission_error(result.unwrap_err())

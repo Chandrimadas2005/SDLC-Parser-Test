@@ -64,13 +64,20 @@ class ExtractorRegistry:
         self._extractors = dict(extractors)
 
     @classmethod
-    def default(cls, max_pages: int | None = None, limits: Limits | None = None) -> Self:
+    def default(
+        cls,
+        max_pages: int | None = None,
+        limits: Limits | None = None,
+        *,
+        password: str | None = None,
+    ) -> Self:
         """Build the registry with every extractor that exists today.
 
         Args:
             max_pages: Page limit for paged formats (PDF), or ``None`` for no limit.
             limits: The archive limits ZIP-based formats are checked against; the
                 defaults when not given.
+            password: The caller's password for an encrypted PDF, if one was sent.
 
         Returns:
             A registry for every format implemented so far. DOC, RTF, ODT and PPT are
@@ -79,7 +86,7 @@ class ExtractorRegistry:
             is. HTML and ODS are read natively.
         """
         extractors = cls._repairing(
-            {**cls._document_extractors(max_pages), **cls._spreadsheet_extractors()}
+            {**cls._document_extractors(max_pages, password), **cls._spreadsheet_extractors()}
         )
         converted = cls._converted(extractors, LibreOfficeConverter.available())
         native = cls._native(limits or Limits(), converted.get(DetectedType.ODS))
@@ -106,13 +113,14 @@ class ExtractorRegistry:
         return OdsExtractor(reader, SpreadsheetTableBuilder(), fallback)
 
     @staticmethod
-    def _document_extractors(max_pages: int | None) -> dict[DetectedType, Extractor]:
+    def _document_extractors(
+        max_pages: int | None, password: str | None
+    ) -> dict[DetectedType, Extractor]:
         reader, builder = TextFileReader(), TextDocumentBuilder()
         splitter, tables = PlainTextBlockSplitter(), TextTableBuilder()
+        pdf = PdfReader(max_pages, PdfPageOcr.available(), password)
         return {
-            DetectedType.PDF: PdfExtractor(
-                PdfReader(max_pages, PdfPageOcr.available()), PdfDocumentAssembler(splitter)
-            ),
+            DetectedType.PDF: PdfExtractor(pdf, PdfDocumentAssembler(splitter)),
             DetectedType.DOCX: DocxExtractor(
                 DocxReader(DocxStyleReader()), DocxDocumentAssembler(tables)
             ),
