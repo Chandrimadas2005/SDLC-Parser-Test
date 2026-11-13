@@ -14,6 +14,7 @@ class HttpStatusMapping:
         ApplicationErrorCode.BATCH_TOO_LARGE: HTTPStatus.REQUEST_ENTITY_TOO_LARGE,
         ApplicationErrorCode.RESULT_NOT_FOUND: HTTPStatus.NOT_FOUND,
         ApplicationErrorCode.RESULT_NOT_READY: HTTPStatus.CONFLICT,
+        ApplicationErrorCode.JOB_FAILED: HTTPStatus.CONFLICT,
         ApplicationErrorCode.RETRY_NOT_ALLOWED: HTTPStatus.CONFLICT,
         ApplicationErrorCode.FILE_TOO_LARGE: HTTPStatus.REQUEST_ENTITY_TOO_LARGE,
         ApplicationErrorCode.DISK_FULL: HTTPStatus.SERVICE_UNAVAILABLE,
@@ -29,6 +30,9 @@ class HttpStatusMapping:
         ApplicationErrorCode.BATCH_TOO_LARGE: "Too many files in one upload.",
         ApplicationErrorCode.RESULT_NOT_FOUND: "The stored parse result is missing.",
         ApplicationErrorCode.RESULT_NOT_READY: "The parse result is not ready yet.",
+        ApplicationErrorCode.JOB_FAILED: (
+            "The parse job failed, so it has no result; see failure_reason on the job."
+        ),
         ApplicationErrorCode.RETRY_NOT_ALLOWED: "Only failed parse jobs can be retried.",
         ApplicationErrorCode.FILE_TOO_LARGE: "The file exceeds the configured size limit.",
         ApplicationErrorCode.DISK_FULL: (
