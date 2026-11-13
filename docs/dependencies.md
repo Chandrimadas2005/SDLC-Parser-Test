@@ -19,7 +19,7 @@ Shipped in the service image. Checked by CI.
 | charset-normalizer | 3.5.2 | MIT | Encoding detection for text files |
 | fastapi | 0.162.2 | MIT | HTTP API |
 | lxml | 6.1.3 | BSD-3-Clause | HTML parser behind beautifulsoup4 (never fetches or runs anything) |
-| defusedxml | 0.7.1 | PSF-2.0 | Safe XML parsing of untrusted workbook parts: XLSX, and the streamed ODS reader (brief 2.5) |
+| defusedxml | 0.7.1 | PSF-2.0 | Safe XML parsing of untrusted workbook parts (XLSX/ODS) and XML documents (brief 2.5) |
 | olefile | 0.47 | BSD-2-Clause | Reading Outlook MSG e-mails (OLE compound files) |
 | openpyxl | 3.1.5 | MIT | Streaming XLSX/XLSM worksheet extraction |
 | pg8000 | 1.31.6 | BSD-3-Clause | Pure-Python PostgreSQL driver |
@@ -28,6 +28,7 @@ Shipped in the service image. Checked by CI.
 | pypdfium2 | 5.15.2 | Apache-2.0 / BSD-3-Clause | PDF text and outline (bundles Google's PDFium); chosen in `docs/pdf-library-comparison.md` |
 | python-magic | 0.4.27 | MIT | Content-based type detection (needs the libmagic1 system package) |
 | python-multipart | 0.0.33 | Apache-2.0 | Multipart file uploads for FastAPI |
+| PyYAML | 6.0.3 | MIT | Safe YAML loading with `yaml.safe_load` |
 | sqlalchemy | 2.1.8 | MIT | Core SQL toolkit for the job table |
 | structlog | 25.5.0 | MIT OR Apache-2.0 | Structured JSON logging |
 | uvicorn | 0.54.0 | BSD-3-Clause | ASGI server |
