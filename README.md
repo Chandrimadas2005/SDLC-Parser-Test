@@ -151,9 +151,10 @@ as `password_protected` (open point).
 ZIP archives, EML and MSG e-mails are containers: every file inside (archive entries,
 the message body, attachments) is parsed like an upload and appears under its own
 level-1 heading, in order. Archive limits are checked from the table of contents
-before anything is decompressed (`PARSER_ARCHIVE_MAX_FILES`,
-`PARSER_ARCHIVE_MAX_EXPANDED_BYTES`, nesting depth `PARSER_ARCHIVE_MAX_DEPTH`); above
-them the file fails with `limit_exceeded`. Entry names are never used as paths, so
+before anything is decompressed (at most 1,000 files, 1 GB expanded and 3 levels of
+nesting); above them the file fails with `limit_exceeded`. The isolated worker uses
+these defaults for now; passing the `PARSER_ARCHIVE_*` settings into it is an open
+point. Entry names are never used as paths, so
 "zip slip" names are harmless. A part that cannot be parsed adds `element_skipped`
 and makes the result `partial`. E-mail headers (subject, from, to, date) go into the
 file properties.
