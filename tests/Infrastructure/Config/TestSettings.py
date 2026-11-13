@@ -38,6 +38,17 @@ class TestSettings:
         assert settings.limits.queue_capacity == Limits.DEFAULT_QUEUE_CAPACITY
         assert settings.limits.retention_days == 7
 
+    def test_structured_data_limits_are_settings(self) -> None:
+        settings = Settings.from_environment(
+            {
+                EnvironmentVariable.STRUCTURED_MAX_DEPTH: "8",
+                EnvironmentVariable.STRUCTURED_MAX_NODES: "500",
+            }
+        )
+
+        assert settings.limits.structured_max_depth == 8
+        assert settings.limits.structured_max_nodes == 500
+
     def test_non_integer_limit_is_rejected_with_the_variable_name(self) -> None:
         with pytest.raises(ValueError, match="PARSER_MAX_PAGES must be an integer"):
             Settings.from_environment({EnvironmentVariable.MAX_PAGES: "many"})

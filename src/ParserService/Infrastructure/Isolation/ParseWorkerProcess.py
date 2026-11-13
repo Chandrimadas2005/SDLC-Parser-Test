@@ -1,4 +1,5 @@
 import json
+import os
 import resource
 import time
 from collections.abc import Sequence
@@ -8,6 +9,7 @@ from typing import Final
 from ParserService.Domain.Documents.ParsedDocument import ParsedDocument
 from ParserService.Domain.Documents.SourceFile import SourceFile
 from ParserService.Domain.Jobs.FileName import FileName
+from ParserService.Infrastructure.Config.Settings import Settings
 from ParserService.Infrastructure.Detection.MagicTypeDetector import MagicTypeDetector
 from ParserService.Infrastructure.Detection.TextEncodingDetector import TextEncodingDetector
 from ParserService.Infrastructure.Detection.ZipContentInspector import ZipContentInspector
@@ -83,7 +85,9 @@ class ParseWorkerProcess:
     @staticmethod
     def _pipeline(max_pages: int | None, password: str | None) -> ParsePipeline:
         detector = MagicTypeDetector(TextEncodingDetector(), ZipContentInspector())
-        registry = ExtractorRegistry.default(max_pages, None, ExtractionContext(password))
+        # The worker inherits the service's environment, so it applies the same limits.
+        limits = Settings.from_environment(os.environ).limits
+        registry = ExtractorRegistry.default(max_pages, limits, ExtractionContext(password))
         return ParsePipeline(detector, registry)
 
     @staticmethod

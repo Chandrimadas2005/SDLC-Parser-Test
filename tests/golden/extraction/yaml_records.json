@@ -1,0 +1,219 @@
+{
+  "schema_version": "1.2",
+  "status": "succeeded",
+  "document": {
+    "file_name": "records.yaml",
+    "detected_type": "yaml",
+    "size_bytes": 158,
+    "sha256": "9edc07e5d9cc6088e16f196c123f693f39864edc31d4abc0866ac6b68b99773b",
+    "properties": {
+      "encoding": "ascii"
+    }
+  },
+  "warnings": [],
+  "outline": [
+    {
+      "kind": "heading",
+      "name": "title",
+      "level": 1,
+      "locator": {
+        "paragraph": 1,
+        "char_start": 0,
+        "char_end": 5
+      }
+    },
+    {
+      "kind": "heading",
+      "name": "active",
+      "level": 1,
+      "locator": {
+        "paragraph": 3,
+        "char_start": 25,
+        "char_end": 31
+      }
+    },
+    {
+      "kind": "heading",
+      "name": "records",
+      "level": 1,
+      "locator": {
+        "paragraph": 5,
+        "char_start": 38,
+        "char_end": 45
+      }
+    },
+    {
+      "kind": "heading",
+      "name": "metadata",
+      "level": 1,
+      "locator": {
+        "paragraph": 7,
+        "char_start": 97,
+        "char_end": 105
+      }
+    },
+    {
+      "kind": "heading",
+      "name": "tags",
+      "level": 1,
+      "locator": {
+        "paragraph": 10,
+        "char_start": 136,
+        "char_end": 140
+      }
+    }
+  ],
+  "elements": [
+    {
+      "id": "e-000001",
+      "kind": "heading",
+      "locator": {
+        "paragraph": 1,
+        "char_start": 0,
+        "char_end": 5
+      },
+      "text": "title",
+      "level": 1
+    },
+    {
+      "id": "e-000002",
+      "kind": "paragraph",
+      "locator": {
+        "paragraph": 2,
+        "char_start": 7,
+        "char_end": 24
+      },
+      "text": "title: Synthetic records"
+    },
+    {
+      "id": "e-000003",
+      "kind": "heading",
+      "locator": {
+        "paragraph": 3,
+        "char_start": 25,
+        "char_end": 31
+      },
+      "text": "active",
+      "level": 1
+    },
+    {
+      "id": "e-000004",
+      "kind": "paragraph",
+      "locator": {
+        "paragraph": 4,
+        "char_start": 33,
+        "char_end": 37
+      },
+      "text": "active: true"
+    },
+    {
+      "id": "e-000005",
+      "kind": "heading",
+      "locator": {
+        "paragraph": 5,
+        "char_start": 38,
+        "char_end": 45
+      },
+      "text": "records",
+      "level": 1
+    },
+    {
+      "id": "e-000006",
+      "kind": "table",
+      "locator": {
+        "paragraph": 6,
+        "char_start": 38,
+        "char_end": 96
+      },
+      "header_row": 1,
+      "header_confidence": 1.0,
+      "rows": [
+        {
+          "row": 2,
+          "cells": {
+            "id": "1",
+            "name": "Ada"
+          }
+        },
+        {
+          "row": 3,
+          "cells": {
+            "id": "2",
+            "name": "Grace"
+          }
+        }
+      ],
+      "column_profiles": []
+    },
+    {
+      "id": "e-000007",
+      "kind": "heading",
+      "locator": {
+        "paragraph": 7,
+        "char_start": 97,
+        "char_end": 105
+      },
+      "text": "metadata",
+      "level": 1
+    },
+    {
+      "id": "e-000008",
+      "kind": "paragraph",
+      "locator": {
+        "paragraph": 8,
+        "char_start": 117,
+        "char_end": 124
+      },
+      "text": "metadata.source: fixture"
+    },
+    {
+      "id": "e-000009",
+      "kind": "paragraph",
+      "locator": {
+        "paragraph": 9,
+        "char_start": 134,
+        "char_end": 135
+      },
+      "text": "metadata.count: 2"
+    },
+    {
+      "id": "e-000010",
+      "kind": "heading",
+      "locator": {
+        "paragraph": 10,
+        "char_start": 136,
+        "char_end": 140
+      },
+      "text": "tags",
+      "level": 1
+    },
+    {
+      "id": "e-000011",
+      "kind": "paragraph",
+      "locator": {
+        "paragraph": 11,
+        "char_start": 146,
+        "char_end": 149
+      },
+      "text": "tags[0]: one"
+    },
+    {
+      "id": "e-000012",
+      "kind": "paragraph",
+      "locator": {
+        "paragraph": 12,
+        "char_start": 154,
+        "char_end": 157
+      },
+      "text": "tags[1]: two"
+    }
+  ],
+  "metrics": {
+    "words": 18,
+    "elements_by_kind": {
+      "heading": 5,
+      "paragraph": 6,
+      "table": 1
+    }
+  }
+}

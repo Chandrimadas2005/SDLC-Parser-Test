@@ -130,6 +130,9 @@ class TestParsePipeline:
         DetectedType.EML,
         DetectedType.MSG,
         DetectedType.ZIP,
+        DetectedType.JSON,
+        DetectedType.YAML,
+        DetectedType.XML,
     )
     CONVERTED: Final = (
         DetectedType.ODT,

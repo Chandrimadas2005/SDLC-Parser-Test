@@ -2,8 +2,11 @@ import re
 from collections.abc import Mapping
 from pathlib import Path
 from typing import Final
+from xml.etree.ElementTree import ParseError
 
 import magic
+from defusedxml import ElementTree
+from defusedxml.common import DefusedXmlException
 
 from ParserService.Domain.Documents.DetectedType import DetectedType
 from ParserService.Domain.Documents.Detection import Detection
@@ -33,6 +36,10 @@ class MagicTypeDetector:
     ZIP_SIGNATURE: Final = b"PK\x03\x04"
     HEADER_LINE: Final = re.compile(rb"^[A-Za-z][A-Za-z0-9-]*: ")
     MIME_HEADER: Final = b"MIME-Version:"
+    YAML_SHAPE: Final = re.compile(rb"(?m)^[ \t]*(?:[A-Za-z_][A-Za-z0-9_.-]*:|-[ \t]+[^\r\n]+)")
+    # XML without an <?xml ...?> declaration is plain text to libmagic.
+    XML_SHAPE: Final = re.compile(rb"\A(?:\xef\xbb\xbf)?\s*<[A-Za-z_][\w.:-]*(?:\s[^>]*)?/?>")
+    XML_END: Final = b">"
     DIRECT: Final[Mapping[MimeType, DetectedType]] = {
         MimeType.PDF: DetectedType.PDF,
         MimeType.PNG: DetectedType.PNG,
@@ -61,6 +68,8 @@ class MagicTypeDetector:
             DetectedType.CSV,
             DetectedType.TSV,
             DetectedType.YAML,
+            DetectedType.JSON,
+            DetectedType.XML,
             DetectedType.HTML,
             DetectedType.EML,
         }
@@ -116,10 +125,33 @@ class MagicTypeDetector:
         if encoding is None:
             return Result.err(FailureReason.UNSUPPORTED_TYPE)
         default = DetectedType.CSV if sample.mime is MimeType.CSV else DetectedType.TXT
-        detected = self._hinted(sample, self.TEXT_TYPES) or default
+        detected = self._sniffed(sample, self._hinted(sample, self.TEXT_TYPES) or default)
         guessed = (ParseWarning(WarningCode.ENCODING_GUESSED),)
         extra = guessed if self._encodings.is_guess(encoding) else ()
         return Result.ok(Detection(detected, encoding, self._mismatch(detected, sample) + extra))
+
+    def _sniffed(self, sample: FileSample, detected: DetectedType) -> DetectedType:
+        if detected is not DetectedType.TXT:
+            return detected
+        if self._is_xml(sample.head):
+            return DetectedType.XML
+        return DetectedType.YAML if self.YAML_SHAPE.search(sample.head) else DetectedType.TXT
+
+    def _is_xml(self, head: bytes) -> bool:
+        if self.XML_SHAPE.match(head) is None or not head.rstrip().endswith(self.XML_END):
+            return False
+        # Only the start of a large file is read, so its shape decides.
+        return len(head) >= self.SAMPLE_BYTES or self._parses_as_xml(head)
+
+    @staticmethod
+    def _parses_as_xml(head: bytes) -> bool:
+        try:
+            ElementTree.fromstring(head)
+        except DefusedXmlException:
+            return True  # hostile XML: the XML extractor rejects it with limit_exceeded
+        except (ParseError, ValueError):
+            return False
+        return True
 
     @staticmethod
     def _hinted(sample: FileSample, allowed: frozenset[DetectedType]) -> DetectedType | None:
