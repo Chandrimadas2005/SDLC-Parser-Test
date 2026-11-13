@@ -5,16 +5,31 @@ from ParserService.Domain.Documents.DetectedType import DetectedType
 from ParserService.Domain.Errors.Result import Result
 from ParserService.Domain.Jobs.FailureReason import FailureReason
 from ParserService.Domain.Ports.Extractor import Extractor
+from ParserService.Infrastructure.Config.Limits import Limits
 from ParserService.Infrastructure.Extraction.ConvertingExtractor import ConvertingExtractor
 from ParserService.Infrastructure.Extraction.CsvExtractor import CsvExtractor
 from ParserService.Infrastructure.Extraction.DocxDocumentAssembler import DocxDocumentAssembler
 from ParserService.Infrastructure.Extraction.DocxExtractor import DocxExtractor
 from ParserService.Infrastructure.Extraction.DocxReader import DocxReader
 from ParserService.Infrastructure.Extraction.DocxStyleReader import DocxStyleReader
+from ParserService.Infrastructure.Extraction.Html.HtmlBlockReader import HtmlBlockReader
+from ParserService.Infrastructure.Extraction.Html.HtmlDocumentBuilder import HtmlDocumentBuilder
+from ParserService.Infrastructure.Extraction.Html.HtmlElementPlacer import HtmlElementPlacer
+from ParserService.Infrastructure.Extraction.Html.HtmlExtractor import HtmlExtractor
+from ParserService.Infrastructure.Extraction.Html.HtmlImageReader import HtmlImageReader
+from ParserService.Infrastructure.Extraction.Html.HtmlMetadataReader import HtmlMetadataReader
+from ParserService.Infrastructure.Extraction.Html.HtmlTableReader import HtmlTableReader
 from ParserService.Infrastructure.Extraction.ImageExtractor import ImageExtractor
 from ParserService.Infrastructure.Extraction.LibreOfficeConverter import LibreOfficeConverter
 from ParserService.Infrastructure.Extraction.MarkdownBlockReader import MarkdownBlockReader
 from ParserService.Infrastructure.Extraction.MarkdownExtractor import MarkdownExtractor
+from ParserService.Infrastructure.Extraction.Ods.OdsAttributes import OdsAttributes
+from ParserService.Infrastructure.Extraction.Ods.OdsCellReader import OdsCellReader
+from ParserService.Infrastructure.Extraction.Ods.OdsContentReader import OdsContentReader
+from ParserService.Infrastructure.Extraction.Ods.OdsExtractor import OdsExtractor
+from ParserService.Infrastructure.Extraction.Ods.OdsPropertyReader import OdsPropertyReader
+from ParserService.Infrastructure.Extraction.Ods.OdsRowReader import OdsRowReader
+from ParserService.Infrastructure.Extraction.Ods.OdsWorkbookReader import OdsWorkbookReader
 from ParserService.Infrastructure.Extraction.PdfDocumentAssembler import PdfDocumentAssembler
 from ParserService.Infrastructure.Extraction.PdfExtractor import PdfExtractor
 from ParserService.Infrastructure.Extraction.PdfPageOcr import PdfPageOcr
@@ -34,6 +49,7 @@ from ParserService.Infrastructure.Extraction.TextTableBuilder import TextTableBu
 from ParserService.Infrastructure.Extraction.TsvExtractor import TsvExtractor
 from ParserService.Infrastructure.Extraction.XlsExtractor import XlsExtractor
 from ParserService.Infrastructure.Extraction.XlsxExtractor import XlsxExtractor
+from ParserService.Infrastructure.Extraction.ZipArchiveGuard import ZipArchiveGuard
 from ParserService.Infrastructure.Extraction.ZipSalvager import ZipSalvager
 
 
@@ -48,22 +64,46 @@ class ExtractorRegistry:
         self._extractors = dict(extractors)
 
     @classmethod
-    def default(cls, max_pages: int | None = None) -> Self:
+    def default(cls, max_pages: int | None = None, limits: Limits | None = None) -> Self:
         """Build the registry with every extractor that exists today.
 
         Args:
             max_pages: Page limit for paged formats (PDF), or ``None`` for no limit.
+            limits: The archive limits ZIP-based formats are checked against; the
+                defaults when not given.
 
         Returns:
-            A registry for every format implemented so far. DOC, RTF, ODT, ODS and PPT are
-            included only when LibreOffice is installed, and PNG, JPEG and TIFF only when
-            Tesseract is.
+            A registry for every format implemented so far. DOC, RTF, ODT and PPT are
+            included only when LibreOffice is installed (which also lets a damaged ODS
+            be retried through conversion), and PNG, JPEG and TIFF only when Tesseract
+            is. HTML and ODS are read natively.
         """
         extractors = cls._repairing(
             {**cls._document_extractors(max_pages), **cls._spreadsheet_extractors()}
         )
         converted = cls._converted(extractors, LibreOfficeConverter.available())
-        return cls(extractors | converted | cls._images(TesseractOcr.available()))
+        native = cls._native(limits or Limits(), converted.get(DetectedType.ODS))
+        return cls(extractors | converted | native | cls._images(TesseractOcr.available()))
+
+    @classmethod
+    def _native(
+        cls, limits: Limits, ods_fallback: Extractor | None
+    ) -> dict[DetectedType, Extractor]:
+        return {DetectedType.HTML: cls._html(), DetectedType.ODS: cls._ods(limits, ods_fallback)}
+
+    @staticmethod
+    def _html() -> HtmlExtractor:
+        reader = HtmlBlockReader(HtmlTableReader(), HtmlImageReader())
+        builder = HtmlDocumentBuilder(reader, HtmlElementPlacer(), HtmlMetadataReader())
+        return HtmlExtractor(builder)
+
+    @staticmethod
+    def _ods(limits: Limits, fallback: Extractor | None) -> OdsExtractor:
+        attributes = OdsAttributes()
+        rows = OdsRowReader(OdsCellReader(attributes), attributes)
+        content = OdsContentReader(rows, attributes)
+        reader = OdsWorkbookReader(ZipArchiveGuard(limits), content, OdsPropertyReader())
+        return OdsExtractor(reader, SpreadsheetTableBuilder(), fallback)
 
     @staticmethod
     def _document_extractors(max_pages: int | None) -> dict[DetectedType, Extractor]:

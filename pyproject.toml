@@ -6,9 +6,11 @@ readme = "README.md"
 requires-python = ">=3.12,<3.13"
 dependencies = [
   "alembic>=1.16,<2",
+  "beautifulsoup4>=4.13,<5",
   "charset-normalizer>=3.4,<4",
   "defusedxml>=0.7.1,<0.8",
   "fastapi>=0.120,<1",
+  "lxml>=5.3,<7",
   "openpyxl>=3.1,<4",
   "pg8000>=1.31,<2",
   "prometheus-client>=0.21,<1",
@@ -25,6 +27,7 @@ dependencies = [
 [project.scripts]
 parser-api = "ParserService.Infrastructure.Bootstrap.ServiceRunner:ServiceRunner.main"
 parser-worker = "ParserService.Infrastructure.Bootstrap.WorkerRunner:WorkerRunner.main"
+parser-cli = "ParserService.Infrastructure.Cli.ParserCli:ParserCli.main"
 
 [dependency-groups]
 dev = [

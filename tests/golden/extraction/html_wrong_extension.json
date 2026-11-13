@@ -1,0 +1,60 @@
+{
+  "schema_version": "1.2",
+  "status": "succeeded",
+  "document": {
+    "file_name": "page.txt",
+    "detected_type": "html",
+    "size_bytes": 135,
+    "sha256": "a319a220f70d5605ffa1c47d95e20050c208bccdd0d074660e9b9d9baf781cb2",
+    "properties": {
+      "title": "Mislabelled"
+    }
+  },
+  "warnings": [
+    {
+      "code": "extension_mismatch"
+    }
+  ],
+  "outline": [
+    {
+      "kind": "heading",
+      "name": "Real HTML",
+      "level": 1,
+      "locator": {
+        "paragraph": 1,
+        "char_start": 0,
+        "char_end": 9
+      }
+    }
+  ],
+  "elements": [
+    {
+      "id": "e-000001",
+      "kind": "heading",
+      "locator": {
+        "paragraph": 1,
+        "char_start": 0,
+        "char_end": 9
+      },
+      "text": "Real HTML",
+      "level": 1
+    },
+    {
+      "id": "e-000002",
+      "kind": "paragraph",
+      "locator": {
+        "paragraph": 2,
+        "char_start": 10,
+        "char_end": 38
+      },
+      "text": "Saved with a .txt extension."
+    }
+  ],
+  "metrics": {
+    "words": 7,
+    "elements_by_kind": {
+      "heading": 1,
+      "paragraph": 1
+    }
+  }
+}

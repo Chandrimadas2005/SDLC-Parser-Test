@@ -1,3 +1,4 @@
+import struct
 import zipfile
 from pathlib import Path
 from typing import Final
@@ -17,6 +18,11 @@ class ZipContentInspector:
     MIMETYPE_ENTRY: Final = "mimetype"
     MIMETYPE_MAX_BYTES: Final = 128
     DAMAGED_SCAN_BYTES: Final = 1024 * 1024
+    LOCAL_HEADER: Final = struct.Struct("<4sHHHHHIIIHH")
+    METHOD: Final = 3
+    STORED_SIZE: Final = 7
+    NAME_LENGTH: Final = 9
+    EXTRA_LENGTH: Final = 10
     MACRO_ENTRY: Final = "xl/vbaProject.bin"
     MARKERS: Final = (
         ("word/document.xml", DetectedType.DOCX),
@@ -41,9 +47,30 @@ class ZipContentInspector:
             with zipfile.ZipFile(path) as archive:
                 return self._classify(archive)
         except zipfile.BadZipFile:
-            return self._damaged(path)
+            return self._first_entry(path) or self._damaged(path)
         except OSError:
             return None
+
+    def _first_entry(self, path: Path) -> DetectedType | None:
+        """Read the declared OpenDocument type when the archive's table of contents is broken.
+
+        OpenDocument requires the uncompressed ``mimetype`` entry to come first, so a
+        truncated or damaged package still names its type in its first bytes. The
+        extractor then reports the damage as ``corrupted_file`` instead of the file
+        being rejected as an unknown type.
+        """
+        with path.open("rb") as handle:
+            header = handle.read(self.LOCAL_HEADER.size)
+            if len(header) < self.LOCAL_HEADER.size:
+                return None
+            fields = self.LOCAL_HEADER.unpack(header)
+            name = handle.read(fields[self.NAME_LENGTH])
+            handle.seek(fields[self.EXTRA_LENGTH], 1)
+            declared = handle.read(min(fields[self.STORED_SIZE], self.MIMETYPE_MAX_BYTES))
+        stored = fields[self.METHOD] == 0 and name == self.MIMETYPE_ENTRY.encode()
+        return next(
+            (kind for mime, kind in self.OPEN_DOCUMENT if stored and declared == mime), None
+        )
 
     def _damaged(self, path: Path) -> DetectedType | None:
         # The archive's table of contents is broken, but each entry's own header still

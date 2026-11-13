@@ -1,0 +1,54 @@
+{
+  "schema_version": "1.2",
+  "status": "succeeded",
+  "document": {
+    "file_name": "broken.html",
+    "detected_type": "html",
+    "size_bytes": 28,
+    "sha256": "9cb0bf950480add10534940312ccd5fc208ae60e5c1fbe19b56aff508594614d",
+    "properties": {}
+  },
+  "warnings": [],
+  "outline": [
+    {
+      "kind": "heading",
+      "name": "Broken",
+      "level": 2,
+      "locator": {
+        "paragraph": 1,
+        "char_start": 0,
+        "char_end": 6
+      }
+    }
+  ],
+  "elements": [
+    {
+      "id": "e-000001",
+      "kind": "heading",
+      "locator": {
+        "paragraph": 1,
+        "char_start": 0,
+        "char_end": 6
+      },
+      "text": "Broken",
+      "level": 2
+    },
+    {
+      "id": "e-000002",
+      "kind": "paragraph",
+      "locator": {
+        "paragraph": 2,
+        "char_start": 7,
+        "char_end": 16
+      },
+      "text": "Recovered"
+    }
+  ],
+  "metrics": {
+    "words": 2,
+    "elements_by_kind": {
+      "heading": 1,
+      "paragraph": 1
+    }
+  }
+}

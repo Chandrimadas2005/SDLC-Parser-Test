@@ -1,0 +1,46 @@
+{
+  "schema_version": "1.2",
+  "status": "succeeded",
+  "document": {
+    "file_name": "empty.ods",
+    "detected_type": "ods",
+    "size_bytes": 452,
+    "sha256": "9d004186c5bc18f07ea19783c24b276e11cfe73f2b7e4493a524bdeeb128021b",
+    "sheet_count": 1,
+    "properties": {}
+  },
+  "warnings": [],
+  "outline": [
+    {
+      "kind": "sheet",
+      "name": "Sheet1",
+      "hidden": false,
+      "locator": {
+        "sheet": "Sheet1",
+        "range": "A1:A1"
+      }
+    }
+  ],
+  "elements": [
+    {
+      "id": "e-000001",
+      "kind": "table",
+      "locator": {
+        "sheet": "Sheet1",
+        "range": "A1:A1"
+      },
+      "rows": [],
+      "column_profiles": []
+    }
+  ],
+  "metrics": {
+    "sheets": 1,
+    "rows": 0,
+    "columns": 0,
+    "formulas": 0,
+    "hidden_sheets": 0,
+    "elements_by_kind": {
+      "table": 1
+    }
+  }
+}

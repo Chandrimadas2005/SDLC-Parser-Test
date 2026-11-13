@@ -72,6 +72,22 @@ uv run pytest
 Database tests run on SQLite by default. Set `PARSER_TEST_DATABASE_URL` to a PostgreSQL URL
 to run them against a real PostgreSQL as well (CI does this with a service container).
 
+## Standalone CLI
+
+`parser-cli` parses one file with the same detector, extractors and encoders as the worker,
+without the web server or the database (brief, 2.4):
+
+```bash
+uv run parser-cli parse ./page.html                     # print the JSON result, save nothing
+uv run parser-cli parse ./book.ods --format markdown    # print the Markdown version
+uv run parser-cli parse ./book.ods --summary            # print the result, then the summary
+uv run parser-cli parse ./book.ods --output ./parsed    # save parsed_document.json/.md instead
+```
+
+The optional summary is made only with `--summary` and can never fail the parse. Exit codes:
+`0` succeeded, `2` partial, `1` failed. Results go to standard output; status lines and errors
+go to standard error. HTML, ODS and summary details: [docs/html-ods-extraction.md](docs/html-ods-extraction.md).
+
 ## Configuration
 
 Every setting is an environment variable named in the `EnvironmentVariable` enum and

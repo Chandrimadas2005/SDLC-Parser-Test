@@ -49,6 +49,7 @@ from ParserService.Infrastructure.Extraction.XlsExtractor import XlsExtractor
 from ParserService.Infrastructure.Extraction.XlsPropertyReader import XlsPropertyReader
 from ParserService.Infrastructure.Extraction.XlsxExtractor import XlsxExtractor
 from ParserService.Infrastructure.Extraction.XlsxPropertyReader import XlsxPropertyReader
+from ParserService.Infrastructure.Extraction.ZipArchiveGuard import ZipArchiveGuard
 from ParserService.Infrastructure.Extraction.ZipSalvager import ZipSalvager
 
 __all__ = [
@@ -101,5 +102,6 @@ __all__ = [
     "XlsPropertyReader",
     "XlsxExtractor",
     "XlsxPropertyReader",
+    "ZipArchiveGuard",
     "ZipSalvager",
 ]

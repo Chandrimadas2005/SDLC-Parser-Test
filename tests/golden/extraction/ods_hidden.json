@@ -1,0 +1,56 @@
+{
+  "schema_version": "1.2",
+  "status": "succeeded",
+  "document": {
+    "file_name": "hidden.ods",
+    "detected_type": "ods",
+    "size_bytes": 571,
+    "sha256": "aa188ebe47a354e31baed0a994fb0fc977e9d1d6af5ba4221defa23af40dac69",
+    "sheet_count": 1,
+    "properties": {}
+  },
+  "warnings": [],
+  "outline": [
+    {
+      "kind": "sheet",
+      "name": "Secret",
+      "hidden": true,
+      "locator": {
+        "sheet": "Secret",
+        "range": "A1:A1"
+      }
+    }
+  ],
+  "elements": [
+    {
+      "id": "e-000001",
+      "kind": "table",
+      "locator": {
+        "sheet": "Secret",
+        "range": "A1:A1"
+      },
+      "header_row": 1,
+      "header_confidence": 1.0,
+      "rows": [],
+      "column_profiles": [
+        {
+          "name": "Only",
+          "guessed_type": "empty",
+          "fill_rate": 0.0,
+          "unique_values": 0,
+          "looks_like_id": false
+        }
+      ]
+    }
+  ],
+  "metrics": {
+    "sheets": 1,
+    "rows": 0,
+    "columns": 1,
+    "formulas": 0,
+    "hidden_sheets": 1,
+    "elements_by_kind": {
+      "table": 1
+    }
+  }
+}

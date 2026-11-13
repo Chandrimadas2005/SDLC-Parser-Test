@@ -12,6 +12,7 @@ from ParserService.Domain.Documents.Element import Element
 from ParserService.Domain.Documents.ElementId import ElementId
 from ParserService.Domain.Documents.ElementKind import ElementKind
 from ParserService.Domain.Documents.ExtractionRequest import ExtractionRequest
+from ParserService.Domain.Documents.ImageSource import ImageSource
 from ParserService.Domain.Documents.Locator import Locator
 from ParserService.Domain.Documents.MetricName import MetricName
 from ParserService.Domain.Documents.Metrics import Metrics
@@ -22,6 +23,7 @@ from ParserService.Domain.Documents.ParseOutcome import ParseOutcome
 from ParserService.Domain.Documents.ParseWarning import ParseWarning
 from ParserService.Domain.Documents.PropertyName import PropertyName
 from ParserService.Domain.Documents.SourceFile import SourceFile
+from ParserService.Domain.Documents.Summary import Summary
 from ParserService.Domain.Documents.Table import Table
 from ParserService.Domain.Documents.TableRow import TableRow
 from ParserService.Domain.Documents.WarningCode import WarningCode
@@ -39,6 +41,7 @@ __all__ = [
     "ElementId",
     "ElementKind",
     "ExtractionRequest",
+    "ImageSource",
     "Locator",
     "MetricName",
     "Metrics",
@@ -49,6 +52,7 @@ __all__ = [
     "ParsedDocument",
     "PropertyName",
     "SourceFile",
+    "Summary",
     "Table",
     "TableRow",
     "WarningCode",

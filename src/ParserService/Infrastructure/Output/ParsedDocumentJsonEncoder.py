@@ -6,6 +6,7 @@ from ParserService.Domain.Documents import (
     ColumnProfile,
     DocumentFacts,
     Element,
+    ImageSource,
     Locator,
     MetricName,
     Metrics,
@@ -103,9 +104,22 @@ class ParsedDocumentJsonEncoder:
                     OutputField.LOCATOR: self._locator(element.locator),
                     OutputField.TEXT: element.text,
                     OutputField.LEVEL: element.level,
+                    OutputField.HREF: element.href,
                 }
             )
+            | self._image(element.image)
             | table
+        )
+
+    def _image(self, image: ImageSource | None) -> JsonObject:
+        if image is None:
+            return {}
+        return self._without_empty(
+            {
+                OutputField.SOURCE: image.source,
+                OutputField.WIDTH: image.width,
+                OutputField.HEIGHT: image.height,
+            }
         )
 
     def _table(self, table: Table) -> JsonObject:

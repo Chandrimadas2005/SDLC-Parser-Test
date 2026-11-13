@@ -1,0 +1,286 @@
+{
+  "schema_version": "1.2",
+  "status": "succeeded",
+  "document": {
+    "file_name": "article.html",
+    "detected_type": "html",
+    "size_bytes": 1598,
+    "sha256": "87ecf74e1069c13aab5b282534daecb433fda8a5e8d74fff642b9fae20c186f8",
+    "language": "en-GB",
+    "properties": {
+      "title": "Synthetic release notes",
+      "author": "Synthetic Author",
+      "description": "Made-up notes for parser tests."
+    }
+  },
+  "warnings": [
+    {
+      "code": "element_skipped",
+      "locator": {
+        "paragraph": 1
+      }
+    },
+    {
+      "code": "element_skipped",
+      "locator": {
+        "paragraph": 4
+      }
+    },
+    {
+      "code": "element_skipped",
+      "locator": {
+        "paragraph": 13
+      }
+    }
+  ],
+  "outline": [
+    {
+      "kind": "heading",
+      "name": "Release 2.0",
+      "level": 1,
+      "locator": {
+        "paragraph": 2,
+        "char_start": 12,
+        "char_end": 23
+      }
+    },
+    {
+      "kind": "heading",
+      "name": "Changes",
+      "level": 2,
+      "locator": {
+        "paragraph": 5,
+        "char_start": 136,
+        "char_end": 143
+      }
+    },
+    {
+      "kind": "heading",
+      "name": "Estimates",
+      "level": 2,
+      "locator": {
+        "paragraph": 9,
+        "char_start": 221,
+        "char_end": 230
+      }
+    }
+  ],
+  "elements": [
+    {
+      "id": "e-000001",
+      "kind": "paragraph",
+      "locator": {
+        "paragraph": 1,
+        "char_start": 0,
+        "char_end": 11
+      },
+      "text": "Home | Docs"
+    },
+    {
+      "id": "e-000002",
+      "kind": "link",
+      "locator": {
+        "paragraph": 1,
+        "char_start": 0,
+        "char_end": 4
+      },
+      "text": "Home",
+      "href": "/"
+    },
+    {
+      "id": "e-000003",
+      "kind": "link",
+      "locator": {
+        "paragraph": 1,
+        "char_start": 7,
+        "char_end": 11
+      },
+      "text": "Docs",
+      "href": "/docs"
+    },
+    {
+      "id": "e-000004",
+      "kind": "heading",
+      "locator": {
+        "paragraph": 2,
+        "char_start": 12,
+        "char_end": 23
+      },
+      "text": "Release 2.0",
+      "level": 1
+    },
+    {
+      "id": "e-000005",
+      "kind": "paragraph",
+      "locator": {
+        "paragraph": 3,
+        "char_start": 24,
+        "char_end": 77
+      },
+      "text": "This release is entirely synthetic and never shipped."
+    },
+    {
+      "id": "e-000006",
+      "kind": "paragraph",
+      "locator": {
+        "paragraph": 4,
+        "char_start": 78,
+        "char_end": 135
+      },
+      "text": "See the full change list and the unsafe link for details."
+    },
+    {
+      "id": "e-000007",
+      "kind": "link",
+      "locator": {
+        "paragraph": 4,
+        "char_start": 86,
+        "char_end": 102
+      },
+      "text": "full change list",
+      "href": "https://example.invalid/changes"
+    },
+    {
+      "id": "e-000008",
+      "kind": "heading",
+      "locator": {
+        "paragraph": 5,
+        "char_start": 136,
+        "char_end": 143
+      },
+      "text": "Changes",
+      "level": 2
+    },
+    {
+      "id": "e-000009",
+      "kind": "list_item",
+      "locator": {
+        "paragraph": 6,
+        "char_start": 144,
+        "char_end": 158
+      },
+      "text": "Faster parsing"
+    },
+    {
+      "id": "e-000010",
+      "kind": "list_item",
+      "locator": {
+        "paragraph": 7,
+        "char_start": 159,
+        "char_end": 188
+      },
+      "text": "HTML tables keep merged cells"
+    },
+    {
+      "id": "e-000011",
+      "kind": "list_item",
+      "locator": {
+        "paragraph": 8,
+        "char_start": 189,
+        "char_end": 220
+      },
+      "text": "Spreadsheets read hidden sheets"
+    },
+    {
+      "id": "e-000012",
+      "kind": "heading",
+      "locator": {
+        "paragraph": 9,
+        "char_start": 221,
+        "char_end": 230
+      },
+      "text": "Estimates",
+      "level": 2
+    },
+    {
+      "id": "e-000013",
+      "kind": "table",
+      "locator": {
+        "paragraph": 10,
+        "char_start": 231,
+        "char_end": 231
+      },
+      "header_row": 1,
+      "header_confidence": 0.95,
+      "rows": [
+        {
+          "row": 2,
+          "cells": {
+            "Area": "Parser",
+            "Q1": "3",
+            "Q2": "5"
+          }
+        },
+        {
+          "row": 3,
+          "cells": {
+            "Area": "Parser",
+            "Q1": "8 (combined)",
+            "Q2": "8 (combined)"
+          }
+        },
+        {
+          "row": 4,
+          "cells": {
+            "Area": "Docs",
+            "Q1": "1",
+            "Q2": "2"
+          }
+        }
+      ],
+      "column_profiles": []
+    },
+    {
+      "id": "e-000014",
+      "kind": "image",
+      "locator": {
+        "paragraph": 11,
+        "char_start": 232,
+        "char_end": 246
+      },
+      "text": "Estimate chart",
+      "source": "chart.png"
+    },
+    {
+      "id": "e-000015",
+      "kind": "paragraph",
+      "locator": {
+        "paragraph": 12,
+        "char_start": 247,
+        "char_end": 266
+      },
+      "text": "Figure 1: estimates"
+    },
+    {
+      "id": "e-000016",
+      "kind": "paragraph",
+      "locator": {
+        "paragraph": 13,
+        "char_start": 267,
+        "char_end": 303
+      },
+      "text": "Café naïve résumé — entities decode."
+    },
+    {
+      "id": "e-000017",
+      "kind": "paragraph",
+      "locator": {
+        "paragraph": 14,
+        "char_start": 304,
+        "char_end": 325
+      },
+      "text": "Synthetic footer text"
+    }
+  ],
+  "metrics": {
+    "words": 60,
+    "elements_by_kind": {
+      "heading": 3,
+      "paragraph": 6,
+      "list_item": 3,
+      "table": 1,
+      "image": 1,
+      "link": 3
+    }
+  }
+}
