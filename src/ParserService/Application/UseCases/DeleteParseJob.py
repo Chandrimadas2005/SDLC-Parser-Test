@@ -14,19 +14,25 @@ class DeleteParseJob:
         self._keys = keys
 
     def execute(self, job_id: JobId) -> Result[JobId, ApplicationErrorCode]:
-        """Remove all artifacts and the job record, or report a missing job."""
+        """Mark, remove artifacts, then remove the job record."""
         job = self._services.repository.get(job_id)
         if job is None:
             return Result.err(ApplicationErrorCode.JOB_NOT_FOUND)
-        self._delete_artifacts(job)
-        if not self._services.repository.delete(job_id):
-            return Result.err(ApplicationErrorCode.JOB_NOT_FOUND)
+        marked = self._services.repository.update(job.mark_deleting())
+        if marked.is_err or not self._remove(job):
+            return Result.err(ApplicationErrorCode.STORAGE_UNAVAILABLE)
         return Result.ok(job_id)
+
+    def _remove(self, job: Job) -> bool:
+        try:
+            self._delete_artifacts(job)
+        except OSError:
+            return False
+        return self._services.repository.delete(job.id)
 
     def _delete_artifacts(self, job: Job) -> None:
         self._services.store.delete(job.file_pointer)
         if job.result_pointer is not None:
             self._services.store.delete(job.result_pointer)
-        self._services.store.delete(
-            self._keys.result_markdown(job.key.file_hash, job.key.parser_version)
-        )
+        markdown = self._keys.result_markdown(job.key.file_hash, job.key.parser_version)
+        self._services.store.delete(markdown)

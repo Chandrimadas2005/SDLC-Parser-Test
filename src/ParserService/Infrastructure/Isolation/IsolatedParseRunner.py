@@ -1,4 +1,5 @@
 import json
+import os
 import signal
 import subprocess
 import sys
@@ -30,8 +31,9 @@ class IsolatedParseRunner:
     GRACE_SECONDS: ClassVar[int] = 5
     CPU_LIMIT_SIGNALS: Final = frozenset({-signal.SIGXCPU, -signal.SIGKILL})
 
-    def __init__(self, limits: WorkerLimits) -> None:
+    def __init__(self, limits: WorkerLimits, temporary_root: Path | None = None) -> None:
         self._limits = limits
+        self._temporary_root = temporary_root
 
     def run(self, source: Path, file_name: FileName) -> Result[WorkerResult, FailureReason]:
         """Parse a file in a fresh worker process.
@@ -44,7 +46,10 @@ class IsolatedParseRunner:
             The result and its cost, or ``timeout``, ``extractor_crash`` or the
             failure reason the worker reported.
         """
-        with tempfile.TemporaryDirectory(prefix="parse-") as output:
+        if self._temporary_root is not None:
+            self._temporary_root.mkdir(parents=True, exist_ok=True)
+        prefix = f"parse-{os.getpid()}-"
+        with tempfile.TemporaryDirectory(prefix=prefix, dir=self._temporary_root) as output:
             folder = Path(output)
             exit_code = self._execute([str(source), file_name.value, output])
             if exit_code != 0:

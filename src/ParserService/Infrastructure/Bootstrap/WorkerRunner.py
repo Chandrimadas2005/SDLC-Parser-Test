@@ -12,37 +12,29 @@ from ParserService.Infrastructure.Logging.LoggingConfigurator import LoggingConf
 
 
 class WorkerRunner:
-    """Process entry point of the worker: ``parser-worker`` (see ``pyproject.toml``).
-
-    Each job is parsed in its own short-lived process with time and memory limits;
-    this long-lived process only takes jobs from the queue and records results.
-    SIGTERM and SIGINT stop it after the current job.
-    """
+    """Process entry point of the isolated parser worker."""
 
     def __init__(self) -> None:
         self.stop = threading.Event()
 
     @classmethod
     def main(cls) -> None:
-        """Run the worker until it receives SIGTERM or SIGINT."""
+        """Recover unfinished jobs and run the durable worker loop."""
         settings = Settings.from_environment(os.environ)
         LoggingConfigurator().configure(settings.log_level)
         container = ServiceContainer(settings)
         container.migrate()
+        recovered = container.recover_running_jobs()
+        structlog.get_logger(__name__).info("worker_jobs_recovered", jobs=recovered)
         runner = cls()
         signal.signal(signal.SIGTERM, runner.request_stop)
         signal.signal(signal.SIGINT, runner.request_stop)
         structlog.get_logger(__name__).info(
             "worker_started", parser_version=container.parser_version.value
         )
-        WorkerLoop(container.process_next_job(), runner.stop).run()
+        WorkerLoop(container.process_next_job(), runner.stop, container.retention_cleanup()).run()
 
     def request_stop(self, signal_number: int, frame: FrameType | None) -> None:
-        """Signal handler: finish the current job, then stop.
-
-        Args:
-            signal_number: The signal received.
-            frame: The interrupted frame (unused).
-        """
+        """Stop after the current job completes."""
         del signal_number, frame
         self.stop.set()

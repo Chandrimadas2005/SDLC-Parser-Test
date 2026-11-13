@@ -25,7 +25,7 @@ class LocalFileSystemArtifactStore:
         """
         target = self._path(pointer)
         target.parent.mkdir(parents=True, exist_ok=True)
-        descriptor, temporary = tempfile.mkstemp(dir=target.parent, prefix=".tmp-")
+        descriptor, temporary = tempfile.mkstemp(dir=target.parent, prefix=f".tmp-{os.getpid()}-")
         with os.fdopen(descriptor, "wb") as handle:
             handle.write(content)
             handle.flush()

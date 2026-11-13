@@ -10,6 +10,7 @@ from fastapi.testclient import TestClient
 from ParserService.Application.UseCases import (
     ArtifactKeys,
     DeleteParseJob,
+    GetFailedParseJobs,
     GetParseJobResult,
     GetParseJobStatus,
     JobServices,
@@ -45,6 +46,7 @@ def _dependencies(services: JobServices, tmp_path: Path) -> ApiDependencies:
             services, SubmitPolicy(VERSION, MAX_FILE_SIZE), ArtifactKeys()
         ),
         get_parse_job_status=GetParseJobStatus(repository),
+        get_failed_parse_jobs=GetFailedParseJobs(repository),
         get_parse_job_result=GetParseJobResult(repository, store),
         retry_parse_job=RetryParseJob(services),
         delete_parse_job=DeleteParseJob(services, ArtifactKeys()),
