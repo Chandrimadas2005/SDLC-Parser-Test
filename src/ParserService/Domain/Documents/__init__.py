@@ -23,6 +23,7 @@ from ParserService.Domain.Documents.ParseOutcome import ParseOutcome
 from ParserService.Domain.Documents.ParseWarning import ParseWarning
 from ParserService.Domain.Documents.PropertyName import PropertyName
 from ParserService.Domain.Documents.SourceFile import SourceFile
+from ParserService.Domain.Documents.Summary import Summary
 from ParserService.Domain.Documents.Table import Table
 from ParserService.Domain.Documents.TableRow import TableRow
 from ParserService.Domain.Documents.WarningCode import WarningCode
@@ -51,6 +52,7 @@ __all__ = [
     "ParsedDocument",
     "PropertyName",
     "SourceFile",
+    "Summary",
     "Table",
     "TableRow",
     "WarningCode",

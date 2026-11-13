@@ -8,6 +8,7 @@ from ParserService.Application.Dto.ParseBatchView import ParseBatchView
 from ParserService.Application.Dto.ParseJobStatusView import ParseJobStatusView
 from ParserService.Application.Dto.ParseJobSubmitted import ParseJobSubmitted
 from ParserService.Application.Dto.SubmitParseJobCommand import SubmitParseJobCommand
+from ParserService.Application.Dto.SummaryGenerationResult import SummaryGenerationResult
 
 __all__ = [
     "BatchFileOutcome",
@@ -18,4 +19,5 @@ __all__ = [
     "ParseJobStatusView",
     "ParseJobSubmitted",
     "SubmitParseJobCommand",
+    "SummaryGenerationResult",
 ]

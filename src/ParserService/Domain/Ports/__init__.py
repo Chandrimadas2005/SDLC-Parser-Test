@@ -8,6 +8,7 @@ from ParserService.Domain.Ports.DocumentParser import DocumentParser
 from ParserService.Domain.Ports.Extractor import Extractor
 from ParserService.Domain.Ports.JobQueue import JobQueue
 from ParserService.Domain.Ports.JobRepository import JobRepository
+from ParserService.Domain.Ports.SummaryGenerator import SummaryGenerator
 from ParserService.Domain.Ports.TemporaryFileCleaner import TemporaryFileCleaner
 from ParserService.Domain.Ports.TypeDetector import TypeDetector
 
@@ -20,6 +21,7 @@ __all__ = [
     "Extractor",
     "JobQueue",
     "JobRepository",
+    "SummaryGenerator",
     "TemporaryFileCleaner",
     "TypeDetector",
 ]

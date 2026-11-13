@@ -27,6 +27,7 @@ dependencies = [
 [project.scripts]
 parser-api = "ParserService.Infrastructure.Bootstrap.ServiceRunner:ServiceRunner.main"
 parser-worker = "ParserService.Infrastructure.Bootstrap.WorkerRunner:WorkerRunner.main"
+parser-cli = "ParserService.Infrastructure.Cli.ParserCli:ParserCli.main"
 
 [dependency-groups]
 dev = [

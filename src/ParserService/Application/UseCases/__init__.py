@@ -3,6 +3,7 @@
 from ParserService.Application.UseCases.ArtifactKeys import ArtifactKeys
 from ParserService.Application.UseCases.DeleteParseJob import DeleteParseJob
 from ParserService.Application.UseCases.DiskGuard import DiskGuard
+from ParserService.Application.UseCases.GenerateOptionalSummary import GenerateOptionalSummary
 from ParserService.Application.UseCases.GetFailedParseJobs import GetFailedParseJobs
 from ParserService.Application.UseCases.GetParseBatch import GetParseBatch
 from ParserService.Application.UseCases.GetParseJobResult import GetParseJobResult
@@ -20,6 +21,7 @@ __all__ = [
     "ArtifactKeys",
     "DeleteParseJob",
     "DiskGuard",
+    "GenerateOptionalSummary",
     "GetFailedParseJobs",
     "GetParseBatch",
     "GetParseJobResult",
