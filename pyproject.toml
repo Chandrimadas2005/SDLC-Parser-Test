@@ -11,6 +11,7 @@ dependencies = [
   "defusedxml>=0.7.1,<0.8",
   "fastapi>=0.120,<1",
   "lxml>=5.3,<7",
+  "olefile>=0.47,<1",
   "openpyxl>=3.1,<4",
   "pg8000>=1.31,<2",
   "prometheus-client>=0.21,<1",
@@ -109,7 +110,7 @@ explicit_package_bases = true
 
 [[tool.mypy.overrides]]
 # pypdfium2 and xlrd ship no type information; the extractors wrap them in typed classes.
-module = ["pypdfium2", "pypdfium2.*", "xlrd", "xlrd.*"]
+module = ["pypdfium2", "pypdfium2.*", "xlrd", "xlrd.*", "olefile", "olefile.*"]
 ignore_missing_imports = true
 
 # ---------------------------------------------------------------- pytest

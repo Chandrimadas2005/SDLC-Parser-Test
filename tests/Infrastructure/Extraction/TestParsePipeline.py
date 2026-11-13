@@ -127,6 +127,9 @@ class TestParsePipeline:
         DetectedType.PPTX,
         DetectedType.HTML,
         DetectedType.ODS,
+        DetectedType.EML,
+        DetectedType.MSG,
+        DetectedType.ZIP,
     )
     CONVERTED: Final = (
         DetectedType.ODT,

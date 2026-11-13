@@ -1,17 +1,24 @@
 from collections.abc import Mapping
-from typing import Self
+from typing import TYPE_CHECKING, Self
 
 from ParserService.Domain.Documents.DetectedType import DetectedType
 from ParserService.Domain.Errors.Result import Result
 from ParserService.Domain.Jobs.FailureReason import FailureReason
 from ParserService.Domain.Ports.Extractor import Extractor
 from ParserService.Infrastructure.Config.Limits import Limits
+from ParserService.Infrastructure.Detection.MagicTypeDetector import MagicTypeDetector
+from ParserService.Infrastructure.Detection.TextEncodingDetector import TextEncodingDetector
+from ParserService.Infrastructure.Detection.ZipContentInspector import ZipContentInspector
 from ParserService.Infrastructure.Extraction.ConvertingExtractor import ConvertingExtractor
 from ParserService.Infrastructure.Extraction.CsvExtractor import CsvExtractor
+from ParserService.Infrastructure.Extraction.DocumentBundle import DocumentBundle
 from ParserService.Infrastructure.Extraction.DocxDocumentAssembler import DocxDocumentAssembler
 from ParserService.Infrastructure.Extraction.DocxExtractor import DocxExtractor
 from ParserService.Infrastructure.Extraction.DocxReader import DocxReader
 from ParserService.Infrastructure.Extraction.DocxStyleReader import DocxStyleReader
+from ParserService.Infrastructure.Extraction.EmbeddedFileParser import EmbeddedFileParser
+from ParserService.Infrastructure.Extraction.EmlReader import EmlReader
+from ParserService.Infrastructure.Extraction.ExtractionContext import ExtractionContext
 from ParserService.Infrastructure.Extraction.Html.HtmlBlockReader import HtmlBlockReader
 from ParserService.Infrastructure.Extraction.Html.HtmlDocumentBuilder import HtmlDocumentBuilder
 from ParserService.Infrastructure.Extraction.Html.HtmlElementPlacer import HtmlElementPlacer
@@ -21,8 +28,11 @@ from ParserService.Infrastructure.Extraction.Html.HtmlMetadataReader import Html
 from ParserService.Infrastructure.Extraction.Html.HtmlTableReader import HtmlTableReader
 from ParserService.Infrastructure.Extraction.ImageExtractor import ImageExtractor
 from ParserService.Infrastructure.Extraction.LibreOfficeConverter import LibreOfficeConverter
+from ParserService.Infrastructure.Extraction.MailAssembler import MailAssembler
+from ParserService.Infrastructure.Extraction.MailExtractor import MailExtractor
 from ParserService.Infrastructure.Extraction.MarkdownBlockReader import MarkdownBlockReader
 from ParserService.Infrastructure.Extraction.MarkdownExtractor import MarkdownExtractor
+from ParserService.Infrastructure.Extraction.MsgReader import MsgReader
 from ParserService.Infrastructure.Extraction.Ods.OdsAttributes import OdsAttributes
 from ParserService.Infrastructure.Extraction.Ods.OdsCellReader import OdsCellReader
 from ParserService.Infrastructure.Extraction.Ods.OdsContentReader import OdsContentReader
@@ -49,8 +59,12 @@ from ParserService.Infrastructure.Extraction.TextTableBuilder import TextTableBu
 from ParserService.Infrastructure.Extraction.TsvExtractor import TsvExtractor
 from ParserService.Infrastructure.Extraction.XlsExtractor import XlsExtractor
 from ParserService.Infrastructure.Extraction.XlsxExtractor import XlsxExtractor
+from ParserService.Infrastructure.Extraction.ZipArchiveExtractor import ZipArchiveExtractor
 from ParserService.Infrastructure.Extraction.ZipArchiveGuard import ZipArchiveGuard
 from ParserService.Infrastructure.Extraction.ZipSalvager import ZipSalvager
+
+if TYPE_CHECKING:
+    from ParserService.Infrastructure.Extraction.ParsePipeline import ParsePipeline
 
 
 class ExtractorRegistry:
@@ -68,8 +82,7 @@ class ExtractorRegistry:
         cls,
         max_pages: int | None = None,
         limits: Limits | None = None,
-        *,
-        password: str | None = None,
+        context: ExtractionContext | None = None,
     ) -> Self:
         """Build the registry with every extractor that exists today.
 
@@ -77,7 +90,7 @@ class ExtractorRegistry:
             max_pages: Page limit for paged formats (PDF), or ``None`` for no limit.
             limits: The archive limits ZIP-based formats are checked against; the
                 defaults when not given.
-            password: The caller's password for an encrypted PDF, if one was sent.
+            context: The caller's password and the archive depth, when they apply.
 
         Returns:
             A registry for every format implemented so far. DOC, RTF, ODT and PPT are
@@ -85,12 +98,18 @@ class ExtractorRegistry:
             be retried through conversion), and PNG, JPEG and TIFF only when Tesseract
             is. HTML and ODS are read natively.
         """
+        context = context or ExtractionContext()
         extractors = cls._repairing(
-            {**cls._document_extractors(max_pages, password), **cls._spreadsheet_extractors()}
+            {
+                **cls._document_extractors(max_pages, context.password),
+                **cls._spreadsheet_extractors(),
+            }
         )
         converted = cls._converted(extractors, LibreOfficeConverter.available())
         native = cls._native(limits or Limits(), converted.get(DetectedType.ODS))
-        return cls(extractors | converted | native | cls._images(TesseractOcr.available()))
+        images = cls._images(TesseractOcr.available())
+        containers = cls._containers(context.archive_depth, limits or Limits())
+        return cls(extractors | converted | native | images | containers)
 
     @classmethod
     def _native(
@@ -149,6 +168,27 @@ class ExtractorRegistry:
         salvager = ZipSalvager()
         repaired = {kind: RepairingExtractor(extractors[kind], salvager) for kind in office}
         return extractors | repaired
+
+    @classmethod
+    def _containers(cls, depth: int, limits: Limits) -> dict[DetectedType, Extractor]:
+        detector = MagicTypeDetector(TextEncodingDetector(), ZipContentInspector())
+        files = EmbeddedFileParser(depth + 1, lambda: cls._pipeline(detector, depth + 1, limits))
+        bundle = DocumentBundle()
+        mail = MailAssembler(files, bundle)
+        return {
+            DetectedType.ZIP: ZipArchiveExtractor(limits, files, bundle),
+            DetectedType.EML: MailExtractor(EmlReader(), mail),
+            DetectedType.MSG: MailExtractor(MsgReader(), mail),
+        }
+
+    @classmethod
+    def _pipeline(cls, detector: MagicTypeDetector, depth: int, limits: Limits) -> "ParsePipeline":
+        # Imported here: ParsePipeline itself imports this registry.
+        from ParserService.Infrastructure.Extraction.ParsePipeline import (  # noqa: PLC0415
+            ParsePipeline,
+        )
+
+        return ParsePipeline(detector, cls.default(None, limits, ExtractionContext(None, depth)))
 
     @staticmethod
     def _images(ocr: TesseractOcr | None) -> dict[DetectedType, Extractor]:

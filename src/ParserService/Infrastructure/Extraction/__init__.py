@@ -1,7 +1,9 @@
 """One extractor per format, the registry that picks it, and the parse pipeline."""
 
+from ParserService.Infrastructure.Extraction.BundleSection import BundleSection
 from ParserService.Infrastructure.Extraction.ConvertingExtractor import ConvertingExtractor
 from ParserService.Infrastructure.Extraction.CsvExtractor import CsvExtractor
+from ParserService.Infrastructure.Extraction.DocumentBundle import DocumentBundle
 from ParserService.Infrastructure.Extraction.DocxContent import DocxContent
 from ParserService.Infrastructure.Extraction.DocxDocumentAssembler import DocxDocumentAssembler
 from ParserService.Infrastructure.Extraction.DocxExtractor import DocxExtractor
@@ -12,11 +14,22 @@ from ParserService.Infrastructure.Extraction.DocxProperty import DocxProperty
 from ParserService.Infrastructure.Extraction.DocxReader import DocxReader
 from ParserService.Infrastructure.Extraction.DocxStyleReader import DocxStyleReader
 from ParserService.Infrastructure.Extraction.DocxTable import DocxTable
+from ParserService.Infrastructure.Extraction.EmbeddedFile import EmbeddedFile
+from ParserService.Infrastructure.Extraction.EmbeddedFileParser import EmbeddedFileParser
+from ParserService.Infrastructure.Extraction.EmlReader import EmlReader
+from ParserService.Infrastructure.Extraction.ExtractionContext import ExtractionContext
 from ParserService.Infrastructure.Extraction.ExtractorRegistry import ExtractorRegistry
+from ParserService.Infrastructure.Extraction.HtmlText import HtmlText
 from ParserService.Infrastructure.Extraction.ImageExtractor import ImageExtractor
 from ParserService.Infrastructure.Extraction.LibreOfficeConverter import LibreOfficeConverter
+from ParserService.Infrastructure.Extraction.MailAssembler import MailAssembler
+from ParserService.Infrastructure.Extraction.MailContent import MailContent
+from ParserService.Infrastructure.Extraction.MailExtractor import MailExtractor
+from ParserService.Infrastructure.Extraction.MailHeader import MailHeader
+from ParserService.Infrastructure.Extraction.MailReader import MailReader
 from ParserService.Infrastructure.Extraction.MarkdownBlockReader import MarkdownBlockReader
 from ParserService.Infrastructure.Extraction.MarkdownExtractor import MarkdownExtractor
+from ParserService.Infrastructure.Extraction.MsgReader import MsgReader
 from ParserService.Infrastructure.Extraction.OcrConfidence import OcrConfidence
 from ParserService.Infrastructure.Extraction.OcrText import OcrText
 from ParserService.Infrastructure.Extraction.ParsePipeline import ParsePipeline
@@ -49,12 +62,15 @@ from ParserService.Infrastructure.Extraction.XlsExtractor import XlsExtractor
 from ParserService.Infrastructure.Extraction.XlsPropertyReader import XlsPropertyReader
 from ParserService.Infrastructure.Extraction.XlsxExtractor import XlsxExtractor
 from ParserService.Infrastructure.Extraction.XlsxPropertyReader import XlsxPropertyReader
+from ParserService.Infrastructure.Extraction.ZipArchiveExtractor import ZipArchiveExtractor
 from ParserService.Infrastructure.Extraction.ZipArchiveGuard import ZipArchiveGuard
 from ParserService.Infrastructure.Extraction.ZipSalvager import ZipSalvager
 
 __all__ = [
+    "BundleSection",
     "ConvertingExtractor",
     "CsvExtractor",
+    "DocumentBundle",
     "DocxContent",
     "DocxDocumentAssembler",
     "DocxExtractor",
@@ -65,11 +81,22 @@ __all__ = [
     "DocxReader",
     "DocxStyleReader",
     "DocxTable",
+    "EmbeddedFile",
+    "EmbeddedFileParser",
+    "EmlReader",
+    "ExtractionContext",
     "ExtractorRegistry",
+    "HtmlText",
     "ImageExtractor",
     "LibreOfficeConverter",
+    "MailAssembler",
+    "MailContent",
+    "MailExtractor",
+    "MailHeader",
+    "MailReader",
     "MarkdownBlockReader",
     "MarkdownExtractor",
+    "MsgReader",
     "OcrConfidence",
     "OcrText",
     "ParsePipeline",
@@ -102,6 +129,7 @@ __all__ = [
     "XlsPropertyReader",
     "XlsxExtractor",
     "XlsxPropertyReader",
+    "ZipArchiveExtractor",
     "ZipArchiveGuard",
     "ZipSalvager",
 ]

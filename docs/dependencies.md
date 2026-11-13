@@ -20,6 +20,7 @@ Shipped in the service image. Checked by CI.
 | fastapi | 0.162.2 | MIT | HTTP API |
 | lxml | 6.1.3 | BSD-3-Clause | HTML parser behind beautifulsoup4 (never fetches or runs anything) |
 | defusedxml | 0.7.1 | PSF-2.0 | Safe XML parsing of untrusted workbook parts: XLSX, and the streamed ODS reader (brief 2.5) |
+| olefile | 0.47 | BSD-2-Clause | Reading Outlook MSG e-mails (OLE compound files) |
 | openpyxl | 3.1.5 | MIT | Streaming XLSX/XLSM worksheet extraction |
 | pg8000 | 1.31.6 | BSD-3-Clause | Pure-Python PostgreSQL driver |
 | prometheus-client | 0.26.0 | Apache-2.0 | `/metrics` |

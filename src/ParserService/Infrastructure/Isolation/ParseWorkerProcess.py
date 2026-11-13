@@ -11,6 +11,7 @@ from ParserService.Domain.Jobs.FileName import FileName
 from ParserService.Infrastructure.Detection.MagicTypeDetector import MagicTypeDetector
 from ParserService.Infrastructure.Detection.TextEncodingDetector import TextEncodingDetector
 from ParserService.Infrastructure.Detection.ZipContentInspector import ZipContentInspector
+from ParserService.Infrastructure.Extraction.ExtractionContext import ExtractionContext
 from ParserService.Infrastructure.Extraction.ExtractorRegistry import ExtractorRegistry
 from ParserService.Infrastructure.Extraction.ParsePipeline import ParsePipeline
 from ParserService.Infrastructure.Isolation.OutcomeField import OutcomeField
@@ -82,7 +83,7 @@ class ParseWorkerProcess:
     @staticmethod
     def _pipeline(max_pages: int | None, password: str | None) -> ParsePipeline:
         detector = MagicTypeDetector(TextEncodingDetector(), ZipContentInspector())
-        registry = ExtractorRegistry.default(max_pages, password=password)
+        registry = ExtractorRegistry.default(max_pages, None, ExtractionContext(password))
         return ParsePipeline(detector, registry)
 
     @staticmethod

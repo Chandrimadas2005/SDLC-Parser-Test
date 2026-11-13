@@ -1,3 +1,4 @@
+import re
 from collections.abc import Mapping
 from pathlib import Path
 from typing import Final
@@ -30,6 +31,8 @@ class MagicTypeDetector:
 
     SAMPLE_BYTES: Final = 64 * 1024
     ZIP_SIGNATURE: Final = b"PK\x03\x04"
+    HEADER_LINE: Final = re.compile(rb"^[A-Za-z][A-Za-z0-9-]*: ")
+    MIME_HEADER: Final = b"MIME-Version:"
     DIRECT: Final[Mapping[MimeType, DetectedType]] = {
         MimeType.PDF: DetectedType.PDF,
         MimeType.PNG: DetectedType.PNG,
@@ -49,6 +52,8 @@ class MagicTypeDetector:
     TEXT_MIMES: Final = frozenset(
         {MimeType.PLAIN_TEXT, MimeType.CSV, MimeType.MARKDOWN, MimeType.EMPTY, MimeType.INODE_EMPTY}
     )
+    # Plain-text formats that look alike to libmagic; the extension picks among them.
+    # An e-mail without a Received header is plain text to libmagic, hence EML here.
     TEXT_TYPES: Final = frozenset(
         {
             DetectedType.TXT,
@@ -57,6 +62,7 @@ class MagicTypeDetector:
             DetectedType.TSV,
             DetectedType.YAML,
             DetectedType.HTML,
+            DetectedType.EML,
         }
     )
     OLE_TYPES: Final = frozenset(
@@ -80,7 +86,7 @@ class MagicTypeDetector:
         with path.open("rb") as handle:
             head = handle.read(self.SAMPLE_BYTES)
         sample = FileSample(path, head, self._mime(head), FileExtension.of(source.file_name))
-        binary = self._binary_type(sample)
+        binary = self._email(sample) or self._binary_type(sample)
         if binary is not None:
             return Result.ok(Detection(binary, None, self._mismatch(binary, sample)))
         return self._text(sample)
@@ -96,6 +102,13 @@ class MagicTypeDetector:
         if sample.mime is MimeType.OLE_STORAGE:
             return self._hinted(sample, self.OLE_TYPES)
         return None if sample.mime is None else self.DIRECT.get(sample.mime)
+
+    def _email(self, sample: FileSample) -> DetectedType | None:
+        # libmagic calls an e-mail without a Received header plain text or HTML.
+        first_line = sample.head.split(b"\n", 1)[0]
+        looks_like_header = self.HEADER_LINE.match(first_line) is not None
+        hinted = self._hinted(sample, frozenset({DetectedType.EML}))
+        return hinted if looks_like_header and self.MIME_HEADER in sample.head else None
 
     def _text(self, sample: FileSample) -> Result[Detection, FailureReason]:
         is_text = sample.mime in self.TEXT_MIMES

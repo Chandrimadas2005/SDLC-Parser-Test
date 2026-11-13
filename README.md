@@ -145,3 +145,15 @@ is kept next to the stored file only until the worker has used it, never logged,
 then deleted. A file that already failed as `password_protected` is parsed again when
 it is uploaded with a password. PDFs are supported; encrypted Office files still fail
 as `password_protected` (open point).
+
+## Archives and e-mails
+
+ZIP archives, EML and MSG e-mails are containers: every file inside (archive entries,
+the message body, attachments) is parsed like an upload and appears under its own
+level-1 heading, in order. Archive limits are checked from the table of contents
+before anything is decompressed (`PARSER_ARCHIVE_MAX_FILES`,
+`PARSER_ARCHIVE_MAX_EXPANDED_BYTES`, nesting depth `PARSER_ARCHIVE_MAX_DEPTH`); above
+them the file fails with `limit_exceeded`. Entry names are never used as paths, so
+"zip slip" names are harmless. A part that cannot be parsed adds `element_skipped`
+and makes the result `partial`. E-mail headers (subject, from, to, date) go into the
+file properties.
