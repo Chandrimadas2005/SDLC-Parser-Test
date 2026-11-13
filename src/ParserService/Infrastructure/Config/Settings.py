@@ -60,6 +60,7 @@ class Settings:
         "queue_capacity": EnvironmentVariable.QUEUE_CAPACITY,
         "retention_days": EnvironmentVariable.RETENTION_DAYS,
         "min_free_disk_bytes": EnvironmentVariable.MIN_FREE_DISK_BYTES,
+        "max_batch_files": EnvironmentVariable.MAX_BATCH_FILES,
     }
 
     @classmethod

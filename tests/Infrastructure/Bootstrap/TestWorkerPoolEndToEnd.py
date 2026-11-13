@@ -46,3 +46,19 @@ class TestWorkerPoolEndToEnd:
         total = WorkerPool(loops).run()
         timer.cancel()
         return total
+
+    def test_files_uploaded_together_come_back_as_one_combined_result(self, tmp_path: Path) -> None:
+        container = self._container(tmp_path)
+        with TestClient(container.api()) as client:
+            files = [
+                ("file", (f"part-{n}.md", f"# Part {n}\n".encode(), "text/markdown"))
+                for n in range(3)
+            ]
+            batch = client.post("/v1/parse-jobs", files=files).json()["batch_id"]
+            stop = threading.Event()
+            self._run([WorkerLoop(container.process_next_job(), stop) for _ in range(3)], stop)
+            combined = client.get(f"/v1/parse-batches/{batch}/result").json()
+
+        headings = [file["result"]["elements"][0]["text"] for file in combined["files"]]
+        assert combined["status"] == "succeeded"
+        assert headings == ["Part 0", "Part 1", "Part 2"]

@@ -13,6 +13,7 @@ ROOT: Final = Path(__file__).resolve().parents[2]
 COLLECTION: Final = ROOT / "docs" / "postman" / "parser-service.postman_collection.json"
 BASE_URL: Final = "{{baseUrl}}"
 JOB_ID: Final = "{{jobId}}"
+BATCH_ID: Final = "{{batchId}}"
 
 
 class TestPostmanCollection:
@@ -41,21 +42,28 @@ class TestPostmanCollection:
         container.migrate()
         return TestClient(container.api())
 
+    @staticmethod
+    def _path(url: str, ids: dict[str, str]) -> str:
+        path = url.removeprefix(BASE_URL)
+        for variable, value in ids.items():
+            path = path.replace(variable, value)
+        return path
+
     def test_every_request_uses_the_base_url_variable(self) -> None:
         collection = json.loads(COLLECTION.read_text(encoding="utf-8"))
         variables = {entry[PostmanKey.KEY] for entry in collection[PostmanKey.VARIABLE]}
 
-        assert variables == {"baseUrl", "jobId"}
+        assert variables == {"baseUrl", "jobId", "batchId"}
         assert all(url.startswith(BASE_URL) for _, url in self._requests())
 
     def test_every_request_answers_as_the_collection_expects(self, tmp_path: Path) -> None:
         with self._client(tmp_path) as client:
             submitted = client.post("/v1/parse-jobs", files={"file": ("a.txt", b"Synthetic.\n")})
-            job_id = submitted.json()["job_id"]
+            pair = [("file", ("b.txt", b"First.\n")), ("file", ("c.txt", b"Second.\n"))]
+            batch = client.post("/v1/parse-jobs", files=pair).json()["batch_id"]
+            ids = {JOB_ID: submitted.json()["job_id"], BATCH_ID: batch}
             codes = {
-                (method, url): client.request(
-                    method, url.removeprefix(BASE_URL).replace(JOB_ID, job_id)
-                ).status_code
+                (method, url): client.request(method, self._path(url, ids)).status_code
                 for method, url in self._requests()
                 if method == "GET"
             }

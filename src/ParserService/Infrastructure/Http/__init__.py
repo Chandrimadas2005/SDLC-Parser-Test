@@ -2,6 +2,8 @@
 
 from ParserService.Infrastructure.Http.ApiDependencies import ApiDependencies
 from ParserService.Infrastructure.Http.ApiError import ApiError
+from ParserService.Infrastructure.Http.BatchResponse import BatchResponse
+from ParserService.Infrastructure.Http.BatchResponseField import BatchResponseField
 from ParserService.Infrastructure.Http.ErrorEnvelopeHandler import ErrorEnvelopeHandler
 from ParserService.Infrastructure.Http.ErrorResponse import ErrorResponse
 from ParserService.Infrastructure.Http.FormatsRouter import FormatsRouter
@@ -10,6 +12,7 @@ from ParserService.Infrastructure.Http.HealthRouter import HealthRouter
 from ParserService.Infrastructure.Http.HttpHeader import HttpHeader
 from ParserService.Infrastructure.Http.HttpStatusMapping import HttpStatusMapping
 from ParserService.Infrastructure.Http.MetricsRouter import MetricsRouter
+from ParserService.Infrastructure.Http.ParseBatchesRouter import ParseBatchesRouter
 from ParserService.Infrastructure.Http.ParseJobsRouter import ParseJobsRouter
 from ParserService.Infrastructure.Http.ParseJobStatusResponse import ParseJobStatusResponse
 from ParserService.Infrastructure.Http.ParseJobSubmittedResponse import ParseJobSubmittedResponse
@@ -22,6 +25,8 @@ from ParserService.Infrastructure.Http.RequestIdMiddleware import RequestIdMiddl
 __all__ = [
     "ApiDependencies",
     "ApiError",
+    "BatchResponse",
+    "BatchResponseField",
     "ErrorEnvelopeHandler",
     "ErrorResponse",
     "FormatsRouter",
@@ -30,6 +35,7 @@ __all__ = [
     "HttpHeader",
     "HttpStatusMapping",
     "MetricsRouter",
+    "ParseBatchesRouter",
     "ParseJobStatusResponse",
     "ParseJobSubmittedResponse",
     "ParseJobsRouter",

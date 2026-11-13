@@ -9,6 +9,8 @@ class ApplicationErrorCode(StrEnum):
     """
 
     JOB_NOT_FOUND = "job_not_found"
+    BATCH_NOT_FOUND = "batch_not_found"
+    BATCH_TOO_LARGE = "batch_too_large"
     RESULT_NOT_READY = "result_not_ready"
     RESULT_NOT_FOUND = "result_not_found"
     RETRY_NOT_ALLOWED = "retry_not_allowed"

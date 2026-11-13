@@ -10,6 +10,8 @@ class HttpStatusMapping:
 
     STATUSES: ClassVar[Mapping[ApplicationErrorCode, HTTPStatus]] = {
         ApplicationErrorCode.JOB_NOT_FOUND: HTTPStatus.NOT_FOUND,
+        ApplicationErrorCode.BATCH_NOT_FOUND: HTTPStatus.NOT_FOUND,
+        ApplicationErrorCode.BATCH_TOO_LARGE: HTTPStatus.REQUEST_ENTITY_TOO_LARGE,
         ApplicationErrorCode.RESULT_NOT_FOUND: HTTPStatus.NOT_FOUND,
         ApplicationErrorCode.RESULT_NOT_READY: HTTPStatus.CONFLICT,
         ApplicationErrorCode.RETRY_NOT_ALLOWED: HTTPStatus.CONFLICT,
@@ -23,6 +25,8 @@ class HttpStatusMapping:
     }
     MESSAGES: ClassVar[Mapping[ApplicationErrorCode, str]] = {
         ApplicationErrorCode.JOB_NOT_FOUND: "No parse job has this identifier.",
+        ApplicationErrorCode.BATCH_NOT_FOUND: "No batch has this identifier.",
+        ApplicationErrorCode.BATCH_TOO_LARGE: "Too many files in one upload.",
         ApplicationErrorCode.RESULT_NOT_FOUND: "The stored parse result is missing.",
         ApplicationErrorCode.RESULT_NOT_READY: "The parse result is not ready yet.",
         ApplicationErrorCode.RETRY_NOT_ALLOWED: "Only failed parse jobs can be retried.",
