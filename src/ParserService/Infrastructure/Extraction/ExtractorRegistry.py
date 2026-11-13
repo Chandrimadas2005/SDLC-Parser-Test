@@ -17,6 +17,7 @@ from ParserService.Infrastructure.Extraction.MarkdownBlockReader import Markdown
 from ParserService.Infrastructure.Extraction.MarkdownExtractor import MarkdownExtractor
 from ParserService.Infrastructure.Extraction.PdfDocumentAssembler import PdfDocumentAssembler
 from ParserService.Infrastructure.Extraction.PdfExtractor import PdfExtractor
+from ParserService.Infrastructure.Extraction.PdfPageOcr import PdfPageOcr
 from ParserService.Infrastructure.Extraction.PdfReader import PdfReader
 from ParserService.Infrastructure.Extraction.PlainTextBlockSplitter import PlainTextBlockSplitter
 from ParserService.Infrastructure.Extraction.PlainTextExtractor import PlainTextExtractor
@@ -69,7 +70,9 @@ class ExtractorRegistry:
         reader, builder = TextFileReader(), TextDocumentBuilder()
         splitter, tables = PlainTextBlockSplitter(), TextTableBuilder()
         return {
-            DetectedType.PDF: PdfExtractor(PdfReader(max_pages), PdfDocumentAssembler(splitter)),
+            DetectedType.PDF: PdfExtractor(
+                PdfReader(max_pages, PdfPageOcr.available()), PdfDocumentAssembler(splitter)
+            ),
             DetectedType.DOCX: DocxExtractor(
                 DocxReader(DocxStyleReader()), DocxDocumentAssembler(tables)
             ),

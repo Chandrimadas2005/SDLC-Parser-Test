@@ -17,11 +17,13 @@ from ParserService.Infrastructure.Extraction.ImageExtractor import ImageExtracto
 from ParserService.Infrastructure.Extraction.LibreOfficeConverter import LibreOfficeConverter
 from ParserService.Infrastructure.Extraction.MarkdownBlockReader import MarkdownBlockReader
 from ParserService.Infrastructure.Extraction.MarkdownExtractor import MarkdownExtractor
+from ParserService.Infrastructure.Extraction.OcrConfidence import OcrConfidence
 from ParserService.Infrastructure.Extraction.OcrText import OcrText
 from ParserService.Infrastructure.Extraction.ParsePipeline import ParsePipeline
 from ParserService.Infrastructure.Extraction.PdfContent import PdfContent
 from ParserService.Infrastructure.Extraction.PdfDocumentAssembler import PdfDocumentAssembler
 from ParserService.Infrastructure.Extraction.PdfExtractor import PdfExtractor
+from ParserService.Infrastructure.Extraction.PdfPageOcr import PdfPageOcr
 from ParserService.Infrastructure.Extraction.PdfPageText import PdfPageText
 from ParserService.Infrastructure.Extraction.PdfReader import PdfReader
 from ParserService.Infrastructure.Extraction.PlainTextBlockSplitter import PlainTextBlockSplitter
@@ -67,11 +69,13 @@ __all__ = [
     "LibreOfficeConverter",
     "MarkdownBlockReader",
     "MarkdownExtractor",
+    "OcrConfidence",
     "OcrText",
     "ParsePipeline",
     "PdfContent",
     "PdfDocumentAssembler",
     "PdfExtractor",
+    "PdfPageOcr",
     "PdfPageText",
     "PdfReader",
     "PlainTextBlockSplitter",
