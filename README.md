@@ -101,3 +101,12 @@ Dependencies point inward only: `Infrastructure -> Application -> Domain`.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for the code rules, branch naming, commit format
 and the review process. Nothing is merged to the default branch without lead review.
+
+## Worker concurrency
+
+One worker process parses several files at the same time, each in its own isolated
+process. `PARSER_WORKER_CONCURRENCY` sets how many; when it is blank the worker uses
+(available memory - 512 MB) / `PARSER_JOB_MEMORY_LIMIT_MB`, between 1 and 64, so
+concurrent jobs never ask for more memory than the container has. Jobs beyond that
+wait in the queue and start by themselves when a slot frees up. For more throughput,
+run more worker containers: the queue hands each job to exactly one of them.
