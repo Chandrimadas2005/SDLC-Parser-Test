@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.2",
+  "status": "succeeded",
+  "document": {
+    "file_name": "empty.html",
+    "detected_type": "html",
+    "size_bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "properties": {
+      "encoding": "utf_8"
+    }
+  },
+  "warnings": [],
+  "outline": [],
+  "elements": [],
+  "metrics": {
+    "words": 0,
+    "elements_by_kind": {}
+  }
+}

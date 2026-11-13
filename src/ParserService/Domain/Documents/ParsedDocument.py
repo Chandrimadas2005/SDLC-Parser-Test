@@ -20,7 +20,7 @@ class ParsedDocument:
     ``schemas/``.
     """
 
-    SCHEMA_VERSION: ClassVar[str] = "1.1"
+    SCHEMA_VERSION: ClassVar[str] = "1.2"
 
     status: DocumentStatus
     facts: DocumentFacts

@@ -1,0 +1,139 @@
+{
+  "schema_version": "1.2",
+  "status": "succeeded",
+  "document": {
+    "file_name": "synthetic.html",
+    "detected_type": "html",
+    "size_bytes": 312,
+    "sha256": "b0bb4f8edd217cc10ee10f5ee3037fb462ab135110329e0b3e8d5d61831b89c1",
+    "properties": {
+      "title": "Synthetic"
+    }
+  },
+  "warnings": [
+    {
+      "code": "element_skipped",
+      "locator": {
+        "paragraph": 1
+      }
+    }
+  ],
+  "outline": [
+    {
+      "kind": "heading",
+      "name": "Sample",
+      "level": 1,
+      "locator": {
+        "paragraph": 1,
+        "char_start": 0,
+        "char_end": 6
+      }
+    }
+  ],
+  "elements": [
+    {
+      "id": "e-000001",
+      "kind": "heading",
+      "locator": {
+        "paragraph": 1,
+        "char_start": 0,
+        "char_end": 6
+      },
+      "text": "Sample",
+      "level": 1
+    },
+    {
+      "id": "e-000002",
+      "kind": "paragraph",
+      "locator": {
+        "paragraph": 2,
+        "char_start": 7,
+        "char_end": 30
+      },
+      "text": "Only synthetic content."
+    },
+    {
+      "id": "e-000003",
+      "kind": "list_item",
+      "locator": {
+        "paragraph": 3,
+        "char_start": 31,
+        "char_end": 37
+      },
+      "text": "Parent"
+    },
+    {
+      "id": "e-000004",
+      "kind": "list_item",
+      "locator": {
+        "paragraph": 4,
+        "char_start": 38,
+        "char_end": 43
+      },
+      "text": "Child"
+    },
+    {
+      "id": "e-000005",
+      "kind": "table",
+      "locator": {
+        "paragraph": 5,
+        "char_start": 44,
+        "char_end": 44
+      },
+      "header_row": 1,
+      "header_confidence": 0.95,
+      "rows": [
+        {
+          "row": 2,
+          "cells": {
+            "Key": "Value"
+          }
+        }
+      ],
+      "column_profiles": []
+    },
+    {
+      "id": "e-000006",
+      "kind": "paragraph",
+      "locator": {
+        "paragraph": 6,
+        "char_start": 45,
+        "char_end": 49
+      },
+      "text": "Docs"
+    },
+    {
+      "id": "e-000007",
+      "kind": "image",
+      "locator": {
+        "paragraph": 6,
+        "char_start": 45,
+        "char_end": 49
+      },
+      "text": "Chart",
+      "source": "chart.png"
+    },
+    {
+      "id": "e-000008",
+      "kind": "link",
+      "locator": {
+        "paragraph": 6,
+        "char_start": 45,
+        "char_end": 49
+      },
+      "text": "Docs",
+      "href": "/docs"
+    }
+  ],
+  "metrics": {
+    "words": 8,
+    "elements_by_kind": {
+      "heading": 1,
+      "paragraph": 2,
+      "list_item": 2,
+      "table": 1,
+      "image": 1,
+      "link": 1
+    }
+  }
+}

@@ -107,10 +107,10 @@ class TestParsePipeline:
     ) -> None:
         binary = tmp_path / "blob.txt"
         binary.write_bytes(bytes(range(256)) * 4)
-        html = tmp_path / "page.html"
-        html.write_bytes(b"<!DOCTYPE html><html><body><p>Synthetic page</p></body></html>")
+        image = tmp_path / "scan.png"
+        image.write_bytes(b"\x89PNG\r\n\x1a\n" + b"\0" * 64)
 
-        for path in (binary, html):
+        for path in (binary, image):
             result = self.PIPELINE.parse(SourceFile(str(path), FileName(path.name)))
             assert result.unwrap_err() is FailureReason.UNSUPPORTED_TYPE
 
@@ -125,10 +125,11 @@ class TestParsePipeline:
         DetectedType.TXT,
         DetectedType.MD,
         DetectedType.PPTX,
+        DetectedType.HTML,
+        DetectedType.ODS,
     )
     CONVERTED: Final = (
         DetectedType.ODT,
-        DetectedType.ODS,
         DetectedType.RTF,
         DetectedType.DOC,
         DetectedType.PPT,

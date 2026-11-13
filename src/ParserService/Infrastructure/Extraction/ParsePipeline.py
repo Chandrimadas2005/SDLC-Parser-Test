@@ -1,6 +1,6 @@
 import hashlib
 from pathlib import Path
-from typing import Final
+from typing import Final, Self
 
 from ParserService.Domain.Documents.Detection import Detection
 from ParserService.Domain.Documents.DocumentFacts import DocumentFacts
@@ -12,6 +12,10 @@ from ParserService.Domain.Errors.Result import Result
 from ParserService.Domain.Jobs.FailureReason import FailureReason
 from ParserService.Domain.Jobs.FileHash import FileHash
 from ParserService.Domain.Ports.TypeDetector import TypeDetector
+from ParserService.Infrastructure.Config.Limits import Limits
+from ParserService.Infrastructure.Detection.MagicTypeDetector import MagicTypeDetector
+from ParserService.Infrastructure.Detection.TextEncodingDetector import TextEncodingDetector
+from ParserService.Infrastructure.Detection.ZipContentInspector import ZipContentInspector
 from ParserService.Infrastructure.Extraction.ExtractorRegistry import ExtractorRegistry
 
 
@@ -27,6 +31,22 @@ class ParsePipeline:
     def __init__(self, detector: TypeDetector, registry: ExtractorRegistry) -> None:
         self._detector = detector
         self._registry = registry
+
+    @classmethod
+    def default(cls, limits: Limits | None = None) -> Self:
+        """Build the pipeline with the content-based detector and every extractor.
+
+        Used by the command line tool, so it parses exactly as the worker does.
+
+        Args:
+            limits: The page and archive limits; the defaults when not given.
+
+        Returns:
+            The pipeline.
+        """
+        chosen = limits or Limits()
+        detector = MagicTypeDetector(TextEncodingDetector(), ZipContentInspector())
+        return cls(detector, ExtractorRegistry.default(chosen.max_pages, chosen))
 
     def parse(self, source: SourceFile) -> Result[ParsedDocument, FailureReason]:
         """Parse a file.

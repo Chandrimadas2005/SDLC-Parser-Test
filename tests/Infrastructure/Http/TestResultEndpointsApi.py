@@ -18,7 +18,7 @@ class TestResultEndpointsApi:
         assert job is not None
         pointer = ArtifactKeys().result_json(job.key.file_hash, job.key.parser_version)
         content = (
-            b'{"schema_version":"1.1","status":"succeeded",'
+            b'{"schema_version":"1.2","status":"succeeded",'
             b'"document":{"file_name":"a.txt"},'
             b'"warnings":[],"outline":[],"elements":[],"metrics":{}}'
         )

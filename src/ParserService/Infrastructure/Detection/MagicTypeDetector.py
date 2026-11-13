@@ -23,7 +23,8 @@ class MagicTypeDetector:
 
     Only the first bytes are read, plus the table of contents of ZIP-based files.
     The extension only chooses between types the content cannot tell apart (plain
-    text versus Markdown, or the legacy Office formats); when it disagrees with the
+    text versus Markdown, an HTML fragment that libmagic reports as plain text, or
+    the legacy Office formats); when it disagrees with the
     content, the content wins and an ``extension_mismatch`` warning is added.
     """
 
@@ -49,7 +50,14 @@ class MagicTypeDetector:
         {MimeType.PLAIN_TEXT, MimeType.CSV, MimeType.MARKDOWN, MimeType.EMPTY, MimeType.INODE_EMPTY}
     )
     TEXT_TYPES: Final = frozenset(
-        {DetectedType.TXT, DetectedType.MD, DetectedType.CSV, DetectedType.TSV, DetectedType.YAML}
+        {
+            DetectedType.TXT,
+            DetectedType.MD,
+            DetectedType.CSV,
+            DetectedType.TSV,
+            DetectedType.YAML,
+            DetectedType.HTML,
+        }
     )
     OLE_TYPES: Final = frozenset(
         {DetectedType.DOC, DetectedType.XLS, DetectedType.PPT, DetectedType.MSG}

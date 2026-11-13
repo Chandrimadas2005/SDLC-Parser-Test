@@ -1,0 +1,179 @@
+{
+  "schema_version": "1.2",
+  "status": "succeeded",
+  "document": {
+    "file_name": "normal.ods",
+    "detected_type": "ods",
+    "size_bytes": 1145,
+    "sha256": "e0837ae562a5c00135f7e1ecd998c86c75ed7ac3e2459a3cf0effadda7191c93",
+    "sheet_count": 2,
+    "properties": {
+      "title": "Synthetic requirements",
+      "creator": "Synthetic Author"
+    }
+  },
+  "warnings": [],
+  "outline": [
+    {
+      "kind": "sheet",
+      "name": "Requirements",
+      "hidden": false,
+      "locator": {
+        "sheet": "Requirements",
+        "range": "A1:D7"
+      }
+    },
+    {
+      "kind": "sheet",
+      "name": "Archive",
+      "hidden": true,
+      "locator": {
+        "sheet": "Archive",
+        "range": "A1:A2"
+      }
+    }
+  ],
+  "elements": [
+    {
+      "id": "e-000001",
+      "kind": "table",
+      "locator": {
+        "sheet": "Requirements",
+        "range": "A1:D7"
+      },
+      "header_row": 1,
+      "header_confidence": 1.0,
+      "rows": [
+        {
+          "row": 2,
+          "cells": {
+            "ID": "REQ-0001",
+            "Statement": "Parse HTML",
+            "Estimate": {
+              "value": "3",
+              "formula": "of:=1+2",
+              "calculated_value": 3
+            },
+            "Due": "2026-01-31"
+          }
+        },
+        {
+          "row": 3,
+          "cells": {
+            "ID": "REQ-0002",
+            "Statement": "Shared",
+            "Estimate": "5",
+            "Due": "True"
+          }
+        },
+        {
+          "row": 4,
+          "cells": {
+            "ID": "REQ-0003",
+            "Statement": "Shared",
+            "Estimate": "8",
+            "Due": ""
+          }
+        },
+        {
+          "row": 5,
+          "cells": {
+            "ID": "",
+            "Statement": "",
+            "Estimate": "",
+            "Due": ""
+          }
+        },
+        {
+          "row": 6,
+          "cells": {
+            "ID": "",
+            "Statement": "",
+            "Estimate": "",
+            "Due": ""
+          }
+        },
+        {
+          "row": 7,
+          "cells": {
+            "ID": "Total",
+            "Statement": "Total",
+            "Estimate": {
+              "value": "16",
+              "formula": "of:=SUM([.C2:.C4])",
+              "calculated_value": 16
+            },
+            "Due": ""
+          }
+        }
+      ],
+      "column_profiles": [
+        {
+          "name": "ID",
+          "guessed_type": "text",
+          "fill_rate": 0.6666666666666666,
+          "unique_values": 4,
+          "looks_like_id": false
+        },
+        {
+          "name": "Statement",
+          "guessed_type": "text",
+          "fill_rate": 0.6666666666666666,
+          "unique_values": 3,
+          "looks_like_id": false
+        },
+        {
+          "name": "Estimate",
+          "guessed_type": "number",
+          "fill_rate": 0.6666666666666666,
+          "unique_values": 4,
+          "looks_like_id": false
+        },
+        {
+          "name": "Due",
+          "guessed_type": "mixed",
+          "fill_rate": 0.3333333333333333,
+          "unique_values": 2,
+          "looks_like_id": false
+        }
+      ]
+    },
+    {
+      "id": "e-000002",
+      "kind": "table",
+      "locator": {
+        "sheet": "Archive",
+        "range": "A1:A2"
+      },
+      "header_row": 1,
+      "header_confidence": 1.0,
+      "rows": [
+        {
+          "row": 2,
+          "cells": {
+            "Note": "Archived"
+          }
+        }
+      ],
+      "column_profiles": [
+        {
+          "name": "Note",
+          "guessed_type": "text",
+          "fill_rate": 1.0,
+          "unique_values": 1,
+          "looks_like_id": false
+        }
+      ]
+    }
+  ],
+  "metrics": {
+    "sheets": 2,
+    "rows": 7,
+    "columns": 5,
+    "formulas": 2,
+    "hidden_sheets": 1,
+    "elements_by_kind": {
+      "table": 2
+    }
+  }
+}

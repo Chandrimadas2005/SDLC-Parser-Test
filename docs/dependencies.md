@@ -15,9 +15,11 @@ Shipped in the service image. Checked by CI.
 | Package | Version | Licence | Purpose |
 |---|---|---|---|
 | alembic | 1.20.1 | MIT | Schema migrations, forward and backward |
+| beautifulsoup4 | 4.15.0 | MIT | HTML extractor: parse tree over lxml |
 | charset-normalizer | 3.5.2 | MIT | Encoding detection for text files |
 | fastapi | 0.162.2 | MIT | HTTP API |
-| defusedxml | 0.7.1 | PSF-2.0 | Safe XML parsing of untrusted workbook parts (brief 2.5) |
+| lxml | 6.1.3 | BSD-3-Clause | HTML parser behind beautifulsoup4 (never fetches or runs anything) |
+| defusedxml | 0.7.1 | PSF-2.0 | Safe XML parsing of untrusted workbook parts: XLSX, and the streamed ODS reader (brief 2.5) |
 | openpyxl | 3.1.5 | MIT | Streaming XLSX/XLSM worksheet extraction |
 | pg8000 | 1.31.6 | BSD-3-Clause | Pure-Python PostgreSQL driver |
 | prometheus-client | 0.26.0 | Apache-2.0 | `/metrics` |
@@ -48,8 +50,9 @@ Transitive runtime packages (all inside the allow-list):
 | pydantic-core | 2.50.4 | MIT | pydantic |
 | python-dateutil | 4.0.0 | BSD-3-Clause | pg8000 |
 | scramp | 1.5.0 | MIT-0 | pg8000 |
+| soupsieve | 4.1 | MIT | beautifulsoup4 |
 | starlette | 1.10.0 | BSD-3-Clause | fastapi |
-| typing-extensions | 4.16.0 | PSF-2.0 | pydantic, sqlalchemy |
+| typing-extensions | 4.16.0 | PSF-2.0 | pydantic, sqlalchemy, beautifulsoup4 |
 | typing-inspection | 0.4.5 | MIT | pydantic |
 | tzdata | 2026.6 | Apache-2.0 | alembic |
 

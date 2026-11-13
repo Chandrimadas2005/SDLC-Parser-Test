@@ -12,6 +12,7 @@ from ParserService.Domain.Documents.Element import Element
 from ParserService.Domain.Documents.ElementId import ElementId
 from ParserService.Domain.Documents.ElementKind import ElementKind
 from ParserService.Domain.Documents.ExtractionRequest import ExtractionRequest
+from ParserService.Domain.Documents.ImageSource import ImageSource
 from ParserService.Domain.Documents.Locator import Locator
 from ParserService.Domain.Documents.MetricName import MetricName
 from ParserService.Domain.Documents.Metrics import Metrics
@@ -39,6 +40,7 @@ __all__ = [
     "ElementId",
     "ElementKind",
     "ExtractionRequest",
+    "ImageSource",
     "Locator",
     "MetricName",
     "Metrics",
