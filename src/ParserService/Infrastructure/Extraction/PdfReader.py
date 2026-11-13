@@ -9,6 +9,7 @@ from ParserService.Domain.Documents.OutlineKind import OutlineKind
 from ParserService.Domain.Errors.Result import Result
 from ParserService.Domain.Jobs.FailureReason import FailureReason
 from ParserService.Infrastructure.Extraction.PdfContent import PdfContent
+from ParserService.Infrastructure.Extraction.PdfPageOcr import PdfPageOcr
 from ParserService.Infrastructure.Extraction.PdfPageText import PdfPageText
 
 
@@ -19,13 +20,15 @@ class PdfReader:
     that fails to load is reported as unreadable instead of failing the whole file.
     The page count is checked before any page is read: above ``max_pages`` the file
     is rejected with ``file_too_large`` (brief 2.5).
+    Pages without a text layer (scans) are read with OCR when it is available.
     Macros, scripts and embedded objects are never run: only text is read.
     """
 
     PASSWORD_ERROR: Final = 4
 
-    def __init__(self, max_pages: int | None = None) -> None:
+    def __init__(self, max_pages: int | None = None, ocr: PdfPageOcr | None = None) -> None:
         self._max_pages = max_pages
+        self._ocr = ocr
 
     def read(self, path: Path) -> Result[PdfContent, FailureReason]:
         """Read every page and the outline.
@@ -46,6 +49,7 @@ class PdfReader:
             document.close()
             return Result.err(FailureReason.FILE_TOO_LARGE)
         pages = tuple(self._page(document, index) for index in range(len(document)))
+        pages = self._with_ocr(document, pages)
         outline = self._outline(document)
         document.close()
         return Result.ok(PdfContent(pages, outline))
@@ -64,6 +68,28 @@ class PdfReader:
         text = str(page.get_textpage().get_text_range())
         page.close()
         return PdfPageText(index + 1, text)
+
+    def _with_ocr(
+        self, document: pypdfium2.PdfDocument, pages: tuple[PdfPageText, ...]
+    ) -> tuple[PdfPageText, ...]:
+        if self._ocr is None:
+            return pages
+        blank = [page for page in pages if page.text is not None and not page.text.strip()]
+        read = {
+            page.number: self._ocr_page(document, page.number)
+            for page in blank[: self._ocr.MAX_PAGES]
+        }
+        return tuple(read.get(page.number) or page for page in pages)
+
+    def _ocr_page(self, document: pypdfium2.PdfDocument, number: int) -> PdfPageText | None:
+        if self._ocr is None:
+            return None
+        page = document[number - 1]
+        recognised = self._ocr.recognise(page)
+        page.close()
+        if recognised is None or not recognised.text.strip():
+            return None
+        return PdfPageText(number, recognised.text, recognised.confidence)
 
     @staticmethod
     def _outline(document: pypdfium2.PdfDocument) -> tuple[OutlineEntry, ...]:
