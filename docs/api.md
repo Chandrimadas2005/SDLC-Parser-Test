@@ -121,6 +121,22 @@ Success: `200` with `text/markdown; charset=utf-8`. Errors: `400 invalid_request
 `result_not_found`, `409 result_not_ready` while the job is queued or running, `409 job_failed`
 when the job failed (it will never have a result; read `failure_reason` from the job status).
 
+### `GET /v1/parse-jobs/{id}/result.summary`
+
+Return a short plain-text summary built from the same result (file name, type and
+size, status, outline, counts, opening text and warnings). The summary is kept
+outside the `ParsedDocument` and is never stored on its own; it is rendered on
+request, the same way `/result.md` is (brief, section 2.2). Example body:
+
+```text
+notes.txt (TXT, 128 bytes) parsed as succeeded with 3 elements (paragraph 3).
+Opening text: Synthetic meeting notes for parser tests.
+```
+
+Success: `200` with `text/plain; charset=utf-8`. Errors: `400 invalid_request`,
+`404 job_not_found` or `result_not_found`, `409 result_not_ready` while the job is
+queued or running, `409 job_failed` when the job failed.
+
 ### `POST /v1/parse-jobs/{id}/retry`
 
 Requeue a failed job. No request body is required. Success: `202` with the submitted

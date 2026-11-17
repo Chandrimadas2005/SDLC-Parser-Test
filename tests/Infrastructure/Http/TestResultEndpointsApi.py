@@ -40,6 +40,25 @@ class TestResultEndpointsApi:
         assert markdown.headers["content-type"].startswith("text/markdown")
         assert markdown.text.startswith("# Parsed document")
 
+    def test_result_summary(self, harness: ApiHarness) -> None:
+        job_id, _ = self._completed_job(harness)
+
+        summary = harness.client.get(f"{PATH}/{job_id}/result.summary")
+
+        assert summary.status_code == HTTPStatus.OK
+        assert summary.headers["content-type"].startswith("text/plain")
+        assert "a.txt" in summary.text
+        assert "succeeded" in summary.text
+
+    def test_summary_not_ready_uses_error_envelope(self, harness: ApiHarness) -> None:
+        job_id = harness.client.post(
+            PATH, files={"file": ("a.txt", b"source", "text/plain")}
+        ).json()["job_id"]
+
+        response = harness.client.get(f"{PATH}/{job_id}/result.summary")
+
+        assert response.status_code == HTTPStatus.CONFLICT
+
     def test_result_not_ready_uses_error_envelope(self, harness: ApiHarness) -> None:
         job_id = harness.client.post(
             PATH, files={"file": ("a.txt", b"source", "text/plain")}
