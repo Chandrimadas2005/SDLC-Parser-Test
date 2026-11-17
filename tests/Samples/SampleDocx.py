@@ -26,11 +26,20 @@ class SampleDocx:
             + self._table((("ID", "Owner"), ("REQ-1", "Team A")), marked=True)
             + self._table((("a", "a"), ("1", "2")), marked=False)
         )
-        return self._write(path, body, comments=True)
+        return self._write(path, body, (True, False))
+
+    def footnote(self, path: Path) -> Path:
+        """A paragraph with a footnote reference, and the matching footnotes part."""
+        body = (
+            self._p("Synthetic report", "Title") + "<w:p><w:r><w:t>See the note</w:t></w:r>"
+            '<w:r><w:footnoteReference w:id="1"/></w:r>'
+            "<w:r><w:t>.</w:t></w:r></w:p>"
+        )
+        return self._write(path, body, (False, True))
 
     def empty(self, path: Path) -> Path:
         """A document whose body has no content."""
-        return self._write(path, "", comments=False)
+        return self._write(path, "", (False, False))
 
     def corrupted(self, path: Path) -> Path:
         """A DOCX package whose main part is not well-formed XML."""
@@ -56,20 +65,33 @@ class SampleDocx:
             + "</w:tbl>"
         )
 
-    def _write(self, path: Path, body: str, *, comments: bool) -> Path:
+    def _write(
+        self, path: Path, body: str, parts_flags: tuple[bool, bool] = (False, False)
+    ) -> Path:
+        comments, footnotes = parts_flags
         parts = {
             "word/document.xml": f"<w:document {self.W}><w:body>{body}</w:body></w:document>",
             "word/styles.xml": f"<w:styles {self.W}>{self._styles()}</w:styles>",
         }
+        parts |= self._optional_parts(comments=comments, footnotes=footnotes)
+        with zipfile.ZipFile(path, "w") as package:
+            for name, xml in parts.items():
+                package.writestr(zipfile.ZipInfo(name, self.STAMP), xml)
+        return path
+
+    def _optional_parts(self, *, comments: bool, footnotes: bool) -> dict[str, str]:
+        parts = {}
         if comments:
             parts["word/comments.xml"] = (
                 f'<w:comments {self.W}><w:comment w:id="0"><w:p><w:r>'
                 "<w:t>Synthetic reviewer note</w:t></w:r></w:p></w:comment></w:comments>"
             )
-        with zipfile.ZipFile(path, "w") as package:
-            for name, xml in parts.items():
-                package.writestr(zipfile.ZipInfo(name, self.STAMP), xml)
-        return path
+        if footnotes:
+            parts["word/footnotes.xml"] = (
+                f'<w:footnotes {self.W}><w:footnote w:id="1"><w:p><w:r>'
+                "<w:t>Synthetic footnote text</w:t></w:r></w:p></w:footnote></w:footnotes>"
+            )
+        return parts
 
     @staticmethod
     def _styles() -> str:

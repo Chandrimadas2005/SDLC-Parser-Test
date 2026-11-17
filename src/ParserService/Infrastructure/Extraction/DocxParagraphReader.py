@@ -31,8 +31,13 @@ class DocxParagraphReader:
         """
         style = self._style(paragraph)
         comments = tuple(mark.get(WordTag.ID, "") for mark in paragraph.iter(WordTag.COMMENT_START))
+        footnotes = tuple(
+            mark.get(WordTag.ID, "") for mark in paragraph.iter(WordTag.FOOTNOTE_REFERENCE)
+        )
         is_list = paragraph.find(f".//{WordTag.NUMBERING}") is not None or style in self._lists
-        return DocxParagraph(self.text(paragraph), self._level(paragraph, style), is_list, comments)
+        return DocxParagraph(
+            self.text(paragraph), self._level(paragraph, style), is_list, comments, footnotes
+        )
 
     def text(self, element: Element) -> str:
         """The accepted text inside an element: text runs, tabs and line breaks.

@@ -10,6 +10,7 @@ from ParserService.Application.UseCases.GetFailedParseJobs import GetFailedParse
 from ParserService.Application.UseCases.GetParseBatch import GetParseBatch
 from ParserService.Application.UseCases.GetParseJobResult import GetParseJobResult
 from ParserService.Application.UseCases.GetParseJobStatus import GetParseJobStatus
+from ParserService.Application.UseCases.GetParseJobSummary import GetParseJobSummary
 from ParserService.Application.UseCases.JobServices import JobServices
 from ParserService.Application.UseCases.ProcessNextJob import ProcessNextJob
 from ParserService.Application.UseCases.RecoverRunningJobs import RecoverRunningJobs
@@ -28,6 +29,9 @@ from ParserService.Infrastructure.Isolation.IsolatedDocumentParser import Isolat
 from ParserService.Infrastructure.Isolation.IsolatedParseRunner import IsolatedParseRunner
 from ParserService.Infrastructure.Isolation.WorkerLimits import WorkerLimits
 from ParserService.Infrastructure.Logging.ServiceMetrics import ServiceMetrics
+from ParserService.Infrastructure.Output.ParsedDocumentSummaryRenderer import (
+    ParsedDocumentSummaryRenderer,
+)
 from ParserService.Infrastructure.Persistence.DatabaseEngineFactory import DatabaseEngineFactory
 from ParserService.Infrastructure.Persistence.JobRecordMapper import JobRecordMapper
 from ParserService.Infrastructure.Persistence.MigrationRunner import MigrationRunner
@@ -108,6 +112,7 @@ class ServiceContainer:
             metrics=self.metrics,
             submit_parse_batch=SubmitParseBatch(submit, batches, max_files),
             get_parse_batch=GetParseBatch(batches, statuses, results),
+            get_parse_job_summary=GetParseJobSummary(results, ParsedDocumentSummaryRenderer()),
         )
 
     def _job_use_cases(

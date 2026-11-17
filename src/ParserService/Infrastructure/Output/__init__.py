@@ -9,6 +9,9 @@ from ParserService.Infrastructure.Output.ParsedDocumentJsonEncoder import (
 from ParserService.Infrastructure.Output.ParsedDocumentMarkdownRenderer import (
     ParsedDocumentMarkdownRenderer,
 )
+from ParserService.Infrastructure.Output.ParsedDocumentSummaryRenderer import (
+    ParsedDocumentSummaryRenderer,
+)
 
 __all__ = [
     "JsonObject",
@@ -16,4 +19,5 @@ __all__ = [
     "OutputField",
     "ParsedDocumentJsonEncoder",
     "ParsedDocumentMarkdownRenderer",
+    "ParsedDocumentSummaryRenderer",
 ]

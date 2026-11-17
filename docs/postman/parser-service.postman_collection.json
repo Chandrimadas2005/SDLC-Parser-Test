@@ -273,6 +273,37 @@
           ]
         },
         {
+          "name": "Job result (Summary)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v1/parse-jobs/{{jobId}}/result.summary",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "parse-jobs",
+                "{{jobId}}",
+                "result.summary"
+              ]
+            },
+            "description": "A short plain-text summary built from the result alone (file, status, outline, counts, opening text, warnings). Returns 409 until the worker has finished; run Job status first."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"200 when finished, 409 while still running\", () => pm.expect(pm.response.code).to.be.oneOf([200, 409]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
           "name": "Retry a failed job",
           "request": {
             "method": "POST",

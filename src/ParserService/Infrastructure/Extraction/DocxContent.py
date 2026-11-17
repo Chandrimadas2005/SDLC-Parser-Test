@@ -7,9 +7,10 @@ from ParserService.Infrastructure.Extraction.DocxTable import DocxTable
 
 @dataclass(frozen=True, slots=True)
 class DocxContent:
-    """What was read from a DOCX: body blocks in order, comments and tracked-change counts."""
+    """What was read from a DOCX: body blocks in order, notes and tracked-change counts."""
 
     blocks: tuple[DocxParagraph | DocxTable, ...]
     comments: Mapping[str, str]
+    footnotes: Mapping[str, str]
     insertions: int
     deletions: int

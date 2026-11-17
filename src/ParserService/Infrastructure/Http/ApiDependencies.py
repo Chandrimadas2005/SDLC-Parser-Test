@@ -5,6 +5,7 @@ from ParserService.Application.UseCases.GetFailedParseJobs import GetFailedParse
 from ParserService.Application.UseCases.GetParseBatch import GetParseBatch
 from ParserService.Application.UseCases.GetParseJobResult import GetParseJobResult
 from ParserService.Application.UseCases.GetParseJobStatus import GetParseJobStatus
+from ParserService.Application.UseCases.GetParseJobSummary import GetParseJobSummary
 from ParserService.Application.UseCases.RetryParseJob import RetryParseJob
 from ParserService.Application.UseCases.SubmitParseBatch import SubmitParseBatch
 from ParserService.Application.UseCases.SubmitParseJob import SubmitParseJob
@@ -29,3 +30,4 @@ class ApiDependencies:
     metrics: ServiceMetrics
     submit_parse_batch: SubmitParseBatch
     get_parse_batch: GetParseBatch
+    get_parse_job_summary: GetParseJobSummary

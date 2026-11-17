@@ -71,9 +71,15 @@ class DocxDocumentAssembler:
                 )
                 continue
             yield from self._paragraph(block, number)
-            for comment_id in block.comment_ids:
-                text = content.comments.get(comment_id)
-                yield ElementKind.COMMENT, Locator(paragraph=number), text, None, None
+            yield from self._notes(content, block, number)
+
+    @staticmethod
+    def _notes(content: DocxContent, block: DocxParagraph, number: int) -> Iterator[_Draft]:
+        locator = Locator(paragraph=number)
+        for comment_id in block.comment_ids:
+            yield ElementKind.COMMENT, locator, content.comments.get(comment_id), None, None
+        for footnote_id in block.footnote_ids:
+            yield ElementKind.FOOTNOTE, locator, content.footnotes.get(footnote_id), None, None
 
     @staticmethod
     def _paragraph(block: DocxParagraph, number: int) -> Iterator[_Draft]:

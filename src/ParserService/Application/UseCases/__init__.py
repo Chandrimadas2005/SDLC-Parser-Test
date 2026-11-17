@@ -8,6 +8,7 @@ from ParserService.Application.UseCases.GetFailedParseJobs import GetFailedParse
 from ParserService.Application.UseCases.GetParseBatch import GetParseBatch
 from ParserService.Application.UseCases.GetParseJobResult import GetParseJobResult
 from ParserService.Application.UseCases.GetParseJobStatus import GetParseJobStatus
+from ParserService.Application.UseCases.GetParseJobSummary import GetParseJobSummary
 from ParserService.Application.UseCases.JobServices import JobServices
 from ParserService.Application.UseCases.ProcessNextJob import ProcessNextJob
 from ParserService.Application.UseCases.RecoverRunningJobs import RecoverRunningJobs
@@ -26,6 +27,7 @@ __all__ = [
     "GetParseBatch",
     "GetParseJobResult",
     "GetParseJobStatus",
+    "GetParseJobSummary",
     "JobServices",
     "ProcessNextJob",
     "RecoverRunningJobs",

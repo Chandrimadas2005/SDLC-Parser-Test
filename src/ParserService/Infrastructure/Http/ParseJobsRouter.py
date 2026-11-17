@@ -99,6 +99,19 @@ class ParseJobsRouter:
             summary="Get Markdown result",
             description="Returns the Markdown rendering; 409 while processing.",
         )
+        self._register_result_summary_route()
+
+    def _register_result_summary_route(self) -> None:
+        self.router.add_api_route(
+            "/{job_id}/result.summary",
+            self.result_summary,
+            methods=["GET"],
+            summary="Get a short summary",
+            description=(
+                "Returns a short plain-text summary built from the result alone; "
+                "409 while processing."
+            ),
+        )
 
     def _register_job_action_routes(self) -> None:
         self.router.add_api_route(
@@ -229,6 +242,20 @@ class ParseJobsRouter:
             raise ApiError(result.unwrap_err())
         markdown = self._markdown.render(result.unwrap())
         return Response(markdown, media_type="text/markdown; charset=utf-8")
+
+    async def result_summary(self, job_id: str) -> Response:
+        """Return a short summary built from the completed result.
+
+        The summary is derived from the same JSON result ``/result`` serves and is
+        never stored on its own, so it never changes the schema or the parse
+        outcome (brief, section 2.2).
+        """
+        summary = await run_in_threadpool(
+            self._dependencies.get_parse_job_summary.execute, self._job_id(job_id)
+        )
+        if summary.is_err:
+            raise ApiError(summary.unwrap_err())
+        return Response(summary.unwrap(), media_type="text/plain; charset=utf-8")
 
     async def retry_job(self, request: Request, job_id: str) -> JSONResponse:
         """Retry a failed job and return its queued state."""

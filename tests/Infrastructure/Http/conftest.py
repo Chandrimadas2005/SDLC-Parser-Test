@@ -14,6 +14,7 @@ from ParserService.Application.UseCases import (
     GetParseBatch,
     GetParseJobResult,
     GetParseJobStatus,
+    GetParseJobSummary,
     JobServices,
     RetryParseJob,
     SubmitParseBatch,
@@ -24,6 +25,7 @@ from ParserService.Domain.Jobs import Instant, ParserVersion
 from ParserService.Infrastructure.Extraction import ExtractorRegistry
 from ParserService.Infrastructure.Http import ApiDependencies, ParserApi, ReadinessCheck
 from ParserService.Infrastructure.Logging import ServiceMetrics
+from ParserService.Infrastructure.Output import ParsedDocumentSummaryRenderer
 from ParserService.Infrastructure.Persistence import DatabaseEngineFactory
 from ParserService.Infrastructure.Storage import StoredBatchStore
 from tests.Fakes import FixedClock, InMemoryArtifactStore, InMemoryJobQueue, InMemoryJobRepository
@@ -48,14 +50,11 @@ def _readiness(tmp_path: Path) -> ReadinessCheck:
 
 
 def _dependencies(services: JobServices, tmp_path: Path) -> ApiDependencies:
-    repository, store = services.repository, services.store
-    submit = SubmitParseJob(services, SubmitPolicy(VERSION, MAX_FILE_SIZE), ArtifactKeys())
-    statuses, results = GetParseJobStatus(repository), GetParseJobResult(repository, store)
-    batches = StoredBatchStore(store)
+    submit, statuses, results, batches = _use_cases(services)
     return ApiDependencies(
         submit_parse_job=submit,
         get_parse_job_status=statuses,
-        get_failed_parse_jobs=GetFailedParseJobs(repository),
+        get_failed_parse_jobs=GetFailedParseJobs(services.repository),
         get_parse_job_result=results,
         retry_parse_job=RetryParseJob(services),
         delete_parse_job=DeleteParseJob(services, ArtifactKeys()),
@@ -65,7 +64,17 @@ def _dependencies(services: JobServices, tmp_path: Path) -> ApiDependencies:
         metrics=ServiceMetrics(),
         submit_parse_batch=SubmitParseBatch(submit, batches, MAX_BATCH_FILES),
         get_parse_batch=GetParseBatch(batches, statuses, results),
+        get_parse_job_summary=GetParseJobSummary(results, ParsedDocumentSummaryRenderer()),
     )
+
+
+def _use_cases(
+    services: JobServices,
+) -> tuple[SubmitParseJob, GetParseJobStatus, GetParseJobResult, StoredBatchStore]:
+    repository, store = services.repository, services.store
+    submit = SubmitParseJob(services, SubmitPolicy(VERSION, MAX_FILE_SIZE), ArtifactKeys())
+    statuses, results = GetParseJobStatus(repository), GetParseJobResult(repository, store)
+    return submit, statuses, results, StoredBatchStore(store)
 
 
 @pytest.fixture
