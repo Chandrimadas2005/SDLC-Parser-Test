@@ -9,3 +9,4 @@ class DocxParagraph:
     level: int | None
     is_list: bool
     comment_ids: tuple[str, ...]
+    footnote_ids: tuple[str, ...] = ()

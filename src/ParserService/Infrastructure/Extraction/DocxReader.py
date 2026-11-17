@@ -48,11 +48,14 @@ class DocxReader:
         )
         body = document.find(WordTag.BODY)
         blocks = () if body is None else tuple(self._block(reader, node) for node in body)
-        comments = self._comments(reader, self._optional(package, DocxPart.COMMENTS))
+        comments = self._notes(reader, self._optional(package, DocxPart.COMMENTS), WordTag.COMMENT)
+        footnotes = self._notes(
+            reader, self._optional(package, DocxPart.FOOTNOTES), WordTag.FOOTNOTE
+        )
         inserted = sum(1 for _ in document.iter(WordTag.INSERTION))
         deleted = sum(1 for _ in document.iter(WordTag.DELETION))
         kept = tuple(block for block in blocks if block is not None)
-        return DocxContent(kept, comments, inserted, deleted)
+        return DocxContent(kept, comments, footnotes, inserted, deleted)
 
     @staticmethod
     def _optional(package: zipfile.ZipFile, part: DocxPart) -> Element | None:
@@ -80,10 +83,7 @@ class DocxReader:
         return DocxTable(rows, marked)
 
     @staticmethod
-    def _comments(reader: DocxParagraphReader, comments: Element | None) -> dict[str, str]:
-        if comments is None:
+    def _notes(reader: DocxParagraphReader, root: Element | None, tag: WordTag) -> dict[str, str]:
+        if root is None:
             return {}
-        return {
-            comment.get(WordTag.ID, ""): reader.text(comment)
-            for comment in comments.iter(WordTag.COMMENT)
-        }
+        return {note.get(WordTag.ID, ""): reader.text(note) for note in root.iter(tag)}

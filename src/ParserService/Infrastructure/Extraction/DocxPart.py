@@ -7,3 +7,4 @@ class DocxPart(StrEnum):
     DOCUMENT = "word/document.xml"
     STYLES = "word/styles.xml"
     COMMENTS = "word/comments.xml"
+    FOOTNOTES = "word/footnotes.xml"

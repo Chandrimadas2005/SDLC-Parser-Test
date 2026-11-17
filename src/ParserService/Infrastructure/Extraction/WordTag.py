@@ -27,3 +27,7 @@ class WordTag(StrEnum):
     VAL = "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}val"
     ID = "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}id"
     STYLE_ID = "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}styleId"
+    FOOTNOTE = "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}footnote"
+    FOOTNOTE_REFERENCE = (
+        "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}footnoteReference"
+    )
